@@ -384,17 +384,43 @@ html[lang="ko"] .hero__subtitle {
   scroll-snap-align: center;
 }
 
+.app-preview__slide-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min(92vw, 540px);
+}
+
+.app-preview__slide-title {
+  margin: 0 0 16px;
+  font-size: clamp(0.92rem, 1.8vw, 1rem);
+  font-weight: 600;
+  color: #1a1a1a;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.app-preview__image-card {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  background: #f1efed;
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+}
+
 .app-preview__image {
-  width: min(85%, 420px);
+  width: min(100%, 420px);
   max-width: 420px;
   height: auto;
   aspect-ratio: 3 / 5;
-  border-radius: 20px;
+  border-radius: 18px;
   object-fit: contain;
   object-position: center;
-  background: #fff;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(28, 28, 28, 0.06);
+  background: transparent;
+  box-shadow: none;
+  border: 0;
 }
 
 .app-preview__dots {
@@ -874,6 +900,13 @@ html[lang="ko"] .hero__subtitle {
   .app-preview__slide {
     padding: 0 18px;
   }
+  .app-preview__slide-title {
+    font-size: 0.95rem;
+  }
+  .app-preview__image-card {
+    padding: 18px;
+    border-radius: 20px;
+  }
   .app-preview__image {
     width: min(88vw, 420px);
     border-radius: 24px;
@@ -917,8 +950,13 @@ html[lang="ko"] .hero__subtitle {
   .hero__actions--mobile { padding: 0 16px; }
   .app-preview__inner { padding: 0 16px; }
   .app-preview__slide { padding: 0 10px; }
+  .app-preview__image-card {
+    padding: 14px;
+    border-radius: 18px;
+  }
   .app-preview__image {
     width: min(90vw, 420px);
+    border-radius: 16px;
   }
   .btn {
     width: min(92vw, 320px);

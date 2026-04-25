@@ -32,7 +32,14 @@
     "ios": "iOS Download",
     "previewTitle": "Preview the Blen App",
     "previewHeadline": "The One Match Blen Found",
-    "previewSubtitle": "Preview the connection that fits you best"
+    "previewSubtitle": "Preview the connection that fits you best",
+    "previewSlides": {
+      "one": "Blen AI",
+      "two": "Talk with AI",
+      "three": "My Dating Style Analysis",
+      "four": "Best-Match Recommendations",
+      "five": "AI-Found Perfect Match"
+    }
   },
   "about": {
     "title": "About Blen",

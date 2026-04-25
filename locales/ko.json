@@ -32,7 +32,14 @@
     "ios": "iOS 다운로드",
     "previewTitle": "Blen 앱 미리보기",
     "previewHeadline": "Blen이 찾은 단 하나의 인연",
-    "previewSubtitle": "당신에게 딱 맞는 인연을 미리 만나보세요"
+    "previewSubtitle": "당신에게 딱 맞는 인연을 미리 만나보세요",
+    "previewSlides": {
+      "one": "Blen AI",
+      "two": "AI와의 대화",
+      "three": "나의 연애 성향 분석",
+      "four": "나와 꼭 맞는 인연 추천",
+      "five": "AI가 찾아주는 나의 인연"
+    }
   },
   "about": {
     "title": "Blen 소개",
