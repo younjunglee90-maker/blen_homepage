@@ -39,7 +39,8 @@
       "three": "나의 연애 성향 분석",
       "four": "나와 꼭 맞는 인연 추천",
       "five": "AI가 찾아주는 나의 인연"
-    }
+    },
+    "previewCta": "나의 인연 찾기"
   },
   "about": {
     "title": "Blen 소개",

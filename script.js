@@ -309,6 +309,18 @@ function bindPreviewCarousel() {
   window.addEventListener("resize", updateActiveFromScroll);
 }
 
+function bindPreviewCTA() {
+  const ctaButton = document.querySelector("[data-scroll-to-download]");
+  if (!ctaButton) return;
+
+  ctaButton.addEventListener("click", () => {
+    document.getElementById("download-section")?.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+  });
+}
+
 async function init() {
   const currentLang = getCurrentLang();
   const savedLang = getSavedLang();
@@ -337,6 +349,7 @@ async function init() {
   bindStoreLinks();
   bindSupportForm();
   bindPreviewCarousel();
+  bindPreviewCTA();
 }
 
 if (document.readyState === "loading") {

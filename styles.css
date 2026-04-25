@@ -448,6 +448,39 @@ html[lang="ko"] .hero__subtitle {
   background: #1a1a1a;
 }
 
+.app-preview__cta-wrap {
+  margin-top: 32px;
+  display: flex;
+  justify-content: center;
+}
+
+.app-preview__cta {
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  padding: 16px 28px;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #ffffff;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.app-preview__cta:hover {
+  background: rgba(0, 0, 0, 0.8);
+  transform: scale(1.03);
+}
+
+.app-preview__cta:active {
+  transform: scale(0.97);
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
