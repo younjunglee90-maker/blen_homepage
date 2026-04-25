@@ -239,6 +239,7 @@ body {
 
 .page--home {
   display: block;
+  min-height: auto;
 }
 
 .hero {
@@ -251,6 +252,7 @@ body {
 
 .page--home .hero {
   margin: 0 auto;
+  padding-bottom: clamp(100px, 11vw, 140px);
 }
 
 .hero__art {
@@ -322,8 +324,11 @@ html[lang="ko"] .hero__subtitle {
 .app-preview {
   width: 100%;
   margin-top: 0;
-  padding: clamp(48px, 7vw, 84px) 0 clamp(56px, 8vw, 96px);
+  padding: clamp(80px, 9vw, 108px) 0 clamp(76px, 10vw, 128px);
   background: #f1efed;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
 }
 
 .app-preview__inner {
@@ -343,10 +348,11 @@ html[lang="ko"] .hero__subtitle {
 
 .app-preview__track {
   display: flex;
-  gap: clamp(12px, 2vw, 18px);
+  gap: 0;
   overflow-x: auto;
-  padding: 4px 2px 12px;
+  padding: 4px 0 18px;
   scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
@@ -355,16 +361,25 @@ html[lang="ko"] .hero__subtitle {
   display: none;
 }
 
+.app-preview__slide {
+  flex: 0 0 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 0 clamp(16px, 4vw, 28px);
+  scroll-snap-align: center;
+}
+
 .app-preview__image {
-  flex: 0 0 clamp(220px, 24vw, 272px);
-  width: clamp(220px, 24vw, 272px);
-  height: clamp(390px, 42vw, 484px);
+  width: min(85%, 420px);
+  max-width: 420px;
+  height: auto;
+  aspect-ratio: 3 / 5;
   border-radius: 20px;
   object-fit: contain;
   object-position: center;
   background: #fff;
-  box-shadow: 0 14px 30px rgba(23, 23, 23, 0.08);
-  scroll-snap-align: center;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
   border: 1px solid rgba(28, 28, 28, 0.06);
 }
 
@@ -636,9 +651,13 @@ html[lang="ko"] .hero__subtitle {
 }
 
 .site-footer {
+  position: static;
+  z-index: auto;
+  clear: none;
   width: 100%;
   border-top: 1px solid var(--line);
   padding: 14px 20px 24px;
+  margin-top: 0;
 }
 
 .site-footer__inner {
@@ -798,7 +817,7 @@ html[lang="ko"] .hero__subtitle {
     width: 100%;
   }
   .app-preview {
-    padding: 42px 0 54px;
+    padding: 80px 0 72px;
   }
   .app-preview__inner {
     padding: 0 22px;
@@ -808,15 +827,14 @@ html[lang="ko"] .hero__subtitle {
     margin-bottom: 16px;
   }
   .app-preview__track {
-    gap: 12px;
     padding: 2px 0 8px;
   }
+  .app-preview__slide {
+    padding: 0 18px;
+  }
   .app-preview__image {
-    flex: 0 0 min(78vw, 300px);
-    width: min(78vw, 300px);
-    height: auto;
-    aspect-ratio: 3 / 5;
-    border-radius: 16px;
+    width: min(88vw, 420px);
+    border-radius: 24px;
   }
   .btn {
     width: min(86vw, 320px);
@@ -856,9 +874,9 @@ html[lang="ko"] .hero__subtitle {
   }
   .hero__actions--mobile { padding: 0 16px; }
   .app-preview__inner { padding: 0 16px; }
+  .app-preview__slide { padding: 0 10px; }
   .app-preview__image {
-    flex-basis: min(82vw, 300px);
-    width: min(82vw, 300px);
+    width: min(90vw, 420px);
   }
   .btn {
     width: min(92vw, 320px);
