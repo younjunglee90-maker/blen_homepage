@@ -43,8 +43,40 @@
             data-i18n-attr="aria-label"
             data-i18n-key="common.languageAria"
           >
-            <button type="button" class="site-lang__btn" data-set-lang="en" aria-pressed="false" data-i18n="common.langEng"></button>
-            <button type="button" class="site-lang__btn" data-set-lang="ko" aria-pressed="false" data-i18n="common.langKo"></button>
+            <button
+              type="button"
+              class="site-lang__trigger"
+              aria-expanded="false"
+              aria-controls="language-menu"
+              data-i18n-attr="aria-label"
+              data-i18n-key="common.languageAria"
+            >
+              <span class="site-lang__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2Zm6.92 9h-3.03c-.2-2.18-.98-4.11-2.1-5.46A8.04 8.04 0 0 1 18.92 11ZM12 4.04c1.39 1.48 2.34 3.98 2.55 6.96H9.45c.21-2.98 1.16-5.48 2.55-6.96ZM4.26 13h3.03c.2 2.18.98 4.11 2.1 5.46A8.04 8.04 0 0 1 4.26 13Zm3.03-2H4.26a8.04 8.04 0 0 1 5.13-5.46C8.27 6.89 7.49 8.82 7.29 11Zm4.71 8.96c-1.39-1.48-2.34-3.98-2.55-6.96h5.1c-.21 2.98-1.16 5.48-2.55 6.96ZM14.61 18.46c1.12-1.35 1.9-3.28 2.1-5.46h3.03a8.04 8.04 0 0 1-5.13 5.46Z" fill="currentColor"/>
+                </svg>
+              </span>
+              <span class="site-lang__current" data-lang-current>English</span>
+              <span class="site-lang__chevron" aria-hidden="true">▾</span>
+            </button>
+            <div id="language-menu" class="site-lang__menu" role="menu">
+              <button
+                type="button"
+                class="site-lang__btn"
+                data-set-lang="en"
+                aria-pressed="false"
+                role="menuitemradio"
+                data-i18n="common.langEng"
+              ></button>
+              <button
+                type="button"
+                class="site-lang__btn"
+                data-set-lang="ko"
+                aria-pressed="false"
+                role="menuitemradio"
+                data-i18n="common.langKo"
+              ></button>
+            </div>
           </div>
         </nav>
       </div>
