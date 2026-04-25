@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Redirecting…</title>
+    <script>
+      (function () {
+        var lang = localStorage.getItem('blen-lang');
+        if (lang !== 'ko' && lang !== 'en') lang = 'en';
+        location.replace('/' + lang + '/about/');
+      })();
+    </script>
+  </head>
+  <body></body>
+</html>

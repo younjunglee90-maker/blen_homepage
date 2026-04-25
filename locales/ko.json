@@ -1,0 +1,268 @@
+{
+  "meta": {
+    "titleHome": "Blen | 데이트, 채팅, 새로운 만남",
+    "titleAbout": "회사소개 | Blen",
+    "titleTerms": "이용약관 | Blen",
+    "titlePrivacy": "개인정보처리방침 | Blen",
+    "titleSupport": "고객센터 | Blen"
+  },
+  "common": {
+    "languageAria": "언어 선택",
+    "navAria": "주요 메뉴",
+    "navHome": "홈",
+    "navAbout": "소개",
+    "navSupport": "고객센터",
+    "menuToggle": "메뉴 열기",
+    "langEng": "ENG",
+    "langKo": "KO",
+    "footerAbout": "회사소개",
+    "footerTerms": "이용약관",
+    "footerPrivacy": "개인정보처리방침",
+    "footerSupport": "고객센터",
+    "copyright": "© 2026 Aether Global LLC"
+  },
+  "home": {
+    "heroAria": "Blen 소개",
+    "heroAlt": "Blen 일러스트 이미지",
+    "title": "Blen",
+    "subtitleLine1": "AI가 당신의 성향을 깊이 이해하고,",
+    "subtitleLine2": "가장 잘 맞는 상대를 찾아드립니다.",
+    "downloadAria": "다운로드 링크",
+    "android": "안드로이드 다운로드",
+    "ios": "iOS 다운로드",
+    "features": {
+      "title": "Blen 주요 기능 미리보기",
+      "subtitle": "앱의 핵심 화면을 좌우로 넘겨 확인해 보세요.",
+      "items": [
+        "AI 대화 기반 성향 분석",
+        "가치관 & 연애 스타일 매칭",
+        "나와 가장 잘 맞는 상대 추천",
+        "자연스러운 대화형 매칭 경험",
+        "AI 기반 관계 인사이트"
+      ]
+    }
+  },
+  "about": {
+    "title": "Blen 소개",
+    "description": "Blen은 인공지능 기반으로 사람들의 성향과 가치관을 분석하여 더 의미 있는 인연을 찾을 수 있도록 돕는 매칭 플랫폼입니다.",
+    "missionTitle": "우리의 미션",
+    "missionIntro": "우리는 좋은 관계는 '이해'에서 시작된다고 믿습니다.",
+    "missionBody": "Blen은 AI를 통해 이용자의 성향, 가치관, 라이프스타일을 깊이 있게 분석하고, 가장 잘 맞는 사람을 연결하는 것을 목표로 합니다.",
+    "whatWeDoTitle": "우리가 하는 일",
+    "whatWeDoBody": "Blen은 이용자의 응답 데이터를 기반으로 AI 분석을 수행하여 개인 맞춤형 인사이트와 매칭 결과를 제공합니다.",
+    "serviceIncludesTitle": "서비스에는 다음이 포함됩니다:",
+    "serviceIncludes": {
+      "analysis": "AI 성향 및 가치관 분석",
+      "compatibility": "궁합 분석",
+      "recommendations": "맞춤형 매칭 추천",
+      "experience": "더 신중하고 의미 있는 매칭 경험"
+    },
+    "approachTitle": "우리의 접근 방식",
+    "approachIntro": "기존의 외모 중심, 스와이프 중심의 매칭 방식과 달리 Blen은 보다 깊은 궁합과 연결에 집중합니다.",
+    "prioritizeTitle": "우리는 다음 요소를 중요하게 생각합니다:",
+    "priorities": {
+      "valuesGoals": "가치관과 인생 방향",
+      "emotional": "감정 및 커뮤니케이션 스타일",
+      "lifestyle": "라이프스타일의 조화"
+    },
+    "approachGoal": "피상적인 매칭을 넘어, 진짜 연결을 만드는 것이 목표입니다.",
+    "importantNoteTitle": "안내",
+    "importantNoteBody": "Blen의 AI 분석 및 매칭 결과는 참고용으로 제공되며, 관계 형성이나 결과에 대한 보장을 하지 않습니다.",
+    "contactTitle": "문의",
+    "contactEmail": "hello@blenmatch.com"
+  },
+  "terms": {
+    "title": "이용약관",
+    "legalTitle": "블렌 이용약관 (Terms of Service)",
+    "subtitle": "최종 업데이트: 2026.04.22",
+    "intro1": "본 이용약관(이하 \"약관\")은 블렌(Blen, 이하 \"서비스\")이 제공하는 인공지능 기반 매칭 서비스의 이용과 관련하여 서비스 제공자와 이용자 간의 권리, 의무 및 책임사항을 규정합니다.",
+    "intro2": "이용자가 회원가입 또는 서비스를 이용하는 경우 본 약관에 동의한 것으로 간주됩니다.",
+    "section1": {
+      "title": "제1조 서비스 목적",
+      "body1": "블렌은 인공지능(AI)을 활용하여 이용자의 성향, 가치관 및 라이프스타일 정보를 분석하고 이를 기반으로 이용자 간 매칭을 추천하는 서비스를 제공합니다.",
+      "body2": "서비스에는 다음 기능이 포함될 수 있습니다:",
+      "items": {
+        "aiPersonality": "AI 성향 분석",
+        "compatibility": "궁합 분석",
+        "recommendations": "매칭 추천",
+        "messaging": "사용자 간 메시지 기능"
+      },
+      "note": "블렌의 AI 매칭 결과는 참고 정보로 제공되며 이에 대한 책임을 지지 않습니다."
+    },
+    "section2": {
+      "title": "제2조 이용 자격",
+      "body1": "블렌 서비스는 만 19세 이상 이용자만 이용할 수 있습니다.",
+      "body2": "미성년자의 가입 및 이용은 금지됩니다.",
+      "body3": "다음 절차가 요구될 수 있습니다:",
+      "items": {
+        "phone": "휴대폰 본인 인증",
+        "identity": "실명 확인",
+        "dob": "생년월일 확인"
+      },
+      "note": "위반 시 계정은 삭제될 수 있습니다."
+    },
+    "section3": {
+      "title": "제3조 회원가입",
+      "steps": {
+        "step1": "회원 정보 입력",
+        "step2": "약관 동의",
+        "step3": "개인정보 동의",
+        "step4": "프로필 생성"
+      },
+      "note": "허위 정보 제공 시 서비스 이용이 제한될 수 있습니다."
+    },
+    "section4": {
+      "title": "제4조 이용자의 의무",
+      "body": "다음 행위 금지:",
+      "items": {
+        "impersonation": "타인 사칭",
+        "fakeProfile": "허위 프로필",
+        "spam": "스팸 메시지",
+        "harassment": "성적 괴롭힘",
+        "stalking": "스토킹",
+        "illegal": "불법 행위",
+        "hacking": "해킹 시도"
+      }
+    },
+    "section5": {
+      "title": "제5조 사용자 콘텐츠",
+      "body1": "프로필, 사진, 메시지, 설문 응답 제공 가능",
+      "body2": "이용자는 콘텐츠에 대한 권리를 가지며 타인의 권리를 침해하면 안 됩니다."
+    },
+    "section6": {
+      "title": "제6조 AI 매칭 서비스",
+      "body1": "AI 기반 추천이며 결과는 참고용입니다.",
+      "body2": "다음 보장하지 않음:",
+      "items": {
+        "relationship": "관계 형성",
+        "accuracy": "정확성",
+        "satisfaction": "만족도"
+      }
+    },
+    "section7": {
+      "title": "제7조 유료 서비스",
+      "body1": "추가 매칭권 제공",
+      "price": "가격: 3,900원 (VAT 포함)"
+    },
+    "section8": {
+      "title": "제8조 환불 정책",
+      "items": {
+        "used": "사용 시 환불 불가",
+        "unused": "미사용 시 3일 이내 환불 가능 (플랫폼 정책 따름)"
+      }
+    },
+    "section9": {
+      "title": "제9조 결제",
+      "items": {
+        "apple": "Apple App Store",
+        "google": "Google Play",
+        "pg": "PG 결제"
+      },
+      "note": "플랫폼 정책 따름"
+    },
+    "section10": {
+      "title": "제10조 이용 제한",
+      "body": "약관 위반, 불법 행위 등 시 제한 가능"
+    },
+    "section11": {
+      "title": "제11조 이용자 보호",
+      "items": {
+        "accountDeletion": "계정 삭제 기능 제공"
+      }
+    },
+    "section12": {
+      "title": "제12조 책임 제한",
+      "body": "분쟁, 오프라인 사건, 정보 정확성, AI 결과에 대해 책임 없음"
+    },
+    "section13": {
+      "title": "제13조 계정 삭제",
+      "body": "언제든 삭제 가능"
+    },
+    "section14": {
+      "title": "제14조 약관 변경",
+      "body": "공지 후 변경 가능"
+    },
+    "section15": {
+      "title": "제15조 준거법",
+      "body": "대한민국 법 적용"
+    },
+    "contact": {
+      "title": "문의",
+      "email": "hello@blenmatch.com"
+    }
+  },
+  "privacy": {
+    "title": "개인정보처리방침",
+    "legalTitle": "개인정보 처리방침 (개인정보 수집 및 이용)",
+    "section1": {
+      "title": "1. 개인정보 수집 및 이용 항목",
+      "table": {
+        "headers": {
+          "category": "구분",
+          "info": "수집 항목",
+          "purpose": "이용 목적"
+        },
+        "required": {
+          "category": "필수",
+          "info": "이메일, 닉네임, 생년월일, 성별, IP 주소, 기기 정보, 앱 사용 기록",
+          "purpose": "회원 가입 및 관리, 본인 확인, 서비스 보안 및 부정 이용 방지"
+        },
+        "optional": {
+          "category": "선택",
+          "info": "프로필 사진, 성향 설문 응답(가치관, 취향 등), 매칭 관련 데이터",
+          "purpose": "AI 기반 맞춤형 매칭 서비스 제공, 서비스 개인화 및 개선"
+        }
+      }
+    },
+    "section2": {
+      "title": "2. 민감정보 수집 및 이용 (별도 동의)",
+      "collected": "수집 항목: 종교",
+      "purpose": "이용 목적: AI 매칭 알고리즘 반영 및 정교한 프로필 매칭 서비스 제공",
+      "note": "귀하는 본 동의를 거부할 권리가 있으며, 거부 시 해당 정보를 바탕으로 한 매칭 기능이 제한될 수 있습니다."
+    },
+    "section3": {
+      "title": "3. 개인정보의 보유 및 이용 기간",
+      "intro": "이용자의 개인정보는 원칙적으로 회원 탈퇴 시까지 보관 후 지체 없이 파기합니다. 단, 관련 법령에 따라 아래 정보는 명시된 기간 동안 보존합니다:",
+      "items": {
+        "logs": "서비스 이용 기록, 접속 로그, 접속 IP: 3개월 (통신비밀보호법)",
+        "disputes": "소비자의 불만 또는 분쟁처리에 관한 기록: 3년 (전자상거래법)"
+      }
+    },
+    "section4": {
+      "title": "4. 동의 거부 권리 및 불이익 고지",
+      "intro": "이용자는 개인정보 수집 및 이용에 대한 동의를 거부할 수 있습니다. 단:",
+      "items": {
+        "required": "필수 정보 제공에 동의하지 않을 경우 서비스 이용(가입)이 제한될 수 있습니다",
+        "optional": "선택 정보 및 민감 정보 미동의 시 해당 정보를 기반으로 한 맞춤형 매칭 기능이 제한될 수 있습니다"
+      }
+    },
+    "section5": {
+      "title": "5. 문의처",
+      "email": "이메일: hello@blenmatch.com",
+      "dpo": "개인정보 보호책임자: 이윤정 (YOUNJUNG LEE)"
+    },
+    "effectiveDate": "시행일: 2026년 4월 22일"
+  },
+  "support": {
+    "title": "고객센터",
+    "subtitle": "문의사항이 있으시면 아래 양식을 통해 언제든지 연락해 주세요.",
+    "contactEmailLabel": "문의 메일주소",
+    "businessHoursLabel": "영업시간",
+    "businessHoursValue": "월요일~금요일 오전 10시 ~ 오후 4시",
+    "form": {
+      "nameLabel": "이름",
+      "namePlaceholder": "이름을 입력하세요",
+      "emailLabel": "이메일",
+      "emailPlaceholder": "이메일을 입력하세요",
+      "messageLabel": "문의사항",
+      "messagePlaceholder": "문의 내용을 입력하세요",
+      "sendButton": "보내기",
+      "helperText": "보내기를 누르면 이메일로 문의하실 수 있습니다.",
+      "requiredAlert": "모든 항목을 입력해 주세요.",
+      "subjectPrefix": "문의 -",
+      "bodyNameLabel": "이름",
+      "bodyEmailLabel": "이메일",
+      "bodyMessageLabel": "문의 내용"
+    }
+  }
+}

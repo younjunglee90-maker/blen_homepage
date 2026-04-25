@@ -1,0 +1,433 @@
+---
+pid: 73867
+cwd: /Users/younjunglee/Desktop/Cursor_WS/homepage_app
+last_command: rm -rf .git
+last_exit_code: 0
+---
+younjunglee@younjungs-MacBook-Pro Landing page % open "/Users/younjunglee/.cursor/projects/Users-younjunglee-Desktop-Blen-Landing-page"
+
+younjunglee@younjungs-MacBook-Pro Landing page % cd /Users/younjunglee/Desktop/Cursor_WS/homepage_app
+npm install
+npm run devㅍ
+
+up to date, audited 361 packages in 3s
+
+144 packages are looking for funding
+  run `npm fund` for details
+
+2 vulnerabilities (1 moderate, 1 high)
+
+To address all issues, run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+npm error Missing script: "devㅍ"
+npm error
+npm error Did you mean this?
+npm error   npm run dev # run the "dev" package script
+npm error
+npm error To see a list of scripts, run:
+npm error   npm run
+npm error A complete log of this run can be found in: /Users/younjunglee/.npm/_logs/2026-04-25T09_44_20_340Z-debug-0.log
+younjunglee@younjungs-MacBook-Pro homepage_app % http://localhost:3000
+younjunglee@younjungs-MacBook-Pro homepage_app % 
+younjunglee@younjungs-MacBook-Pro homepage_app % 
+younjunglee@younjungs-MacBook-Pro homepage_app % git add .
+git commit -m "update landing page UI"
+git push
+[main b6f2b22] update landing page UI
+ Committer: younjung lee <younjunglee@younjungs-MacBook-Pro.local>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly. Run the
+following command and follow the instructions in your editor to edit
+your configuration file:
+
+    git config --global --edit
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 11 files changed, 1258 insertions(+), 78 deletions(-)
+ create mode 100644 app/components/About.tsx
+ create mode 100644 app/components/Contact.tsx
+ create mode 100644 app/components/Footer.tsx
+ create mode 100644 app/components/Header.tsx
+ create mode 100644 app/components/Hero.tsx
+ create mode 100644 app/components/Products.tsx
+ create mode 100644 public/images/hero-couple.jpg
+fatal: No configured push destination.
+Either specify the URL from the command-line or configure a remote repository using
+
+    git remote add <name> <url>
+
+and then push using the remote name
+
+    git push <name>
+
+younjunglee@younjungs-MacBook-Pro homepage_app % git remote add origin https://github.com/younjunglee90-maker/blen_landingpage/upload/main
+younjunglee@younjungs-MacBook-Pro homepage_app % git push -u origin main
+fatal: https://github.com/younjunglee90-maker/blen_landingpage/upload/main/info/refs not valid: is this a git repository?
+younjunglee@younjungs-MacBook-Pro homepage_app % git remote remove origin
+younjunglee@younjungs-MacBook-Pro homepage_app % git remote add origin https://github.com/younjunglee90-maker/blen_landingpage.git
+younjunglee@younjungs-MacBook-Pro homepage_app % git push -u origin main
+gh auth login
+^C
+younjunglee@younjungs-MacBook-Pro homepage_app % gh auth login
+zsh: command not found: gh
+younjunglee@younjungs-MacBook-Pro homepage_app % git push -u origin main
+To https://github.com/younjunglee90-maker/blen_landingpage.git
+ ! [rejected]        main -> main (fetch first)
+error: failed to push some refs to 'https://github.com/younjunglee90-maker/blen_landingpage.git'
+hint: Updates were rejected because the remote contains work that you do
+hint: not have locally. This is usually caused by another repository pushing
+hint: to the same ref. You may want to first integrate the remote changes
+hint: (e.g., 'git pull ...') before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+younjunglee@younjungs-MacBook-Pro homepage_app % git pull origin main --allow-unrelated-histories
+remote: Enumerating objects: 284, done.
+remote: Counting objects: 100% (284/284), done.
+remote: Compressing objects: 100% (255/255), done.
+remote: Total 284 (delta 135), reused 0 (delta 0), pack-reused 0 (from 0)
+Receiving objects: 100% (284/284), 1.16 MiB | 7.11 MiB/s, done.
+Resolving deltas: 100% (135/135), done.
+From https://github.com/younjunglee90-maker/blen_landingpage
+ * branch            main       -> FETCH_HEAD
+ * [new branch]      main       -> origin/main
+hint: You have divergent branches and need to specify how to reconcile them.
+hint: You can do so by running one of the following commands sometime before
+hint: your next pull:
+hint: 
+hint:   git config pull.rebase false  # merge
+hint:   git config pull.rebase true   # rebase
+hint:   git config pull.ff only       # fast-forward only
+hint: 
+hint: You can replace "git config" with "git config --global" to set a default
+hint: preference for all repositories. You can also pass --rebase, --no-rebase,
+hint: or --ff-only on the command line to override the configured default per
+hint: invocation.
+fatal: Need to specify how to reconcile divergent branches.
+younjunglee@younjungs-MacBook-Pro homepage_app % git push -u origin main
+To https://github.com/younjunglee90-maker/blen_landingpage.git
+ ! [rejected]        main -> main (non-fast-forward)
+error: failed to push some refs to 'https://github.com/younjunglee90-maker/blen_landingpage.git'
+hint: Updates were rejected because the tip of your current branch is behind
+hint: its remote counterpart. Integrate the remote changes (e.g.
+hint: 'git pull ...') before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+younjunglee@younjungs-MacBook-Pro homepage_app % git push -u origin main --force                               
+Enumerating objects: 40, done.
+Counting objects: 100% (40/40), done.
+Delta compression using up to 12 threads
+Compressing objects: 100% (38/38), done.
+Writing objects: 100% (40/40), 365.99 KiB | 6.31 MiB/s, done.
+Total 40 (delta 3), reused 0 (delta 0), pack-reused 0
+remote: Resolving deltas: 100% (3/3), done.
+To https://github.com/younjunglee90-maker/blen_landingpage.git
+ + 0a653ac...b6f2b22 main -> main (forced update)
+branch 'main' set up to track 'origin/main'.
+younjunglee@younjungs-MacBook-Pro homepage_app % git push -u origin main
+branch 'main' set up to track 'origin/main'.
+Everything up-to-date
+younjunglee@younjungs-MacBook-Pro homepage_app % git status
+On branch main
+Your branch is up to date with 'origin/main'.
+
+nothing to commit, working tree clean
+younjunglee@younjungs-MacBook-Pro homepage_app % 
+younjunglee@younjungs-MacBook-Pro homepage_app % 
+younjunglee@younjungs-MacBook-Pro homepage_app % git status
+git push
+On branch main
+Your branch is up to date with 'origin/main'.
+
+nothing to commit, working tree clean
+Everything up-to-date
+younjunglee@younjungs-MacBook-Pro homepage_app % 
+younjunglee@younjungs-MacBook-Pro homepage_app % git add .
+git commit -m "latest UI update"
+git push
+On branch main
+Your branch is up to date with 'origin/main'.
+
+nothing to commit, working tree clean
+To https://github.com/younjunglee90-maker/blen_landingpage.git
+ ! [rejected]        main -> main (fetch first)
+error: failed to push some refs to 'https://github.com/younjunglee90-maker/blen_landingpage.git'
+hint: Updates were rejected because the remote contains work that you do
+hint: not have locally. This is usually caused by another repository pushing
+hint: to the same ref. You may want to first integrate the remote changes
+hint: (e.g., 'git pull ...') before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+younjunglee@younjungs-MacBook-Pro homepage_app % git pull origin main --allow-unrelated-histories
+remote: Enumerating objects: 54, done.
+remote: Counting objects: 100% (54/54), done.
+remote: Compressing objects: 100% (43/43), done.
+remote: Total 53 (delta 8), reused 0 (delta 0), pack-reused 0 (from 0)
+Unpacking objects: 100% (53/53), 798.74 KiB | 7.33 MiB/s, done.
+From https://github.com/younjunglee90-maker/blen_landingpage
+ * branch            main       -> FETCH_HEAD
+   b6f2b22..4c92791  main       -> origin/main
+Updating b6f2b22..4c92791
+Fast-forward
+ CNAME                                                                                     |    1 +
+ about.html                                                                                |   15 +
+ about/index.html                                                                          |   76 ++++
+ assets/1-14089a39-42ff-468c-948e-a6d71b0edb54.png                                         |  Bin 0 -> 61180 bytes
+ assets/1-38d08bc8-a223-464c-90d6-05cf2c0de542.png                                         |  Bin 0 -> 75379 bytes
+ assets/1-3c04527c-b53c-4562-a795-262c4e94e1b1.png                                         |  Bin 0 -> 75379 bytes
+ assets/2-1e0e6ae7-7279-4521-be42-0e2944e8be27.png                                         |  Bin 0 -> 41787 bytes
+ assets/2-c8578901-8d8f-455f-bbcb-7ffc36f8a148.png                                         |  Bin 0 -> 41787 bytes
+ assets/2-f09ca741-ef8b-4cb3-ad3b-74c9634cacdf.png                                         |  Bin 0 -> 33699 bytes
+ assets/3-094d016d-fe2c-44be-863d-b211d591cf5f.png                                         |  Bin 0 -> 52516 bytes
+ assets/3-413692d7-0cd3-4e0e-a12d-56d0399e29c2.png                                         |  Bin 0 -> 61735 bytes
+ assets/3-a47cb831-4fb8-433d-9e7e-5a85357e6e3f.png                                         |  Bin 0 -> 61735 bytes
+ assets/4-76418896-1baf-401a-9abe-d2356bf66f7b.png                                         |  Bin 0 -> 47538 bytes
+ assets/4-97e11514-fbad-468b-91cb-703869008a44.png                                         |  Bin 0 -> 57931 bytes
+ assets/4-990fdb0f-ee1a-4a27-a843-4766b5380ce8.png                                         |  Bin 0 -> 57931 bytes
+ assets/5-1976e117-d6cb-4a99-b17c-4087cb716209.png                                         |  Bin 0 -> 64280 bytes
+ assets/5-d6ac0b20-f556-4430-9d9d-89557746ffa1.png                                         |  Bin 0 -> 64280 bytes
+ assets/5-eb165442-ee07-4c32-8831-234446a6789a.png                                         |  Bin 0 -> 47890 bytes
+ ...rn_Typography__Creative_Studio_Brand_Logo__5_-1927f148-3dd1-41c8-9c00-1934ac8bc7ed.png |  Bin 0 -> 76821 bytes
+ assets/Screenshot_2026-04-02_at_10.51.22_PM-3e703b4e-40f0-4744-866c-c880d2d07c83.png      |  Bin 0 -> 17391 bytes
+ assets/Screenshot_2026-04-10_at_1.21.39_PM-531e66fe-fead-4444-bc0a-8e60bda6c29e.png       |  Bin 0 -> 39162 bytes
+ assets/Screenshot_2026-04-10_at_1.33.20_PM-d5ebd5c1-f043-4544-b2dc-d328d05c1d0a.png       |  Bin 0 -> 45152 bytes
+ assets/Screenshot_2026-04-10_at_1.39.11_PM-a54de41c-8a38-4d44-99dd-bc899e192196.png       |  Bin 0 -> 30398 bytes
+ assets/Screenshot_2026-04-25_at_5.43.57_PM-649038bb-8468-44ce-8f9c-2074880a59ac.png       |  Bin 0 -> 87662 bytes
+ assets/Screenshot_2026-04-25_at_5.45.00_PM-ddfa7cc3-8100-44c1-9e9e-23bb45b9c532.png       |  Bin 0 -> 89874 bytes
+ assets/Screenshot_2026-04-25_at_7.10.06_PM-3403f566-c32c-41a4-bbc7-b6804751ef52.png       |  Bin 0 -> 34551 bytes
+ assets/right-image.svg                                                                    |    1 +
+ en/about/index.html                                                                       |  115 +++++
+ en/index.html                                                                             |  154 +++++++
+ en/privacy/index.html                                                                     |  133 ++++++
+ en/support/index.html                                                                     |  126 ++++++
+ en/terms/index.html                                                                       |  209 +++++++++
+ index.html                                                                                |   16 +
+ ko/about/index.html                                                                       |  115 +++++
+ ko/index.html                                                                             |  154 +++++++
+ ko/privacy/index.html                                                                     |  133 ++++++
+ ko/support/index.html                                                                     |  126 ++++++
+ ko/terms/index.html                                                                       |  204 +++++++++
+ locales/en.json                                                                           |  275 +++++++++++
+ locales/ko.json                                                                           |  268 +++++++++++
+ script.js                                                                                 |  413 +++++++++++++++++
+ styles.css                                                                                | 1026 ++++++++++++++++++++++++++++++++++++++++++
+ vercel.json                                                                               |   15 +
+ 43 files changed, 3575 insertions(+)
+ create mode 100644 CNAME
+ create mode 100644 about.html
+ create mode 100644 about/index.html
+ create mode 100644 assets/1-14089a39-42ff-468c-948e-a6d71b0edb54.png
+ create mode 100644 assets/1-38d08bc8-a223-464c-90d6-05cf2c0de542.png
+ create mode 100644 assets/1-3c04527c-b53c-4562-a795-262c4e94e1b1.png
+ create mode 100644 assets/2-1e0e6ae7-7279-4521-be42-0e2944e8be27.png
+ create mode 100644 assets/2-c8578901-8d8f-455f-bbcb-7ffc36f8a148.png
+ create mode 100644 assets/2-f09ca741-ef8b-4cb3-ad3b-74c9634cacdf.png
+ create mode 100644 assets/3-094d016d-fe2c-44be-863d-b211d591cf5f.png
+ create mode 100644 assets/3-413692d7-0cd3-4e0e-a12d-56d0399e29c2.png
+ create mode 100644 assets/3-a47cb831-4fb8-433d-9e7e-5a85357e6e3f.png
+ create mode 100644 assets/4-76418896-1baf-401a-9abe-d2356bf66f7b.png
+ create mode 100644 assets/4-97e11514-fbad-468b-91cb-703869008a44.png
+ create mode 100644 assets/4-990fdb0f-ee1a-4a27-a843-4766b5380ce8.png
+ create mode 100644 assets/5-1976e117-d6cb-4a99-b17c-4087cb716209.png
+ create mode 100644 assets/5-d6ac0b20-f556-4430-9d9d-89557746ffa1.png
+ create mode 100644 assets/5-eb165442-ee07-4c32-8831-234446a6789a.png
+ create mode 100644 assets/Black_and_White_Minimalist_Elegant_Modern_Typography__Creative_Studio_Brand_Logo__5_-1927f148-3dd1-41c8-9c00-1934ac8bc7ed.png
+ create mode 100644 assets/Screenshot_2026-04-02_at_10.51.22_PM-3e703b4e-40f0-4744-866c-c880d2d07c83.png
+ create mode 100644 assets/Screenshot_2026-04-10_at_1.21.39_PM-531e66fe-fead-4444-bc0a-8e60bda6c29e.png
+ create mode 100644 assets/Screenshot_2026-04-10_at_1.33.20_PM-d5ebd5c1-f043-4544-b2dc-d328d05c1d0a.png
+ create mode 100644 assets/Screenshot_2026-04-10_at_1.39.11_PM-a54de41c-8a38-4d44-99dd-bc899e192196.png
+ create mode 100644 assets/Screenshot_2026-04-25_at_5.43.57_PM-649038bb-8468-44ce-8f9c-2074880a59ac.png
+ create mode 100644 assets/Screenshot_2026-04-25_at_5.45.00_PM-ddfa7cc3-8100-44c1-9e9e-23bb45b9c532.png
+ create mode 100644 assets/Screenshot_2026-04-25_at_7.10.06_PM-3403f566-c32c-41a4-bbc7-b6804751ef52.png
+ create mode 100644 assets/right-image.svg
+ create mode 100644 en/about/index.html
+ create mode 100644 en/index.html
+ create mode 100644 en/privacy/index.html
+ create mode 100644 en/support/index.html
+ create mode 100644 en/terms/index.html
+ create mode 100644 index.html
+ create mode 100644 ko/about/index.html
+ create mode 100644 ko/index.html
+ create mode 100644 ko/privacy/index.html
+ create mode 100644 ko/support/index.html
+ create mode 100644 ko/terms/index.html
+ create mode 100644 locales/en.json
+ create mode 100644 locales/ko.json
+ create mode 100644 script.js
+ create mode 100644 styles.css
+ create mode 100644 vercel.json
+younjunglee@younjungs-MacBook-Pro homepage_app % git push
+Everything up-to-date
+younjunglee@younjungs-MacBook-Pro homepage_app % git push --force
+Everything up-to-date
+younjunglee@younjungs-MacBook-Pro homepage_app % git push --force origin main
+Everything up-to-date
+younjunglee@younjungs-MacBook-Pro homepage_app % git remote -v
+git branch
+git push --force origin mainv
+origin  https://github.com/younjunglee90-maker/blen_landingpage.git (fetch)
+origin  https://github.com/younjunglee90-maker/blen_landingpage.git (push)
+* main
+error: src refspec mainv does not match any
+error: failed to push some refs to 'https://github.com/younjunglee90-maker/blen_landingpage.git'
+younjunglee@younjungs-MacBook-Pro homepage_app % git remote -v
+git branch
+git push --force origin main
+origin  https://github.com/younjunglee90-maker/blen_landingpage.git (fetch)
+origin  https://github.com/younjunglee90-maker/blen_landingpage.git (push)
+* main
+Everything up-to-date
+younjunglee@younjungs-MacBook-Pro homepage_app % cd ..
+younjunglee@younjungs-MacBook-Pro Cursor_WS % blen_landingpage
+zsh: command not found: blen_landingpage
+younjunglee@younjungs-MacBook-Pro Cursor_WS % git add .
+git commit -m "final landing page"
+git push --force
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+younjunglee@younjungs-MacBook-Pro Cursor_WS % cd blen_landingpage
+cd: no such file or directory: blen_landingpage
+younjunglee@younjungs-MacBook-Pro Cursor_WS % 
+younjunglee@younjungs-MacBook-Pro Cursor_WS % 
+younjunglee@younjungs-MacBook-Pro Cursor_WS % cd blen_landingpage
+cd: no such file or directory: blen_landingpage
+younjunglee@younjungs-MacBook-Pro Cursor_WS % ls
+Blen_app        empty_app       homepage_app    Python_game_app
+younjunglee@younjungs-MacBook-Pro Cursor_WS % 
+younjunglee@younjungs-MacBook-Pro Cursor_WS % cd homepage_app               
+younjunglee@younjungs-MacBook-Pro homepage_app % git status
+git remote -v
+git add .
+git commit -m "final landing page"
+git push --force origin main
+On branch main
+Your branch is up to date with 'origin/main'.
+
+nothing to commit, working tree clean
+origin  https://github.com/younjunglee90-maker/blen_landingpage.git (fetch)
+origin  https://github.com/younjunglee90-maker/blen_landingpage.git (push)
+On branch main
+Your branch is up to date with 'origin/main'.
+
+nothing to commit, working tree clean
+Everything up-to-date
+younjunglee@younjungs-MacBook-Pro homepage_app % 
+younjunglee@younjungs-MacBook-Pro homepage_app % cd /Users/younjunglee/Desktop/Cursor_WS/homepage_app
+
+rm -rf .git
+
+git init
+git branch -M main
+
+git add .
+git commit -m "initial blen landing page"
+
+git remote add origin https://github.com/younjunglee90-maker/blen.git
+git push -u origin main
+Initialized empty Git repository in /Users/younjunglee/Desktop/Cursor_WS/homepage_app/.git/
+[main (root-commit) f5fa9a8] initial blen landing page
+ Committer: younjung lee <younjunglee@younjungs-MacBook-Pro.local>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly. Run the
+following command and follow the instructions in your editor to edit
+your configuration file:
+
+    git config --global --edit
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 69 files changed, 11760 insertions(+)
+ create mode 100644 .gitignore
+ create mode 100644 AGENTS.md
+ create mode 100644 CLAUDE.md
+ create mode 100644 CNAME
+ create mode 100644 README.md
+ create mode 100644 about.html
+ create mode 100644 about/index.html
+ create mode 100644 app/components/About.tsx
+ create mode 100644 app/components/Contact.tsx
+ create mode 100644 app/components/Footer.tsx
+ create mode 100644 app/components/Header.tsx
+ create mode 100644 app/components/Hero.tsx
+ create mode 100644 app/components/Products.tsx
+ create mode 100644 app/favicon.ico
+ create mode 100644 app/globals.css
+ create mode 100644 app/layout.tsx
+ create mode 100644 app/page.tsx
+ create mode 100644 assets/1-14089a39-42ff-468c-948e-a6d71b0edb54.png
+ create mode 100644 assets/1-38d08bc8-a223-464c-90d6-05cf2c0de542.png
+ create mode 100644 assets/1-3c04527c-b53c-4562-a795-262c4e94e1b1.png
+ create mode 100644 assets/2-1e0e6ae7-7279-4521-be42-0e2944e8be27.png
+ create mode 100644 assets/2-c8578901-8d8f-455f-bbcb-7ffc36f8a148.png
+ create mode 100644 assets/2-f09ca741-ef8b-4cb3-ad3b-74c9634cacdf.png
+ create mode 100644 assets/3-094d016d-fe2c-44be-863d-b211d591cf5f.png
+ create mode 100644 assets/3-413692d7-0cd3-4e0e-a12d-56d0399e29c2.png
+ create mode 100644 assets/3-a47cb831-4fb8-433d-9e7e-5a85357e6e3f.png
+ create mode 100644 assets/4-76418896-1baf-401a-9abe-d2356bf66f7b.png
+ create mode 100644 assets/4-97e11514-fbad-468b-91cb-703869008a44.png
+ create mode 100644 assets/4-990fdb0f-ee1a-4a27-a843-4766b5380ce8.png
+ create mode 100644 assets/5-1976e117-d6cb-4a99-b17c-4087cb716209.png
+ create mode 100644 assets/5-d6ac0b20-f556-4430-9d9d-89557746ffa1.png
+ create mode 100644 assets/5-eb165442-ee07-4c32-8831-234446a6789a.png
+ create mode 100644 assets/Black_and_White_Minimalist_Elegant_Modern_Typography__Creative_Studio_Brand_Logo__5_-1927f148-3dd1-41c8-9c00-1934ac8bc7ed.png
+ create mode 100644 assets/Screenshot_2026-04-02_at_10.51.22_PM-3e703b4e-40f0-4744-866c-c880d2d07c83.png
+ create mode 100644 assets/Screenshot_2026-04-10_at_1.21.39_PM-531e66fe-fead-4444-bc0a-8e60bda6c29e.png
+ create mode 100644 assets/Screenshot_2026-04-10_at_1.33.20_PM-d5ebd5c1-f043-4544-b2dc-d328d05c1d0a.png
+ create mode 100644 assets/Screenshot_2026-04-10_at_1.39.11_PM-a54de41c-8a38-4d44-99dd-bc899e192196.png
+ create mode 100644 assets/Screenshot_2026-04-25_at_5.43.57_PM-649038bb-8468-44ce-8f9c-2074880a59ac.png
+ create mode 100644 assets/Screenshot_2026-04-25_at_5.45.00_PM-ddfa7cc3-8100-44c1-9e9e-23bb45b9c532.png
+ create mode 100644 assets/Screenshot_2026-04-25_at_7.10.06_PM-3403f566-c32c-41a4-bbc7-b6804751ef52.png
+ create mode 100644 assets/right-image.svg
+ create mode 100644 en/about/index.html
+ create mode 100644 en/index.html
+ create mode 100644 en/privacy/index.html
+ create mode 100644 en/support/index.html
+ create mode 100644 en/terms/index.html
+ create mode 100644 eslint.config.mjs
+ create mode 100644 index.html
+ create mode 100644 ko/about/index.html
+ create mode 100644 ko/index.html
+ create mode 100644 ko/privacy/index.html
+ create mode 100644 ko/support/index.html
+ create mode 100644 ko/terms/index.html
+ create mode 100644 locales/en.json
+ create mode 100644 locales/ko.json
+ create mode 100644 next.config.ts
+ create mode 100644 package-lock.json
+ create mode 100644 package.json
+ create mode 100644 postcss.config.mjs
+ create mode 100644 public/file.svg
+ create mode 100644 public/globe.svg
+ create mode 100644 public/images/hero-couple.jpg
+ create mode 100644 public/next.svg
+ create mode 100644 public/vercel.svg
+ create mode 100644 public/window.svg
+ create mode 100644 script.js
+ create mode 100644 styles.css
+ create mode 100644 tsconfig.json
+ create mode 100644 vercel.json
+Enumerating objects: 83, done.
+Counting objects: 100% (83/83), done.
+Delta compression using up to 12 threads
+Compressing objects: 100% (71/71), done.
+Writing objects: 100% (83/83), 1.14 MiB | 2.76 MiB/s, done.
+Total 83 (delta 7), reused 0 (delta 0), pack-reused 0
+remote: Resolving deltas: 100% (7/7), done.
+To https://github.com/younjunglee90-maker/blen.git
+ * [new branch]      main -> main
+branch 'main' set up to track 'origin/main'.
+younjunglee@younjungs-MacBook-Pro homepage_app % pwd
+/Users/younjunglee/Desktop/Cursor_WS/homepage_app
+younjunglee@younjungs-MacBook-Pro homepage_app % pwd
+younjunglee@younjungs-MacBook-Pro homepage_app % pwd
+/Users/younjunglee/Desktop/Cursor_WS/homepage_app
+younjunglee@younjungs-MacBook-Pro homepage_app % git remote remove origin
+younjunglee@younjungs-MacBook-Pro homepage_app % git remote -v
+younjunglee@younjungs-MacBook-Pro homepage_app % rm -rf .git
+younjunglee@younjungs-MacBook-Pro homepage_app %

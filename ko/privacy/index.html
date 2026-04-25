@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blen</title>
+    <link rel="stylesheet" href="../../../styles.css" />
+  </head>
+  <body data-page="privacy" data-locale="ko">
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="site-brand" href="/ko" aria-label="Blen Home">Blen</a>
+
+        <button
+          type="button"
+          class="site-nav-toggle"
+          aria-expanded="false"
+          aria-controls="primary-nav"
+          data-i18n-attr="aria-label"
+          data-i18n-key="common.menuToggle"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <nav
+          id="primary-nav"
+          class="site-nav"
+          aria-label="Primary navigation"
+          data-i18n-attr="aria-label"
+          data-i18n-key="common.navAria"
+        >
+          <ul class="site-nav__list">
+            <li><a class="site-nav__link" data-nav="home" href="/ko" data-i18n="common.navHome"></a></li>
+            <li><a class="site-nav__link" data-nav="about" href="/ko/about" data-i18n="common.navAbout"></a></li>
+            <li><a class="site-nav__link" data-nav="support" href="/ko/support" data-i18n="common.navSupport"></a></li>
+          </ul>
+          <div
+            class="site-lang"
+            role="group"
+            aria-label="Language selector"
+            data-i18n-attr="aria-label"
+            data-i18n-key="common.languageAria"
+          >
+            <button type="button" class="site-lang__btn" data-set-lang="en" aria-pressed="false" data-i18n="common.langEng"></button>
+            <button type="button" class="site-lang__btn" data-set-lang="ko" aria-pressed="false" data-i18n="common.langKo"></button>
+          </div>
+        </nav>
+      </div>
+    </header>
+
+<main class="content-page">
+      <article class="content-card">
+        <h1 class="content-page__title" data-i18n="privacy.legalTitle"></h1>
+
+        <section class="content-page__section">
+          <h2 class="content-page__heading" data-i18n="privacy.section1.title"></h2>
+          <div class="content-table-wrap">
+            <table class="content-table">
+              <thead>
+                <tr>
+                  <th data-i18n="privacy.section1.table.headers.category"></th>
+                  <th data-i18n="privacy.section1.table.headers.info"></th>
+                  <th data-i18n="privacy.section1.table.headers.purpose"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-i18n="privacy.section1.table.required.category"></td>
+                  <td data-i18n="privacy.section1.table.required.info"></td>
+                  <td data-i18n="privacy.section1.table.required.purpose"></td>
+                </tr>
+                <tr>
+                  <td data-i18n="privacy.section1.table.optional.category"></td>
+                  <td data-i18n="privacy.section1.table.optional.info"></td>
+                  <td data-i18n="privacy.section1.table.optional.purpose"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="content-page__section">
+          <h2 class="content-page__heading" data-i18n="privacy.section2.title"></h2>
+          <p class="content-page__text" data-i18n="privacy.section2.collected"></p>
+          <p class="content-page__text" data-i18n="privacy.section2.purpose"></p>
+          <p class="content-note" data-i18n="privacy.section2.note"></p>
+        </section>
+
+        <section class="content-page__section">
+          <h2 class="content-page__heading" data-i18n="privacy.section3.title"></h2>
+          <p class="content-page__text" data-i18n="privacy.section3.intro"></p>
+          <ul class="content-list">
+            <li data-i18n="privacy.section3.items.logs"></li>
+            <li data-i18n="privacy.section3.items.disputes"></li>
+          </ul>
+        </section>
+
+        <section class="content-page__section">
+          <h2 class="content-page__heading" data-i18n="privacy.section4.title"></h2>
+          <p class="content-page__text" data-i18n="privacy.section4.intro"></p>
+          <ul class="content-list">
+            <li data-i18n="privacy.section4.items.required"></li>
+            <li data-i18n="privacy.section4.items.optional"></li>
+          </ul>
+        </section>
+
+        <section class="content-page__section">
+          <h2 class="content-page__heading" data-i18n="privacy.section5.title"></h2>
+          <ul class="content-list">
+            <li data-i18n="privacy.section5.email"></li>
+            <li data-i18n="privacy.section5.dpo"></li>
+          </ul>
+        </section>
+
+        <p class="content-page__effective" data-i18n="privacy.effectiveDate"></p>
+      </article>
+    </main>
+    <footer class="site-footer">
+      <div class="site-footer__inner">
+        <ul class="footer-nav" aria-label="Footer Menu">
+          <li><a class="footer-nav__link" data-footer-link="about" data-i18n="common.footerAbout" href="../about/"></a></li>
+          <li><a class="footer-nav__link" data-footer-link="terms" data-i18n="common.footerTerms" href="../terms/"></a></li>
+          <li><a class="footer-nav__link" data-footer-link="privacy" data-i18n="common.footerPrivacy" href="../privacy/"></a></li>
+          <li><a class="footer-nav__link" data-footer-link="support" data-i18n="common.footerSupport" href="../support/"></a></li>
+        </ul>
+        <p class="site-footer__text" data-i18n="common.copyright"></p>
+      </div>
+    </footer>
+    <script src="../../../script.js"></script>
+  </body>
+</html>

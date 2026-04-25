@@ -1,0 +1,15 @@
+{
+  "rewrites": [
+    { "source": "/about", "destination": "/about.html" },
+    { "source": "/en", "destination": "/en/" },
+    { "source": "/ko", "destination": "/ko/" },
+    { "source": "/en/about", "destination": "/en/about/" },
+    { "source": "/en/terms", "destination": "/en/terms/" },
+    { "source": "/en/privacy", "destination": "/en/privacy/" },
+    { "source": "/en/support", "destination": "/en/support/" },
+    { "source": "/ko/about", "destination": "/ko/about/" },
+    { "source": "/ko/terms", "destination": "/ko/terms/" },
+    { "source": "/ko/privacy", "destination": "/ko/privacy/" },
+    { "source": "/ko/support", "destination": "/ko/support/" }
+  ]
+}
