@@ -29,18 +29,7 @@
     "subtitleLine2": "and helps you find your most compatible match.",
     "downloadAria": "Download links",
     "android": "Android Download",
-    "ios": "iOS Download",
-    "features": {
-      "title": "See Blen in Action",
-      "subtitle": "Swipe through key moments of the app experience.",
-      "items": [
-        "AI conversation-based personality analysis",
-        "Values and dating style matching",
-        "Recommendations for your most compatible match",
-        "Natural conversation-first matching flow",
-        "AI-powered relationship insights"
-      ]
-    }
+    "ios": "iOS Download"
   },
   "about": {
     "title": "About Blen",

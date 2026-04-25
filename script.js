@@ -41,13 +41,10 @@ function localeUrl(lang, page) {
 }
 
 function setActiveLangButton(lang) {
-  document.querySelectorAll(".site-lang__option").forEach((btn) => {
+  document.querySelectorAll(".site-lang__btn").forEach((btn) => {
     const active = btn.dataset.setLang === lang;
-    btn.classList.toggle("site-lang__option--active", active);
+    btn.classList.toggle("site-lang__btn--active", active);
     btn.setAttribute("aria-pressed", active ? "true" : "false");
-    btn.setAttribute("aria-current", active ? "true" : "false");
-    const check = btn.querySelector(".site-lang__check");
-    if (check) check.hidden = !active;
   });
 }
 
@@ -104,81 +101,16 @@ async function loadLocale(locale) {
   return response.json();
 }
 
-function closeAllLanguageMenus(except) {
-  document.querySelectorAll(".site-lang").forEach((selector) => {
-    if (selector !== except) {
-      selector.classList.remove("is-open");
-      const trigger = selector.querySelector(".site-lang__trigger");
-      if (trigger) trigger.setAttribute("aria-expanded", "false");
-    }
-  });
-}
-
-function initializeLanguageSelector() {
-  const selectors = document.querySelectorAll(".site-lang");
-  selectors.forEach((selector) => {
-    selector.classList.add("site-lang--dropdown");
-    selector.innerHTML = `
-      <button type="button" class="site-lang__trigger" aria-label="Select language" aria-expanded="false">
-        <span class="site-lang__icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" role="presentation" focusable="false">
-            <circle cx="12" cy="12" r="9"></circle>
-            <path d="M3 12h18"></path>
-            <path d="M12 3a14 14 0 0 1 0 18"></path>
-            <path d="M12 3a14 14 0 0 0 0 18"></path>
-          </svg>
-        </span>
-      </button>
-      <div class="site-lang__menu" role="menu" aria-label="Language options">
-        <button type="button" class="site-lang__option" data-set-lang="en" aria-pressed="false" role="menuitemradio">
-          <span class="site-lang__label">ENG</span>
-          <span class="site-lang__check" aria-hidden="true" hidden>✓</span>
-        </button>
-        <button type="button" class="site-lang__option" data-set-lang="ko" aria-pressed="false" role="menuitemradio">
-          <span class="site-lang__label">KOR</span>
-          <span class="site-lang__check" aria-hidden="true" hidden>✓</span>
-        </button>
-      </div>
-    `;
-
-    const headerInner = selector.closest(".site-header__inner");
-    const navToggle = headerInner ? headerInner.querySelector(".site-nav-toggle") : null;
-    if (headerInner && navToggle && selector.parentElement !== headerInner) {
-      headerInner.insertBefore(selector, navToggle);
-    }
-
-    const trigger = selector.querySelector(".site-lang__trigger");
-    if (trigger) {
-      trigger.addEventListener("click", (event) => {
-        event.stopPropagation();
-        const willOpen = !selector.classList.contains("is-open");
-        closeAllLanguageMenus(selector);
-        selector.classList.toggle("is-open", willOpen);
-        trigger.setAttribute("aria-expanded", willOpen ? "true" : "false");
-      });
-    }
-
-    selector.querySelectorAll(".site-lang__option").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const targetLang = btn.dataset.setLang;
-        if (!SUPPORTED_LANGS.includes(targetLang)) return;
-        setSavedLang(targetLang);
-        selector.classList.remove("is-open");
-        if (trigger) trigger.setAttribute("aria-expanded", "false");
-        const nextUrl = localeUrl(targetLang, getCurrentPage());
-        if (nextUrl !== location.pathname) {
-          location.href = nextUrl;
-        }
-      });
-    });
-  });
-
-  document.addEventListener("click", (event) => {
-    document.querySelectorAll(".site-lang").forEach((selector) => {
-      if (selector.contains(event.target)) return;
-      selector.classList.remove("is-open");
-      const trigger = selector.querySelector(".site-lang__trigger");
-      if (trigger) trigger.setAttribute("aria-expanded", "false");
+function bindLangToggle() {
+  document.querySelectorAll(".site-lang__btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const targetLang = btn.dataset.setLang;
+      if (!SUPPORTED_LANGS.includes(targetLang)) return;
+      setSavedLang(targetLang);
+      const nextUrl = localeUrl(targetLang, getCurrentPage());
+      if (nextUrl !== location.pathname) {
+        location.href = nextUrl;
+      }
     });
   });
 }
@@ -223,101 +155,6 @@ function bindHeaderNav() {
       link.removeAttribute("aria-current");
     }
   });
-}
-
-function initFeatureCarousel() {
-  const carousel = document.querySelector("[data-feature-carousel]");
-  if (!carousel) return;
-
-  const track = carousel.querySelector("[data-carousel-track]");
-  const slides = Array.from(carousel.querySelectorAll("[data-carousel-slide]"));
-  const prevButton = carousel.querySelector("[data-carousel-prev]");
-  const nextButton = carousel.querySelector("[data-carousel-next]");
-  const dotsContainer = carousel.querySelector("[data-carousel-dots]");
-  if (!track || slides.length === 0 || !dotsContainer) return;
-
-  let currentIndex = 0;
-  let startX = 0;
-  let dragging = false;
-  let dragOffset = 0;
-  const swipeThreshold = 44;
-
-  dotsContainer.innerHTML = slides
-    .map(
-      (_, index) =>
-        `<button type="button" class="feature-carousel__dot${
-          index === 0 ? " is-active" : ""
-        }" data-carousel-dot="${index}" aria-label="Go to slide ${index + 1}" aria-current="${
-          index === 0 ? "true" : "false"
-        }"></button>`
-    )
-    .join("");
-
-  const dots = Array.from(dotsContainer.querySelectorAll("[data-carousel-dot]"));
-
-  function applyPosition(withAnimation = true) {
-    track.style.transition = withAnimation ? "transform 340ms ease" : "none";
-    track.style.transform = `translateX(calc(${-currentIndex * 100}% + ${dragOffset}px))`;
-    dots.forEach((dot, index) => {
-      const active = index === currentIndex;
-      dot.classList.toggle("is-active", active);
-      dot.setAttribute("aria-current", active ? "true" : "false");
-    });
-  }
-
-  function goTo(index) {
-    const total = slides.length;
-    currentIndex = (index + total) % total;
-    dragOffset = 0;
-    applyPosition(true);
-  }
-
-  function onPointerDown(event) {
-    dragging = true;
-    startX = event.clientX;
-    dragOffset = 0;
-    track.style.transition = "none";
-    track.setPointerCapture(event.pointerId);
-    if (track.parentElement) track.parentElement.style.cursor = "grabbing";
-  }
-
-  function onPointerMove(event) {
-    if (!dragging) return;
-    dragOffset = event.clientX - startX;
-    applyPosition(false);
-  }
-
-  function onPointerUp(event) {
-    if (!dragging) return;
-    dragging = false;
-    track.releasePointerCapture(event.pointerId);
-    if (track.parentElement) track.parentElement.style.cursor = "grab";
-    if (Math.abs(dragOffset) > swipeThreshold) {
-      if (dragOffset < 0) goTo(currentIndex + 1);
-      else goTo(currentIndex - 1);
-      return;
-    }
-    dragOffset = 0;
-    applyPosition(true);
-  }
-
-  if (prevButton) prevButton.addEventListener("click", () => goTo(currentIndex - 1));
-  if (nextButton) nextButton.addEventListener("click", () => goTo(currentIndex + 1));
-
-  dots.forEach((dot) => {
-    dot.addEventListener("click", () => {
-      const targetIndex = Number(dot.dataset.carouselDot);
-      if (!Number.isNaN(targetIndex)) goTo(targetIndex);
-    });
-  });
-
-  track.addEventListener("pointerdown", onPointerDown);
-  track.addEventListener("pointermove", onPointerMove);
-  track.addEventListener("pointerup", onPointerUp);
-  track.addEventListener("pointercancel", onPointerUp);
-  track.addEventListener("pointerleave", onPointerUp);
-
-  applyPosition(true);
 }
 
 function buildSupportMailto(payload, formLocale) {
@@ -398,10 +235,9 @@ async function init() {
   }
 
   applyI18n(currentLang);
-  initializeLanguageSelector();
   setActiveLangButton(currentLang);
   bindHeaderNav();
-  initFeatureCarousel();
+  bindLangToggle();
   bindStoreLinks();
   bindSupportForm();
 }

@@ -50,8 +50,12 @@
       </div>
     </header>
 
-<main class="page page--home">
-      <section class="hero" aria-label="Blen introduction" data-i18n-attr="aria-label" data-i18n-key="home.heroAria"><img class="hero__art" src="../assets/right-image.svg" alt="Blen illustration" data-i18n-attr="alt" data-i18n-key="home.heroAlt" />
+<main class="page">
+      <section class="hero" aria-label="Blen introduction" data-i18n-attr="aria-label" data-i18n-key="home.heroAria">
+        <div class="hero__visual">
+          <img class="hero__art" src="../assets/right-image.svg" alt="Blen illustration" data-i18n-attr="alt" data-i18n-key="home.heroAlt" />
+          <p class="hero__overlay-text">Not many. Just the right one.</p>
+        </div>
 
         <div class="hero__content">
           <div class="hero__left">
@@ -69,72 +73,6 @@
 
         <div class="hero__actions hero__actions--mobile" role="group" aria-label="Download links" data-i18n-attr="aria-label" data-i18n-key="home.downloadAria"><a class="btn btn--android store-link" data-store="android" href="#" target="_blank" rel="noopener" data-i18n="home.android"></a>
           <a class="btn btn--ios store-link" data-store="ios" href="#" target="_blank" rel="noopener" data-i18n="home.ios"></a>
-        </div>
-      </section>
-
-      <section class="feature-carousel" data-feature-carousel>
-        <div class="feature-carousel__inner">
-          <h2 class="feature-carousel__title" data-i18n="home.features.title"></h2>
-          <p class="feature-carousel__subtitle" data-i18n="home.features.subtitle"></p>
-
-          <div class="feature-carousel__panel">
-            <div class="feature-carousel__viewport">
-              <button
-                type="button"
-                class="feature-carousel__arrow feature-carousel__arrow--prev"
-                data-carousel-prev
-                aria-label="Previous screenshot"
-              >
-                <span aria-hidden="true">‹</span>
-              </button>
-
-              <div class="feature-carousel__track-wrap">
-                <div class="feature-carousel__track" data-carousel-track>
-                  <figure class="feature-carousel__slide" data-carousel-slide>
-                    <div class="feature-carousel__media">
-                      <img src="../assets/Screenshot_2026-04-02_at_10.51.22_PM-3e703b4e-40f0-4744-866c-c880d2d07c83.png" alt="Feature screenshot 1" />
-                    </div>
-                    <figcaption data-i18n="home.features.items.0"></figcaption>
-                  </figure>
-                  <figure class="feature-carousel__slide" data-carousel-slide>
-                    <div class="feature-carousel__media">
-                      <img src="../assets/Screenshot_2026-04-10_at_1.21.39_PM-531e66fe-fead-4444-bc0a-8e60bda6c29e.png" alt="Feature screenshot 2" />
-                    </div>
-                    <figcaption data-i18n="home.features.items.1"></figcaption>
-                  </figure>
-                  <figure class="feature-carousel__slide" data-carousel-slide>
-                    <div class="feature-carousel__media">
-                      <img src="../assets/Screenshot_2026-04-10_at_1.33.20_PM-d5ebd5c1-f043-4544-b2dc-d328d05c1d0a.png" alt="Feature screenshot 3" />
-                    </div>
-                    <figcaption data-i18n="home.features.items.2"></figcaption>
-                  </figure>
-                  <figure class="feature-carousel__slide" data-carousel-slide>
-                    <div class="feature-carousel__media">
-                      <img src="../assets/Screenshot_2026-04-10_at_1.39.11_PM-a54de41c-8a38-4d44-99dd-bc899e192196.png" alt="Feature screenshot 4" />
-                    </div>
-                    <figcaption data-i18n="home.features.items.3"></figcaption>
-                  </figure>
-                  <figure class="feature-carousel__slide" data-carousel-slide>
-                    <div class="feature-carousel__media">
-                      <img src="../assets/Screenshot_2026-04-25_at_5.43.57_PM-649038bb-8468-44ce-8f9c-2074880a59ac.png" alt="Feature screenshot 5" />
-                    </div>
-                    <figcaption data-i18n="home.features.items.4"></figcaption>
-                  </figure>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                class="feature-carousel__arrow feature-carousel__arrow--next"
-                data-carousel-next
-                aria-label="Next screenshot"
-              >
-                <span aria-hidden="true">›</span>
-              </button>
-            </div>
-
-            <div class="feature-carousel__dots" data-carousel-dots aria-label="Carousel pagination"></div>
-          </div>
         </div>
       </section>
     </main>
