@@ -257,6 +257,58 @@ function bindSupportForm() {
   });
 }
 
+function bindPreviewCarousel() {
+  const track = document.querySelector(".app-preview__track");
+  const dotsWrap = document.querySelector(".app-preview__dots");
+  if (!track || !dotsWrap) return;
+
+  const slides = Array.from(track.querySelectorAll(".app-preview__slide"));
+  if (!slides.length) return;
+
+  dotsWrap.innerHTML = "";
+  const dots = slides.map((_, index) => {
+    const dot = document.createElement("button");
+    dot.type = "button";
+    dot.className = "app-preview__dot";
+    dot.setAttribute("role", "tab");
+    dot.setAttribute("aria-label", `Go to preview ${index + 1}`);
+    dot.setAttribute("aria-selected", "false");
+    dot.addEventListener("click", () => {
+      track.scrollTo({
+        left: track.clientWidth * index,
+        behavior: "smooth",
+      });
+    });
+    dotsWrap.appendChild(dot);
+    return dot;
+  });
+
+  function setActive(index) {
+    dots.forEach((dot, dotIndex) => {
+      const active = dotIndex === index;
+      dot.classList.toggle("is-active", active);
+      dot.setAttribute("aria-selected", active ? "true" : "false");
+    });
+  }
+
+  function updateActiveFromScroll() {
+    const slideWidth = track.clientWidth || 1;
+    const index = Math.round(track.scrollLeft / slideWidth);
+    const safeIndex = Math.max(0, Math.min(index, slides.length - 1));
+    setActive(safeIndex);
+  }
+
+  setActive(0);
+
+  let scrollTimer = null;
+  track.addEventListener("scroll", () => {
+    if (scrollTimer) window.clearTimeout(scrollTimer);
+    scrollTimer = window.setTimeout(updateActiveFromScroll, 60);
+  });
+
+  window.addEventListener("resize", updateActiveFromScroll);
+}
+
 async function init() {
   const currentLang = getCurrentLang();
   const savedLang = getSavedLang();
@@ -284,6 +336,7 @@ async function init() {
   bindLangToggle();
   bindStoreLinks();
   bindSupportForm();
+  bindPreviewCarousel();
 }
 
 if (document.readyState === "loading") {

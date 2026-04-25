@@ -30,7 +30,9 @@
     "downloadAria": "Download links",
     "android": "Android Download",
     "ios": "iOS Download",
-    "previewTitle": "Preview the Blen App"
+    "previewTitle": "Preview the Blen App",
+    "previewHeadline": "The One Match Blen Found",
+    "previewSubtitle": "Preview the connection that fits you best"
   },
   "about": {
     "title": "About Blen",

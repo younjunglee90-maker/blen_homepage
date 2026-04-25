@@ -324,8 +324,9 @@ html[lang="ko"] .hero__subtitle {
 .app-preview {
   width: 100%;
   margin-top: 0;
-  padding: clamp(80px, 9vw, 108px) 0 clamp(76px, 10vw, 128px);
-  background: #f1efed;
+  padding: 100px 0 120px;
+  background: var(--bg);
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
   position: relative;
   z-index: 1;
   overflow: hidden;
@@ -337,12 +338,25 @@ html[lang="ko"] .hero__subtitle {
   padding: 0 clamp(18px, 5vw, 36px);
 }
 
+.app-preview__text-area {
+  text-align: center;
+}
+
 .app-preview__title {
-  margin: 0 0 clamp(18px, 2.8vw, 28px);
-  color: rgba(30, 30, 30, 0.92);
-  font-size: clamp(1.45rem, 3.2vw, 2rem);
+  margin: 0 0 12px;
+  color: #1a1a1a;
+  font-size: clamp(2.25rem, 4.6vw, 2.75rem);
   font-weight: 800;
   letter-spacing: -0.02em;
+  text-align: center;
+}
+
+.app-preview__subtitle {
+  margin: 0 0 40px;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: clamp(1rem, 1.7vw, 1.125rem);
+  font-weight: 400;
+  line-height: 1.5;
   text-align: center;
 }
 
@@ -381,6 +395,31 @@ html[lang="ko"] .hero__subtitle {
   background: #fff;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
   border: 1px solid rgba(28, 28, 28, 0.06);
+}
+
+.app-preview__dots {
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.app-preview__dot {
+  width: 8px;
+  height: 8px;
+  border: none;
+  padding: 0;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.app-preview__dot.is-active {
+  width: 24px;
+  height: 8px;
+  background: #1a1a1a;
 }
 
 .btn {
@@ -817,14 +856,17 @@ html[lang="ko"] .hero__subtitle {
     width: 100%;
   }
   .app-preview {
-    padding: 80px 0 72px;
+    padding: 100px 0 120px;
   }
   .app-preview__inner {
     padding: 0 22px;
   }
   .app-preview__title {
-    text-align: left;
-    margin-bottom: 16px;
+    font-size: clamp(2rem, 8.8vw, 2.5rem);
+  }
+  .app-preview__subtitle {
+    margin-bottom: 34px;
+    font-size: clamp(0.98rem, 4.3vw, 1.1rem);
   }
   .app-preview__track {
     padding: 2px 0 8px;

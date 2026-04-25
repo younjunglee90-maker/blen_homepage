@@ -105,7 +105,10 @@
       </section>
       <section class="app-preview" aria-label="App preview section">
         <div class="app-preview__inner">
-          <h2 class="app-preview__title" data-i18n="home.previewTitle"></h2>
+          <div class="app-preview__text-area">
+            <h2 class="app-preview__title" data-i18n="home.previewHeadline"></h2>
+            <p class="app-preview__subtitle" data-i18n="home.previewSubtitle"></p>
+          </div>
           <div class="app-preview__track" aria-label="App preview images">
             <div class="app-preview__slide">
               <img class="app-preview__image" src="../assets/showcase-1.png" alt="Blen app preview 1" loading="lazy" />
@@ -123,6 +126,7 @@
               <img class="app-preview__image" src="../assets/showcase-5.png" alt="Blen app preview 5" loading="lazy" />
             </div>
           </div>
+          <div class="app-preview__dots" role="tablist" aria-label="Preview carousel pagination"></div>
         </div>
       </section>
     </main>

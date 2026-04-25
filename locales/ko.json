@@ -30,7 +30,9 @@
     "downloadAria": "다운로드 링크",
     "android": "안드로이드 다운로드",
     "ios": "iOS 다운로드",
-    "previewTitle": "Blen 앱 미리보기"
+    "previewTitle": "Blen 앱 미리보기",
+    "previewHeadline": "Blen이 찾은 단 하나의 인연",
+    "previewSubtitle": "당신에게 딱 맞는 인연을 미리 만나보세요"
   },
   "about": {
     "title": "Blen 소개",
