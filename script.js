@@ -22,6 +22,7 @@ const ANALYSIS_STORAGE_KEY = "blen_report";
 const LEGACY_ANALYSIS_STORAGE_KEY = "blen-analysis-result";
 const AUTH_SESSION_KEY = "blen_auth_session";
 const PENDING_REPORT_SAVE_KEY = "blen_pending_report_save";
+const POST_LOGIN_REDIRECT_KEY = "blen_post_login_redirect";
 let supabaseClientPromise = null;
 
 function getSupabaseAccessTokenFromStorage() {
@@ -92,6 +93,36 @@ function getCurrentPage() {
 function localeUrl(lang, page) {
   if (page === "home") return `/${lang}/`;
   return `/${lang}/${PAGE_PATHS[page]}/`;
+}
+
+function parseUrlParams() {
+  return new URLSearchParams(window.location.search || "");
+}
+
+function getRedirectFromUrlOrStorage(defaultPath) {
+  const params = parseUrlParams();
+  const fromQuery = params.get("redirect");
+  if (fromQuery) {
+    localStorage.setItem(POST_LOGIN_REDIRECT_KEY, fromQuery);
+    return fromQuery;
+  }
+  const stored = localStorage.getItem(POST_LOGIN_REDIRECT_KEY);
+  return stored || defaultPath;
+}
+
+function consumeStoredRedirect(defaultPath) {
+  const target = localStorage.getItem(POST_LOGIN_REDIRECT_KEY) || defaultPath;
+  localStorage.removeItem(POST_LOGIN_REDIRECT_KEY);
+  return target;
+}
+
+function toAbsoluteUrl(pathOrUrl) {
+  if (!pathOrUrl) return window.location.origin;
+  try {
+    return new URL(pathOrUrl, window.location.origin).toString();
+  } catch (_) {
+    return window.location.origin;
+  }
 }
 
 function setActiveLangButton(lang) {
@@ -441,6 +472,23 @@ function renderChatBubble(messagesEl, text, role) {
   bubble.textContent = text;
   messagesEl.appendChild(bubble);
   messagesEl.scrollTop = messagesEl.scrollHeight;
+  window.requestAnimationFrame(() => {
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  });
+}
+
+function renderTypingBubble(messagesEl) {
+  const bubble = document.createElement("div");
+  bubble.className = "ai-chat__bubble ai-chat__bubble--ai";
+  bubble.setAttribute("data-typing-bubble", "true");
+  bubble.innerHTML =
+    '<span class="ai-chat__typing"><span class="ai-chat__typing-dot"></span><span class="ai-chat__typing-dot"></span><span class="ai-chat__typing-dot"></span></span>';
+  messagesEl.appendChild(bubble);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+  window.requestAnimationFrame(() => {
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  });
+  return bubble;
 }
 
 function bindAiChatFlow() {
@@ -459,6 +507,114 @@ function bindAiChatFlow() {
   const conversationHistory = [];
   const sendButton = form.querySelector(".ai-chat__send");
   const sendLabel = sendButton ? sendButton.textContent : "";
+  const loginModal = document.querySelector("[data-login-modal]");
+  const modalCloseButton = loginModal ? loginModal.querySelector("[data-login-modal-close]") : null;
+  const modalGoogleButton = loginModal ? loginModal.querySelector("[data-login-google]") : null;
+  const modalOtpForm = loginModal ? loginModal.querySelector("[data-login-otp-form]") : null;
+  const modalOtpInput = modalOtpForm ? modalOtpForm.querySelector('[data-login-input="email"]') : null;
+  const modalStatus = loginModal ? loginModal.querySelector("[data-login-modal-status]") : null;
+
+  function closeLoginModal() {
+    if (!loginModal) return;
+    loginModal.hidden = true;
+    document.body.classList.remove("has-modal-open");
+  }
+
+  function openLoginModal() {
+    if (!loginModal) return;
+    loginModal.hidden = false;
+    document.body.classList.add("has-modal-open");
+    if (modalOtpInput) modalOtpInput.focus();
+  }
+
+  async function signInWithGoogle(redirectPath) {
+    const supabase = await getSupabaseClient();
+    if (!supabase) throw new Error("Supabase client unavailable");
+    localStorage.setItem(POST_LOGIN_REDIRECT_KEY, redirectPath);
+    const callbackPath = localeUrl(getCurrentLang(), "login");
+    const redirectTo = toAbsoluteUrl(
+      `${callbackPath}?auth_callback=1&redirect=${encodeURIComponent(redirectPath)}`
+    );
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo },
+    });
+    if (error) throw error;
+  }
+
+  async function signInWithOtp(email, redirectPath) {
+    const supabase = await getSupabaseClient();
+    if (!supabase) throw new Error("Supabase client unavailable");
+    localStorage.setItem(POST_LOGIN_REDIRECT_KEY, redirectPath);
+    const callbackPath = localeUrl(getCurrentLang(), "login");
+    const emailRedirectTo = toAbsoluteUrl(
+      `${callbackPath}?auth_callback=1&redirect=${encodeURIComponent(redirectPath)}`
+    );
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo },
+    });
+    if (error) throw error;
+  }
+
+  async function ensureReportSavedAfterLogin(analysis) {
+    if (!analysis) return;
+    localStorage.setItem(ANALYSIS_STORAGE_KEY, JSON.stringify(analysis));
+    localStorage.setItem(PENDING_REPORT_SAVE_KEY, "1");
+    const redirectPath = localeUrl(getCurrentLang(), "report");
+    localStorage.setItem(POST_LOGIN_REDIRECT_KEY, redirectPath);
+    openLoginModal();
+  }
+
+  if (modalCloseButton) {
+    modalCloseButton.addEventListener("click", closeLoginModal);
+  }
+  if (loginModal) {
+    loginModal.addEventListener("click", (event) => {
+      if (event.target === loginModal) closeLoginModal();
+    });
+  }
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeLoginModal();
+  });
+  if (modalGoogleButton) {
+    modalGoogleButton.addEventListener("click", async () => {
+      if (modalStatus) modalStatus.textContent = "";
+      try {
+        modalGoogleButton.disabled = true;
+        await signInWithGoogle(window.location.pathname);
+      } catch (_) {
+        if (modalStatus) {
+          modalStatus.textContent =
+            deepGet(window.__BLEN_LOCALE__, "login.error") || "Login failed. Try again.";
+        }
+        modalGoogleButton.disabled = false;
+      }
+    });
+  }
+  if (modalOtpForm && modalOtpInput) {
+    modalOtpForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const email = modalOtpInput.value.trim();
+      if (!email) return;
+      if (modalStatus) {
+        modalStatus.textContent = deepGet(window.__BLEN_LOCALE__, "login.loading") || "Loading...";
+      }
+      try {
+        await signInWithOtp(email, window.location.pathname);
+        if (modalStatus) {
+          modalStatus.textContent =
+            deepGet(window.__BLEN_LOCALE__, "login.magicSent") ||
+            "Check your email for the magic link.";
+        }
+      } catch (_) {
+        if (modalStatus) {
+          modalStatus.textContent =
+            deepGet(window.__BLEN_LOCALE__, "login.error") || "Login failed. Try again.";
+        }
+      }
+    });
+  }
 
   renderChatBubble(messagesEl, firstMessage, "ai");
   conversationHistory.push({ role: "assistant", content: firstMessage });
@@ -493,8 +649,11 @@ function bindAiChatFlow() {
   async function saveAnalysisToReportStore(analysis) {
     const supabase = await getSupabaseClient();
     if (!supabase) return false;
-    const { data: userResult } = await supabase.auth.getUser();
-    const user = userResult?.user;
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+    if (userError) return false;
     if (!user) return false;
     const { error } = await supabase
       .from("relationship_reports")
@@ -564,16 +723,20 @@ function bindAiChatFlow() {
     userTurnCount += 1;
     qualityScore += getMessageQualityScore(raw);
 
+    let typingBubble = null;
     try {
       isRequesting = true;
       if (sendButton) {
         sendButton.disabled = true;
         sendButton.textContent = "...";
       }
+      typingBubble = renderTypingBubble(messagesEl);
       const reply = await requestAIReply();
+      if (typingBubble) typingBubble.remove();
       renderChatBubble(messagesEl, reply, "ai");
       conversationHistory.push({ role: "assistant", content: reply });
     } catch (error) {
+      if (typingBubble) typingBubble.remove();
       renderChatBubble(
         messagesEl,
         "잠깐만, 지금 연결이 살짝 불안정해. 다시 한 번 말해줄래?",
@@ -602,18 +765,13 @@ function bindAiChatFlow() {
           }, 520);
           return;
         }
-        const currentLang = getCurrentLang();
-        window.setTimeout(() => {
-          location.href = localeUrl(currentLang, "login");
-        }, 520);
+        await ensureReportSavedAfterLogin(analysis);
         return;
       } catch (error) {
-        localStorage.setItem(ANALYSIS_STORAGE_KEY, JSON.stringify(createFallbackAnalysis()));
+        const fallbackAnalysis = createFallbackAnalysis();
+        localStorage.setItem(ANALYSIS_STORAGE_KEY, JSON.stringify(fallbackAnalysis));
         localStorage.setItem(PENDING_REPORT_SAVE_KEY, "1");
-        const currentLang = getCurrentLang();
-        window.setTimeout(() => {
-          location.href = localeUrl(currentLang, "login");
-        }, 520);
+        await ensureReportSavedAfterLogin(fallbackAnalysis);
         return;
       }
     }
@@ -621,19 +779,102 @@ function bindAiChatFlow() {
 }
 
 function bindLoginPage() {
+  if (getCurrentPage() !== "login") return;
   const form = document.querySelector("[data-login-form]");
+  const googleButton = document.querySelector("[data-login-google]");
   if (!form) return;
   const emailInput = form.querySelector('[data-login-input="email"]');
-  const passwordInput = form.querySelector('[data-login-input="password"]');
   const submitButton = form.querySelector("[data-login-submit]");
   const statusText = form.querySelector("[data-login-status]");
-  if (!emailInput || !passwordInput || !submitButton || !statusText) return;
+  if (!emailInput || !submitButton || !statusText) return;
+
+  const currentLang = getCurrentLang();
+  const defaultRedirect = localeUrl(currentLang, "report");
+  const redirectTarget = getRedirectFromUrlOrStorage(defaultRedirect);
+
+  async function finalizeAfterLogin(supabase) {
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+    if (userError || !user) return false;
+    const { data: sessionData } = await supabase.auth.getSession();
+    if (sessionData?.session) {
+      localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(sessionData.session));
+    }
+    const hasPendingReport = localStorage.getItem(PENDING_REPORT_SAVE_KEY) === "1";
+    const reportRaw =
+      localStorage.getItem(ANALYSIS_STORAGE_KEY) ||
+      localStorage.getItem(LEGACY_ANALYSIS_STORAGE_KEY);
+    const reportAnalysis = reportRaw ? JSON.parse(reportRaw) : null;
+
+    if (hasPendingReport && reportAnalysis) {
+      await supabase.from("relationship_reports").insert({
+        user_id: user.id,
+        analysis_json: reportAnalysis,
+      });
+      localStorage.removeItem(PENDING_REPORT_SAVE_KEY);
+    }
+
+    const finalPath = consumeStoredRedirect(redirectTarget);
+    location.href = finalPath;
+    return true;
+  }
+
+  (async () => {
+    const supabase = await getSupabaseClient();
+    if (!supabase) return;
+    const params = parseUrlParams();
+    if (params.get("auth_callback") === "1") {
+      submitButton.disabled = true;
+      statusText.textContent =
+        deepGet(window.__BLEN_LOCALE__, "login.callbackLoading") ||
+        "Completing login...";
+      const done = await finalizeAfterLogin(supabase);
+      if (!done) {
+        submitButton.disabled = false;
+        statusText.textContent =
+          deepGet(window.__BLEN_LOCALE__, "login.error") || "Login failed. Try again.";
+      }
+      return;
+    }
+    const { data: existingSession } = await supabase.auth.getSession();
+    if (existingSession?.session) {
+      localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(existingSession.session));
+    }
+  })();
+
+  if (googleButton) {
+    googleButton.addEventListener("click", async () => {
+      submitButton.disabled = true;
+      googleButton.disabled = true;
+      statusText.textContent = deepGet(window.__BLEN_LOCALE__, "login.loading") || "Loading...";
+      try {
+        const supabase = await getSupabaseClient();
+        if (!supabase) throw new Error("Supabase client unavailable");
+        localStorage.setItem(POST_LOGIN_REDIRECT_KEY, redirectTarget);
+        const callbackPath = localeUrl(currentLang, "login");
+        const redirectTo = toAbsoluteUrl(
+          `${callbackPath}?auth_callback=1&redirect=${encodeURIComponent(redirectTarget)}`
+        );
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: "google",
+          options: { redirectTo },
+        });
+        if (error) throw error;
+      } catch (_) {
+        statusText.textContent =
+          deepGet(window.__BLEN_LOCALE__, "login.error") || "Login failed. Try again.";
+        submitButton.disabled = false;
+        googleButton.disabled = false;
+      }
+    });
+  }
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     const email = emailInput.value.trim();
-    const password = passwordInput.value.trim();
-    if (!email || !password) return;
+    if (!email) return;
 
     submitButton.disabled = true;
     statusText.textContent = deepGet(window.__BLEN_LOCALE__, "login.loading") || "Loading...";
@@ -641,29 +882,20 @@ function bindLoginPage() {
     try {
       const supabase = await getSupabaseClient();
       if (!supabase) throw new Error("Supabase client unavailable");
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error || !data?.session) {
-        throw new Error(error?.message || "Login failed");
-      }
-      localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(data.session));
-      setSavedLang(getCurrentLang());
-
-      const hasPendingReport = localStorage.getItem(PENDING_REPORT_SAVE_KEY) === "1";
-      const reportRaw =
-        localStorage.getItem(ANALYSIS_STORAGE_KEY) ||
-        localStorage.getItem(LEGACY_ANALYSIS_STORAGE_KEY);
-      const reportAnalysis = reportRaw ? JSON.parse(reportRaw) : null;
-
-      if (hasPendingReport && reportAnalysis) {
-        await supabase.from("relationship_reports").insert({
-          user_id: data.user.id,
-          analysis_json: reportAnalysis,
-        });
-      }
-
-      localStorage.removeItem(PENDING_REPORT_SAVE_KEY);
-      const currentLang = getCurrentLang();
-      location.href = localeUrl(currentLang, "report");
+      localStorage.setItem(POST_LOGIN_REDIRECT_KEY, redirectTarget);
+      const callbackPath = localeUrl(currentLang, "login");
+      const emailRedirectTo = toAbsoluteUrl(
+        `${callbackPath}?auth_callback=1&redirect=${encodeURIComponent(redirectTarget)}`
+      );
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: { emailRedirectTo },
+      });
+      if (error) throw new Error(error.message || "Login failed");
+      statusText.textContent =
+        deepGet(window.__BLEN_LOCALE__, "login.magicSent") ||
+        "Check your email for the magic link.";
+      submitButton.disabled = false;
     } catch (error) {
       statusText.textContent =
         deepGet(window.__BLEN_LOCALE__, "login.error") || "Login failed. Try again.";
@@ -719,6 +951,12 @@ function bindReportPage() {
   if (!token) {
     if (gate) gate.hidden = false;
     if (content) content.hidden = true;
+    const loginButton = reportRoot.querySelector(".report__login-btn");
+    if (loginButton) {
+      const currentLang = getCurrentLang();
+      const redirect = encodeURIComponent(localeUrl(currentLang, "report"));
+      loginButton.setAttribute("href", `${localeUrl(currentLang, "login")}?redirect=${redirect}`);
+    }
     return;
   }
   if (gate) gate.hidden = true;
@@ -726,8 +964,11 @@ function bindReportPage() {
   (async () => {
     const supabase = await getSupabaseClient();
     if (!supabase) return;
-    const { data: userResult } = await supabase.auth.getUser();
-    const user = userResult?.user;
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+    if (userError) return;
     if (!user) {
       if (gate) gate.hidden = false;
       if (content) content.hidden = true;

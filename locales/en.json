@@ -302,17 +302,22 @@
   },
   "login": {
     "title": "Log in to Save Your Report",
-    "subtitle": "Log in to save your relationship report and view it again later.",
+    "subtitle": "Use Google or a magic link. No password needed.",
     "emailLabel": "Email",
-    "passwordLabel": "Password",
-    "submit": "Log In",
-    "helper": "Enter your account details to continue.",
+    "submit": "Send Magic Link",
+    "helper": "Enter your email and we'll send a secure login link.",
+    "google": "Continue with Google",
+    "or": "or",
     "loading": "Signing in...",
-    "error": "Login failed. Please check your credentials."
+    "callbackLoading": "Completing login...",
+    "magicSent": "Check your email for the magic link.",
+    "error": "Login failed. Please try again.",
+    "modalTitle": "Login Required",
+    "modalBody": "Log in to save your report."
   },
   "report": {
     "loginRequiredTitle": "Login Required",
-    "loginRequiredBody": "Log in to save your relationship report and view it again later.",
+    "loginRequiredBody": "Log in to save your report.",
     "loginButton": "Log In"
   }
 }

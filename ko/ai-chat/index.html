@@ -96,6 +96,21 @@
         <button class="ai-chat__send" type="submit" data-i18n="aiChat.send"></button>
       </form>
     </main>
+    <div class="login-modal" data-login-modal hidden>
+      <section class="login-modal__panel" role="dialog" aria-modal="true" aria-labelledby="loginModalTitle">
+        <button type="button" class="login-modal__close" data-login-modal-close aria-label="Close">×</button>
+        <h2 id="loginModalTitle" class="login-modal__title" data-i18n="login.modalTitle"></h2>
+        <p class="login-modal__copy" data-i18n="login.modalBody"></p>
+        <button type="button" class="login-modal__oauth" data-login-google data-i18n="login.google"></button>
+        <p class="login-modal__divider" data-i18n="login.or"></p>
+        <form class="login-modal__form" data-login-otp-form>
+          <label class="login-modal__label" for="chatLoginEmail" data-i18n="login.emailLabel"></label>
+          <input id="chatLoginEmail" class="login-modal__input" type="email" data-login-input="email" />
+          <button type="submit" class="login-modal__submit" data-i18n="login.submit"></button>
+        </form>
+        <p class="login-modal__status" data-login-modal-status></p>
+      </section>
+    </div>
     <footer class="site-footer">
       <div class="site-footer__inner">
         <ul class="footer-nav" aria-label="Footer Menu">
