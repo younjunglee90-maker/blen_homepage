@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blen</title>
+    <link rel="stylesheet" href="../../../styles.css" />
+  </head>
+  <body data-page="aiChat" data-locale="en">
+    <main class="ai-chat">
+      <header class="ai-chat__header">
+        <h1 class="ai-chat__title" data-i18n="aiChat.title"></h1>
+        <p class="ai-chat__subtitle" data-i18n="aiChat.subtitle"></p>
+      </header>
+
+      <section class="ai-chat__messages" aria-label="AI conversation">
+        <div class="ai-chat__bubble ai-chat__bubble--ai" data-i18n="aiChat.firstMessage"></div>
+      </section>
+
+      <form class="ai-chat__input-wrap" action="javascript:void(0)">
+        <input class="ai-chat__input" type="text" data-i18n-attr="placeholder" data-i18n-key="aiChat.inputPlaceholder" />
+        <button class="ai-chat__send" type="submit" data-i18n="aiChat.send"></button>
+      </form>
+    </main>
+    <script src="../../../script.js"></script>
+  </body>
+</html>

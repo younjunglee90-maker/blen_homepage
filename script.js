@@ -4,7 +4,7 @@ const SUPPORT_RECIPIENT = "hello@blenmatch.com";
 
 const LANG_KEY = "blen-lang";
 const SUPPORTED_LANGS = ["en", "ko"];
-const PAGE_KEYS = ["home", "about", "terms", "privacy", "support"];
+const PAGE_KEYS = ["home", "about", "terms", "privacy", "support", "relationshipTest", "aiChat"];
 
 const PAGE_PATHS = {
   home: "",
@@ -12,6 +12,8 @@ const PAGE_PATHS = {
   terms: "terms",
   privacy: "privacy",
   support: "support",
+  relationshipTest: "relationship-test",
+  aiChat: "ai-chat",
 };
 
 function getSavedLang() {
@@ -88,6 +90,8 @@ function applyI18n(locale) {
     terms: "meta.titleTerms",
     privacy: "meta.titlePrivacy",
     support: "meta.titleSupport",
+    relationshipTest: "meta.titleRelationshipTest",
+    aiChat: "meta.titleAiChat",
   };
   const pageTitle = deepGet(window.__BLEN_LOCALE__, titleMap[page]);
   if (typeof pageTitle === "string") document.title = pageTitle;
@@ -314,10 +318,18 @@ function bindPreviewCTA() {
   if (!ctaButton) return;
 
   ctaButton.addEventListener("click", () => {
-    document.getElementById("download-section")?.scrollIntoView({
-      behavior: "smooth",
-      block: "center",
-    });
+    const currentLang = getCurrentLang();
+    location.href = localeUrl(currentLang, "relationshipTest");
+  });
+}
+
+function bindRelationshipTestCTA() {
+  const startButton = document.querySelector("[data-go-ai-chat]");
+  if (!startButton) return;
+
+  startButton.addEventListener("click", () => {
+    const currentLang = getCurrentLang();
+    location.href = localeUrl(currentLang, "aiChat");
   });
 }
 
@@ -350,6 +362,7 @@ async function init() {
   bindSupportForm();
   bindPreviewCarousel();
   bindPreviewCTA();
+  bindRelationshipTestCTA();
 }
 
 if (document.readyState === "loading") {

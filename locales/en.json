@@ -4,7 +4,9 @@
     "titleAbout": "About Us | Blen",
     "titleTerms": "Terms of Service | Blen",
     "titlePrivacy": "Privacy Policy | Blen",
-    "titleSupport": "Customer Support | Blen"
+    "titleSupport": "Customer Support | Blen",
+    "titleRelationshipTest": "Relationship Tendency Test | Blen",
+    "titleAiChat": "Blen AI Chat | Blen"
   },
   "common": {
     "languageAria": "Language selector",
@@ -271,5 +273,17 @@
       "bodyEmailLabel": "Email",
       "bodyMessageLabel": "Message"
     }
+  },
+  "relationshipTest": {
+    "title": "Romantic Relationship Tendency Test",
+    "subtitle": "What kind of personality is my best match?",
+    "cta": "Start"
+  },
+  "aiChat": {
+    "title": "Blen AI",
+    "subtitle": "I will learn your dating style step by step",
+    "firstMessage": "Hi, welcome to Blen. Want to find your match with me?",
+    "inputPlaceholder": "Type your answer",
+    "send": "Send"
   }
 }

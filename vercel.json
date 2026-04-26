@@ -7,9 +7,15 @@
     { "source": "/en/terms", "destination": "/en/terms/" },
     { "source": "/en/privacy", "destination": "/en/privacy/" },
     { "source": "/en/support", "destination": "/en/support/" },
+    { "source": "/en/relationship-test", "destination": "/en/relationship-test/" },
+    { "source": "/en/ai-chat", "destination": "/en/ai-chat/" },
     { "source": "/ko/about", "destination": "/ko/about/" },
     { "source": "/ko/terms", "destination": "/ko/terms/" },
     { "source": "/ko/privacy", "destination": "/ko/privacy/" },
-    { "source": "/ko/support", "destination": "/ko/support/" }
+    { "source": "/ko/support", "destination": "/ko/support/" },
+    { "source": "/ko/relationship-test", "destination": "/ko/relationship-test/" },
+    { "source": "/ko/ai-chat", "destination": "/ko/ai-chat/" },
+    { "source": "/relationship-test", "destination": "/relationship-test/" },
+    { "source": "/ai-chat", "destination": "/ai-chat/" }
   ]
 }

@@ -4,7 +4,9 @@
     "titleAbout": "회사소개 | Blen",
     "titleTerms": "이용약관 | Blen",
     "titlePrivacy": "개인정보처리방침 | Blen",
-    "titleSupport": "고객센터 | Blen"
+    "titleSupport": "고객센터 | Blen",
+    "titleRelationshipTest": "연애 성향 분석 테스트 | Blen",
+    "titleAiChat": "Blen AI 채팅 | Blen"
   },
   "common": {
     "languageAria": "언어 선택",
@@ -264,5 +266,17 @@
       "bodyEmailLabel": "이메일",
       "bodyMessageLabel": "문의 내용"
     }
+  },
+  "relationshipTest": {
+    "title": "나의 연애 성향 분석 테스트",
+    "subtitle": "나는 어떤 성향이랑 잘 맞을까?",
+    "cta": "시작하기"
+  },
+  "aiChat": {
+    "title": "Blen AI",
+    "subtitle": "너의 연애 성향을 천천히 알아볼게",
+    "firstMessage": "안녕, 블렌에 온 걸 환영해. 나와 같이 너의 인연을 찾아볼래?",
+    "inputPlaceholder": "답변을 입력해 주세요",
+    "send": "전송"
   }
 }
