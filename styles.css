@@ -392,7 +392,7 @@ html[lang="ko"] .hero__subtitle {
 }
 
 .app-preview__slide-title {
-  margin: 0 0 12px;
+  margin: 6px 0 12px;
   font-size: clamp(1.1rem, 2.16vw, 1.2rem);
   font-weight: 700;
   color: #1a1a1a;
