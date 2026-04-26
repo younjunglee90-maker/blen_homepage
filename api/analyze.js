@@ -2,7 +2,14 @@ const ANALYZE_SYSTEM_PROMPT = `
 You are Blen’s relationship analysis engine.
 
 Your job:
-Analyze the full conversation and convert the user's answers into structured JSON for a relationship report.
+Analyze the full conversation and return BOTH:
+1) structured relationship JSON
+2) a human-readable Korean report text
+
+Core principle:
+- Do NOT explain the user in dry analytical language.
+- DESCRIBE the user like a real person.
+- The user should feel: "이거 뭐야... 나인데?"
 
 Output rules:
 - Output JSON only.
@@ -12,77 +19,114 @@ Output rules:
 - Do not continue chatting.
 - Do not ask questions.
 - Do not diagnose mental health conditions.
-
-Analyze these areas:
-1. Values: relationship goal, money/lifestyle, family values, work-life balance
-2. Attachment: secure, anxious, avoidant
-3. Conflict style: avoidant, aggressive, defensive, solution-oriented
-4. Personality: impulsivity, anxiety, empathy, self-control
-
-Scoring:
-- Numeric scores must be 0.0 to 1.0.
-- If evidence is unclear, use 0.5.
-- Strong repeated emotional evidence should increase confidence.
+- Never say "데이터가 부족하다".
+- If something is unclear, infer carefully and phrase softly.
+- Do NOT overclaim certainty.
 
 Return this exact JSON structure:
 
 {
-  "values": {
-    "relationship_goal": "casual | serious | marriage | unclear",
-    "money_values": "saving | spending | balance | unclear",
-    "lifestyle": "active | relaxed | work_focused | balanced | unclear",
-    "family_values": "important | neutral | independent | unclear",
-    "work_life_balance": "career_first | balanced | life_first | unclear"
+  "relationship_style": {
+    "type": "",
+    "score": 0,
+    "evidence": "",
+    "summary": ""
   },
-  "attachment": {
-    "secure": 0.0,
-    "anxious": 0.0,
-    "avoidant": 0.0,
-    "primary_attachment": "secure | anxious | avoidant | mixed | unclear"
+  "core_values": {
+    "top_values": [],
+    "summary": "",
+    "evidence": ""
   },
-  "conflict_style": {
-    "avoidant": 0.0,
-    "aggressive": 0.0,
-    "defensive": 0.0,
-    "solution_oriented": 0.0,
-    "primary_conflict_style": "avoidant | aggressive | defensive | solution_oriented | mixed | unclear"
+  "attraction_pattern": {
+    "primary_attraction": "",
+    "hidden_pattern": "",
+    "summary": ""
   },
-  "personality": {
-    "impulsivity": 0.0,
-    "anxiety": 0.0,
-    "empathy": 0.0,
-    "self_control": 0.0
+  "communication_style": {
+    "type": "",
+    "conflict_response": "",
+    "summary": ""
   },
-  "report": {
-    "headline": "",
+  "emotional_pattern": {
+    "attachment_tendency": "",
+    "emotional_trigger": "",
+    "summary": ""
+  },
+  "boundaries": {
+    "non_negotiables": [],
+    "healthy_boundaries": "",
+    "warning_signs": []
+  },
+  "strengths": [],
+  "risks": [],
+  "ideal_partner": {
+    "personality": "",
     "relationship_style": "",
-    "core_values": "",
-    "attraction_pattern": "",
     "communication_style": "",
-    "emotional_pattern": "",
-    "dealbreakers": "",
-    "strength_and_risk": "",
-    "ideal_partner": "",
-    "one_line_summary": ""
+    "summary": ""
   },
+  "tags": [],
+  "one_line_summary": "",
   "confidence": {
-    "overall": 0.0,
-    "missing_data": []
-  }
+    "score": 0,
+    "reason": ""
+  },
+  "final_report": {
+    "한 줄 요약": "",
+    "너의 연애 핵심": "",
+    "너의 연애 스타일": "",
+    "너가 사랑에 빠지는 방식": "",
+    "연애할 때 너의 모습": "",
+    "갈등 생기면 너는 이렇게 함": "",
+    "너의 연애 강점": "",
+    "너의 연애 리스크": "",
+    "너랑 잘 맞는 사람": "",
+    "너를 위한 연애 조언": ""
+  },
+  "report_text": ""
 }
 
-Report writing rules:
-- Write the report in the user's language.
-- If user spoke Korean, write warm natural Korean.
-- If user spoke English, write natural English.
-- Make it clear, readable, emotionally insightful, and premium.
-- Avoid generic statements.
-- Do not mention ENRICH, ECR, Gottman, TCI, JSON, or scores.
-- Do not label the user negatively.
-- Never say data is insufficient.
-- Always provide complete content for every report section, using best-fit inference from conversation context.
-- "strength_and_risk" should include both strength and gentle caution.
-- "one_line_summary" should feel like an emotional closing sentence.
+Extraction rules:
+1) relationship_style.type must be one closest type among:
+   안정지향형, 설렘추구형, 신중탐색형, 깊은관계형, 자유로운연애형, 헌신형
+2) core_values.top_values: extract 3-5 values.
+3) attraction_pattern: infer primary attraction + hidden pattern.
+4) communication_style: classify from conversational/conflict behavior.
+5) emotional_pattern.attachment_tendency: use soft wording like "~경향이 있어".
+6) boundaries: include non-negotiables, healthy boundaries, warning signs.
+7) strengths: 3-5 concrete strengths.
+8) risks: 3-5 gentle, practical cautions (not harsh).
+9) ideal_partner: describe best-fit person and dynamic.
+10) tags: 3-5 short Korean tags (e.g., 신뢰중심, 안정지향).
+11) confidence.score:
+   - rich answers: usually 80-95
+   - short answers: usually 60-75
+   - never frame confidence negatively.
+
+Report generation rules:
+- Report language: Korean only.
+- Tone: warm, insightful, slightly fun, casual Korean 반말.
+- Feel like a smart friend who understands relationships.
+- Avoid stiff psychological jargon.
+- Use real-life behavior language (e.g., 연락 패턴, 감정 반응, 싸울 때 반응).
+- Use soft inference language:
+  - "~인 편이야"
+  - "~하는 경향이 있어"
+  - "~일 가능성이 커"
+- "한 줄 요약": one strong, bold hook line that feels personal and slightly provocative.
+- "너의 연애 핵심": summarize 3 short traits in natural sentence form.
+- Each of the other final_report sections: 3-5 sentences, personal and specific.
+- "너를 위한 연애 조언": practical, direct, useful, slightly sharp but kind.
+- Never use generic filler sentences.
+- Avoid repeating the same sentence pattern.
+- final_report and report_text must be emotionally engaging, useful, shareable.
+- report_text should read like one polished report that covers all 10 sections naturally.
+
+Final quality check before output:
+- Does this feel like a real person wrote it?
+- Would the user want to screenshot and share it?
+- Does each section feel specific and tailored?
+- If not, rewrite internally before returning final JSON.
 `.trim();
 
 const ANALYZE_MODEL = "gpt-4o-mini";
@@ -162,9 +206,94 @@ function extractJson(text) {
   }
 }
 
+function warnIfReportShapeIncomplete(parsed) {
+  if (!parsed || typeof parsed !== "object") return;
+  if (process.env.NODE_ENV === "production") return;
+  const missing = [];
+  if (!parsed.final_report || typeof parsed.final_report !== "object") {
+    missing.push("final_report");
+  }
+  if (!parsed.report_text || typeof parsed.report_text !== "string" || !parsed.report_text.trim()) {
+    missing.push("report_text");
+  }
+  if (missing.length) {
+    console.warn(
+      `[Blen][analyze] Missing expected report fields: ${missing.join(", ")}`
+    );
+  }
+}
+
 function toClientReportShape(raw) {
   const base = fallbackAnalysis();
+  const structured = raw?.relationship_style ? raw : raw?.structured_json || raw || {};
   const report = raw?.report || {};
+  const finalReport = raw?.final_report || {};
+  const coreValues = Array.isArray(structured?.core_values?.top_values)
+    ? structured.core_values.top_values.filter((item) => typeof item === "string" && item.trim().length > 0)
+    : [];
+  const nonNegotiables = Array.isArray(structured?.boundaries?.non_negotiables)
+    ? structured.boundaries.non_negotiables.filter((item) => typeof item === "string" && item.trim().length > 0)
+    : [];
+  const warningSigns = Array.isArray(structured?.boundaries?.warning_signs)
+    ? structured.boundaries.warning_signs.filter((item) => typeof item === "string" && item.trim().length > 0)
+    : [];
+  const strengths = Array.isArray(structured?.strengths)
+    ? structured.strengths.filter((item) => typeof item === "string" && item.trim().length > 0)
+    : [];
+  const risks = Array.isArray(structured?.risks)
+    ? structured.risks.filter((item) => typeof item === "string" && item.trim().length > 0)
+    : [];
+  const confidenceScore =
+    typeof structured?.confidence?.score === "number"
+      ? Math.max(0, Math.min(1, structured.confidence.score > 1 ? structured.confidence.score / 100 : structured.confidence.score))
+      : base.confidence.overall;
+  const tags = Array.isArray(structured?.tags)
+    ? structured.tags.filter((item) => typeof item === "string" && item.trim().length > 0).slice(0, 5)
+    : [];
+  const headlineFromType = structured?.relationship_style?.type || "";
+  const relationshipStyleText =
+    finalReport["너의 연애 스타일"] ||
+    finalReport["연애 스타일"] ||
+    structured?.relationship_style?.summary ||
+    report.relationship_style ||
+    base.report_inputs.relationship_style;
+  const coreValuesText =
+    finalReport["핵심 가치관"] || structured?.core_values?.summary || report.core_values || "";
+  const attractionText =
+    finalReport["너가 사랑에 빠지는 방식"] ||
+    finalReport["끌림 패턴"] ||
+    structured?.attraction_pattern?.summary ||
+    report.attraction_pattern ||
+    base.report_inputs.attraction_pattern;
+  const communicationText =
+    finalReport["연애할 때 너의 모습"] ||
+    finalReport["커뮤니케이션 스타일"] ||
+    structured?.communication_style?.summary ||
+    report.communication_style ||
+    base.report_inputs.communication_style;
+  const emotionalText =
+    finalReport["감정 패턴"] || structured?.emotional_pattern?.summary || report.emotional_pattern || base.report_inputs.emotional_pattern;
+  const boundaryText =
+    finalReport["갈등 생기면 너는 이렇게 함"] ||
+    finalReport["관계 속 경계선"] ||
+    structured?.boundaries?.healthy_boundaries ||
+    "";
+  const strengthText =
+    finalReport["너의 연애 강점"] || finalReport["강점"] || (strengths.length ? strengths.join(" ") : "");
+  const riskText =
+    finalReport["너의 연애 리스크"] || finalReport["리스크"] || (risks.length ? risks.join(" ") : "");
+  const idealText =
+    finalReport["너랑 잘 맞는 사람"] ||
+    finalReport["이상적인 인연"] ||
+    structured?.ideal_partner?.summary ||
+    report.ideal_partner ||
+    base.report_inputs.ideal_partner_traits.join(", ");
+  const oneLineSummary =
+    finalReport["한 줄 요약"] || structured?.one_line_summary || report.one_line_summary || base.report_inputs.one_line_summary;
+  const adviceText =
+    finalReport["너를 위한 연애 조언"] ||
+    "너는 애매한 신호를 오래 붙잡고 있으면 마음이 빨리 지칠 수 있어. 관계 초반에 기준을 솔직하게 말하고, 맞지 않으면 빨리 선을 정해주는 게 너를 더 편하게 해줄 거야.";
+
   return {
     values: { ...base.values, ...(raw?.values || {}) },
     attachment: { ...base.attachment, ...(raw?.attachment || {}) },
@@ -172,31 +301,63 @@ function toClientReportShape(raw) {
     personality: { ...base.personality, ...(raw?.personality || {}) },
     report_inputs: {
       ...base.report_inputs,
-      headline_keyword: report.headline || base.report_inputs.headline_keyword,
-      relationship_style: report.relationship_style || base.report_inputs.relationship_style,
-      core_values:
-        typeof report.core_values === "string"
-          ? [report.core_values]
-          : base.report_inputs.core_values,
-      attraction_pattern: report.attraction_pattern || base.report_inputs.attraction_pattern,
-      communication_style: report.communication_style || base.report_inputs.communication_style,
-      emotional_pattern: report.emotional_pattern || base.report_inputs.emotional_pattern,
-      dealbreakers:
-        typeof report.dealbreakers === "string"
-          ? [report.dealbreakers]
-          : base.report_inputs.dealbreakers,
-      strengths:
-        typeof report.strength_and_risk === "string"
-          ? [report.strength_and_risk]
-          : base.report_inputs.strengths,
-      risks: base.report_inputs.risks,
-      ideal_partner_traits:
-        typeof report.ideal_partner === "string"
+      headline_keyword: headlineFromType || report.headline || base.report_inputs.headline_keyword,
+      relationship_style: relationshipStyleText,
+      core_values: (() => {
+        if (coreValues.length) return coreValues;
+        if (coreValuesText && typeof coreValuesText === "string") return [coreValuesText];
+        if (Array.isArray(report.core_values)) {
+          const items = report.core_values.filter((item) => typeof item === "string" && item.trim().length > 0);
+          return items.length ? items : base.report_inputs.core_values;
+        }
+        if (typeof report.core_values === "string" && report.core_values.trim().length > 0) {
+          return [report.core_values];
+        }
+        return base.report_inputs.core_values;
+      })(),
+      attraction_pattern: attractionText,
+      communication_style: communicationText,
+      emotional_pattern: emotionalText,
+      dealbreakers: (() => {
+        if (nonNegotiables.length || warningSigns.length) {
+          return [...nonNegotiables, ...warningSigns].slice(0, 5);
+        }
+        if (boundaryText && typeof boundaryText === "string") return [boundaryText];
+        if (Array.isArray(report.dealbreakers)) {
+          const items = report.dealbreakers.filter((item) => typeof item === "string" && item.trim().length > 0);
+          return items.length ? items : base.report_inputs.dealbreakers;
+        }
+        if (typeof report.dealbreakers === "string" && report.dealbreakers.trim().length > 0) {
+          return [report.dealbreakers];
+        }
+        return base.report_inputs.dealbreakers;
+      })(),
+      strengths: strengths.length
+        ? strengths
+        : typeof strengthText === "string" && strengthText.trim().length > 0
+          ? [strengthText]
+          : typeof report.strengths === "string" && report.strengths.trim().length > 0
+            ? [report.strengths]
+            : typeof report.strength_and_risk === "string" && report.strength_and_risk.trim().length > 0
+              ? [report.strength_and_risk]
+              : base.report_inputs.strengths,
+      risks: risks.length
+        ? risks
+        : typeof riskText === "string" && riskText.trim().length > 0
+          ? [riskText]
+          : typeof report.risks === "string" && report.risks.trim().length > 0
+            ? [report.risks]
+            : base.report_inputs.risks,
+      ideal_partner_traits: typeof idealText === "string" && idealText.trim().length > 0
+        ? [idealText]
+        : typeof report.ideal_partner === "string"
           ? [report.ideal_partner]
           : base.report_inputs.ideal_partner_traits,
-      one_line_summary: report.one_line_summary || base.report_inputs.one_line_summary,
+      one_line_summary: oneLineSummary,
+      dating_advice: adviceText,
     },
-    confidence: { ...base.confidence, ...(raw?.confidence || {}) },
+    confidence: { ...base.confidence, ...(raw?.confidence || {}), overall: confidenceScore },
+    tags,
   };
 }
 
@@ -247,6 +408,7 @@ module.exports = async (req, res) => {
       res.status(200).json(fallbackAnalysis());
       return;
     }
+    warnIfReportShapeIncomplete(parsed);
 
     res.status(200).json(toClientReportShape(parsed));
   } catch (_) {

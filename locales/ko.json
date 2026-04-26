@@ -277,8 +277,8 @@
   "aiChat": {
     "title": "Blen AI",
     "subtitle": "너의 연애 성향을 천천히 알아볼게",
-    "firstMessage": "안녕, 블렌에 온 걸 환영해. 나와 같이 너의 인연을 찾아볼래?",
-    "guidanceMessage": "답변을 길고 솔직하게 들려줄수록, Blen AI가 너의 연애 성향을 더 섬세하게 이해할 수 있어.",
+    "firstMessage": "안녕 🙂 너의 연애 스타일을 같이 알아볼게.\n편하게 대답해줘도 되고, 길게 말해줄수록 더 정확하게 분석할 수 있어.",
+    "guidanceMessage": "",
     "progressLabel": "분석 진행률",
     "finalAckMessage": "좋아, 이제 너에 대해 꽤 잘 알 것 같아. 지금까지 얘기한 걸 바탕으로 너의 연애 성향을 정리해볼게.",
     "analyzingMessage": "분석 중...",

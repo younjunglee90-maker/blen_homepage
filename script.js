@@ -461,7 +461,9 @@ function createFallbackAnalysis() {
       strengths: ["공감 능력", "관계를 지키려는 책임감"],
       risks: ["상대의 반응을 과하게 신경 쓰며 혼자 지칠 수 있어."],
       ideal_partner_traits: ["대화를 존중하는 사람", "감정적으로 안정적인 사람"],
-      one_line_summary: "너는 진심을 주고받는 안정적인 관계에서 가장 빛나는 사람이야.",
+      one_line_summary: "너는 확신 없는 관계를 오래 버티기보다, 마음이 맞는 사람에게 깊게 몰입하는 타입이야.",
+      dating_advice:
+        "애매한 신호를 오래 견디기보다 초반에 기준을 분명히 말해줘. 너한테 맞지 않는 패턴은 빨리 정리할수록 마음이 훨씬 덜 지쳐.",
     },
     confidence: {
       overall: 0.2,
@@ -581,7 +583,7 @@ function bindAiChatFlow() {
 
   const firstMessage = deepGet(window.__BLEN_LOCALE__, "aiChat.firstMessage");
   const guidanceMessage = deepGet(window.__BLEN_LOCALE__, "aiChat.guidanceMessage");
-  const totalQuestions = 13;
+  const totalQuestions = 15;
 
   const headerEl = chatRoot.querySelector(".ai-chat__header");
   const progressEl = document.createElement("section");
@@ -909,7 +911,21 @@ function bindReportPage() {
     setText("[data-report-risk]", (report.risks || []).join(" "));
     setText("[data-report-ideal-partner]", (report.ideal_partner_traits || []).join(", "));
     setText("[data-report-one-line]", report.one_line_summary || "");
+    setText("[data-report-advice]", report.dating_advice || "");
+    const setTag = (selector, value) => {
+      const el = reportRoot.querySelector(selector);
+      if (el) el.textContent = value;
+    };
     const isKo = getCurrentLang() === "ko";
+    const analysisTags = Array.isArray(analysis?.tags)
+      ? analysis.tags.filter((tag) => typeof tag === "string" && tag.trim().length > 0)
+      : [];
+    if (analysisTags.length) {
+      setTag("[data-report-tag1]", analysisTags[0] || "");
+      setTag("[data-report-tag2]", analysisTags[1] || "");
+      setTag("[data-report-tag3]", analysisTags[2] || "");
+      return;
+    }
     const goalTagMap = isKo
       ? {
           marriage: "안정지향",
@@ -940,10 +956,6 @@ function bindReportPage() {
           ? "자율존중"
           : "Autonomy-aware";
     const tag1 = goalTagMap[analysis?.values?.relationship_goal] || (isKo ? "안정지향" : "Stable-minded");
-    const setTag = (selector, value) => {
-      const el = reportRoot.querySelector(selector);
-      if (el) el.textContent = value;
-    };
     setTag("[data-report-tag1]", tag1);
     setTag("[data-report-tag2]", attachmentTag);
     setTag("[data-report-tag3]", trustTag);
