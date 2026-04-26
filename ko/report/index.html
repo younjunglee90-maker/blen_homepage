@@ -44,12 +44,6 @@
     </header>
 
     <main class="report">
-      <section class="report__login-gate" data-report-login-gate hidden>
-        <h1 class="report__login-title" data-i18n="report.loginRequiredTitle"></h1>
-        <p class="report__login-copy" data-i18n="report.loginRequiredBody"></p>
-        <a class="report__login-btn" href="/ko/login" data-i18n="report.loginButton"></a>
-      </section>
-
       <div data-report-content>
       <section class="report__hero">
         <p class="report__kicker">Blen Relationship Report</p>
@@ -71,6 +65,19 @@
         <h2>한 줄 요약</h2>
         <p data-report-one-line></p>
       </section>
+
+      <section class="report__share" data-report-share>
+        <h2 class="report__share-title" data-i18n="report.shareTitle"></h2>
+        <p class="report__share-copy" data-i18n="report.shareDescription"></p>
+        <div class="report__share-actions">
+          <button type="button" class="report__share-btn" data-share-copy data-i18n="report.shareCopy"></button>
+          <button type="button" class="report__share-btn" data-share-native data-i18n="report.shareNative"></button>
+          <button type="button" class="report__share-btn" data-share-kakao data-i18n="report.shareKakao"></button>
+          <button type="button" class="report__share-btn" data-share-instagram data-i18n="report.shareInstagram"></button>
+        </div>
+        <p class="report__share-warning" data-i18n="report.shareWarning"></p>
+      </section>
+      <p class="report__share-toast" data-share-toast hidden></p>
       </div>
     </main>
 

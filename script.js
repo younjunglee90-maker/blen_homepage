@@ -125,6 +125,10 @@ function toAbsoluteUrl(pathOrUrl) {
   }
 }
 
+function createLocalReportShareId() {
+  return `r_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+}
+
 function setActiveLangButton(lang) {
   let currentLabel = "";
   document.querySelectorAll(".site-lang__btn").forEach((btn) => {
@@ -568,26 +572,6 @@ function renderTypingBubble(messagesEl) {
   return row;
 }
 
-function renderReportUnlock(messagesEl, label, onClick) {
-  const row = document.createElement("article");
-  row.className = "ai-chat__unlock";
-
-  const button = document.createElement("button");
-  button.type = "button";
-  button.className = "ai-chat__unlock-btn";
-  button.textContent = label;
-  button.addEventListener("click", onClick);
-
-  row.appendChild(button);
-  messagesEl.appendChild(row);
-  messagesEl.scrollTop = messagesEl.scrollHeight;
-  window.requestAnimationFrame(() => {
-    messagesEl.scrollTop = messagesEl.scrollHeight;
-  });
-
-  return button;
-}
-
 function bindAiChatFlow() {
   const chatRoot = document.querySelector(".ai-chat");
   const messagesEl = chatRoot ? chatRoot.querySelector(".ai-chat__messages") : null;
@@ -633,161 +617,13 @@ function bindAiChatFlow() {
   }
 
   let userTurnCount = 0;
-  let qualityScore = 0;
+  let currentQuestionIndex = 0;
+  let isWaitingForFinalAnswer = false;
   let analysisRequested = false;
-  let analysisResult = null;
-  let unlockButton = null;
-  let unlockInProgress = false;
   let isRequesting = false;
   const conversationHistory = [];
   const sendButton = form.querySelector(".ai-chat__send");
   const sendLabel = sendButton ? sendButton.textContent : "";
-  const loginModal = document.querySelector("[data-login-modal]");
-  const modalCloseButton = loginModal ? loginModal.querySelector("[data-login-modal-close]") : null;
-  const modalGoogleButton = loginModal ? loginModal.querySelector("[data-login-google]") : null;
-  const modalOtpForm = loginModal ? loginModal.querySelector("[data-login-otp-form]") : null;
-  const modalOtpInput = modalOtpForm ? modalOtpForm.querySelector('[data-login-input="email"]') : null;
-  const modalStatus = loginModal ? loginModal.querySelector("[data-login-modal-status]") : null;
-
-  function closeLoginModal() {
-    if (!loginModal) return;
-    loginModal.hidden = true;
-    document.body.classList.remove("has-modal-open");
-  }
-
-  function openLoginModal() {
-    if (!loginModal) return;
-    loginModal.hidden = false;
-    document.body.classList.add("has-modal-open");
-    if (modalOtpInput) modalOtpInput.focus();
-  }
-
-  async function signInWithGoogle(redirectPath) {
-    const supabase = await getSupabaseClient();
-    if (!supabase) throw new Error("Supabase client unavailable");
-    localStorage.setItem(POST_LOGIN_REDIRECT_KEY, redirectPath);
-    const callbackPath = localeUrl(getCurrentLang(), "login");
-    const redirectTo = toAbsoluteUrl(
-      `${callbackPath}?auth_callback=1&redirect=${encodeURIComponent(redirectPath)}`
-    );
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo },
-    });
-    if (error) throw error;
-  }
-
-  async function signInWithOtp(email, redirectPath) {
-    const supabase = await getSupabaseClient();
-    if (!supabase) throw new Error("Supabase client unavailable");
-    localStorage.setItem(POST_LOGIN_REDIRECT_KEY, redirectPath);
-    const callbackPath = localeUrl(getCurrentLang(), "login");
-    const emailRedirectTo = toAbsoluteUrl(
-      `${callbackPath}?auth_callback=1&redirect=${encodeURIComponent(redirectPath)}`
-    );
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo },
-    });
-    if (error) throw error;
-  }
-
-  async function ensureReportSavedAfterLogin(analysis) {
-    if (!analysis) return;
-    localStorage.setItem(ANALYSIS_STORAGE_KEY, JSON.stringify(analysis));
-    localStorage.setItem(PENDING_REPORT_SAVE_KEY, "1");
-    const redirectPath = localeUrl(getCurrentLang(), "report");
-    localStorage.setItem(POST_LOGIN_REDIRECT_KEY, redirectPath);
-  }
-
-  async function proceedToReportWithUnlock() {
-    if (unlockInProgress || !analysisResult) return;
-    unlockInProgress = true;
-    if (unlockButton) {
-      unlockButton.disabled = true;
-      unlockButton.textContent =
-        deepGet(window.__BLEN_LOCALE__, "aiChat.unlockLoading") || "Preparing your report...";
-    }
-
-    const reportPath = localeUrl(getCurrentLang(), "report");
-    localStorage.setItem(POST_LOGIN_REDIRECT_KEY, reportPath);
-
-    try {
-      const user = await getLoggedInSupabaseUser();
-      if (!user) {
-        if (unlockButton) unlockButton.disabled = false;
-        unlockInProgress = false;
-        openLoginModal();
-        return;
-      }
-
-      const saved = await saveAnalysisToReportStore(analysisResult);
-      if (saved) {
-        localStorage.removeItem(PENDING_REPORT_SAVE_KEY);
-      } else {
-        localStorage.setItem(PENDING_REPORT_SAVE_KEY, "1");
-      }
-      location.href = reportPath;
-    } catch (_) {
-      localStorage.setItem(PENDING_REPORT_SAVE_KEY, "1");
-      if (unlockButton) {
-        unlockButton.disabled = false;
-        unlockButton.textContent =
-          deepGet(window.__BLEN_LOCALE__, "aiChat.unlockCta") || "View My Report";
-      }
-      unlockInProgress = false;
-    }
-  }
-
-  if (modalCloseButton) {
-    modalCloseButton.addEventListener("click", closeLoginModal);
-  }
-  if (loginModal) {
-    loginModal.addEventListener("click", (event) => {
-      if (event.target === loginModal) closeLoginModal();
-    });
-  }
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") closeLoginModal();
-  });
-  if (modalGoogleButton) {
-    modalGoogleButton.addEventListener("click", async () => {
-      if (modalStatus) modalStatus.textContent = "";
-      try {
-        modalGoogleButton.disabled = true;
-        await signInWithGoogle(localeUrl(getCurrentLang(), "report"));
-      } catch (_) {
-        if (modalStatus) {
-          modalStatus.textContent =
-            deepGet(window.__BLEN_LOCALE__, "login.error") || "Login failed. Try again.";
-        }
-        modalGoogleButton.disabled = false;
-      }
-    });
-  }
-  if (modalOtpForm && modalOtpInput) {
-    modalOtpForm.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const email = modalOtpInput.value.trim();
-      if (!email) return;
-      if (modalStatus) {
-        modalStatus.textContent = deepGet(window.__BLEN_LOCALE__, "login.loading") || "Loading...";
-      }
-      try {
-        await signInWithOtp(email, localeUrl(getCurrentLang(), "report"));
-        if (modalStatus) {
-          modalStatus.textContent =
-            deepGet(window.__BLEN_LOCALE__, "login.magicSent") ||
-            "Check your email for the magic link.";
-        }
-      } catch (_) {
-        if (modalStatus) {
-          modalStatus.textContent =
-            deepGet(window.__BLEN_LOCALE__, "login.error") || "Login failed. Try again.";
-        }
-      }
-    });
-  }
 
   renderChatBubble(messagesEl, firstMessage, "ai");
   conversationHistory.push({ role: "assistant", content: firstMessage });
@@ -823,69 +659,41 @@ function bindAiChatFlow() {
     return response.json();
   }
 
-  async function saveAnalysisToReportStore(analysis) {
-    const supabase = await getSupabaseClient();
-    if (!supabase) return false;
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
-    if (userError) return false;
-    if (!user) return false;
-    const { error } = await supabase
-      .from("relationship_reports")
-      .insert({
-        user_id: user.id,
-        analysis_json: analysis,
-      });
-    return !error;
-  }
+  async function completeAfterFinalAnswer() {
+    if (analysisRequested) return;
+    analysisRequested = true;
 
-  function getMessageQualityScore(text) {
-    const trimmed = text.trim();
-    if (!trimmed) return 0;
+    renderChatBubble(
+      messagesEl,
+      deepGet(window.__BLEN_LOCALE__, "aiChat.finalAckMessage") ||
+        "좋아, 충분히 알겠어. 지금 너의 연애 성향을 분석해볼게.",
+      "ai"
+    );
+    renderChatBubble(
+      messagesEl,
+      deepGet(window.__BLEN_LOCALE__, "aiChat.analyzingMessage") || "분석 중...",
+      "ai"
+    );
 
-    let score = 0;
-    const charLength = trimmed.length;
-    if (charLength >= 6) score += 0.6;
-    if (charLength >= 14) score += 0.7;
-    if (charLength >= 28) score += 0.8;
-
-    const sentenceCount = trimmed.split(/[.!?。！？\n]/).filter(Boolean).length;
-    if (sentenceCount >= 2) score += 0.4;
-
-    const emotionalKeywords = [
-      "좋아",
-      "싫어",
-      "불안",
-      "걱정",
-      "편해",
-      "서운",
-      "외로",
-      "화나",
-      "기대",
-      "두려",
-      "행복",
-      "anxious",
-      "worried",
-      "comfortable",
-      "upset",
-      "lonely",
-      "happy",
-      "afraid",
-      "angry",
-      "trust",
-    ];
-    const lowered = trimmed.toLowerCase();
-    if (emotionalKeywords.some((k) => lowered.includes(k))) score += 0.6;
-
-    return Math.min(2.8, score);
-  }
-
-  function shouldRunAnalysis() {
-    if (userTurnCount >= 12) return true;
-    if (userTurnCount < 10) return false;
-    return qualityScore >= 10.0;
+    try {
+      const analysis = await requestAnalysis();
+      localStorage.setItem(ANALYSIS_STORAGE_KEY, JSON.stringify(analysis));
+      updateProgress(true);
+      const reportPath = localeUrl(getCurrentLang(), "report");
+      window.setTimeout(() => {
+        location.href = reportPath;
+      }, 420);
+      return;
+    } catch (error) {
+      const fallbackAnalysis = createFallbackAnalysis();
+      localStorage.setItem(ANALYSIS_STORAGE_KEY, JSON.stringify(fallbackAnalysis));
+      updateProgress(true);
+      const reportPath = localeUrl(getCurrentLang(), "report");
+      window.setTimeout(() => {
+        location.href = reportPath;
+      }, 420);
+      return;
+    }
   }
 
   form.addEventListener("submit", async (event) => {
@@ -898,9 +706,14 @@ function bindAiChatFlow() {
     input.value = "";
     conversationHistory.push({ role: "user", content: raw });
     userTurnCount += 1;
-    qualityScore += getMessageQualityScore(raw);
     if (progressEl.hidden) progressEl.hidden = false;
     updateProgress(false);
+
+    if (isWaitingForFinalAnswer) {
+      isWaitingForFinalAnswer = false;
+      await completeAfterFinalAnswer();
+      return;
+    }
 
     let typingBubble = null;
     try {
@@ -914,6 +727,12 @@ function bindAiChatFlow() {
       if (typingBubble) typingBubble.remove();
       renderChatBubble(messagesEl, reply, "ai");
       conversationHistory.push({ role: "assistant", content: reply });
+      if (currentQuestionIndex < totalQuestions - 1) {
+        currentQuestionIndex += 1;
+        if (currentQuestionIndex === totalQuestions - 1) {
+          isWaitingForFinalAnswer = true;
+        }
+      }
     } catch (error) {
       if (typingBubble) typingBubble.remove();
       renderChatBubble(
@@ -926,53 +745,6 @@ function bindAiChatFlow() {
       if (sendButton) {
         sendButton.disabled = false;
         sendButton.textContent = sendLabel || deepGet(window.__BLEN_LOCALE__, "aiChat.send") || "Send";
-      }
-    }
-
-    if (shouldRunAnalysis() && !analysisRequested) {
-      analysisRequested = true;
-      try {
-        const analysis = await requestAnalysis();
-        analysisResult = analysis;
-        localStorage.setItem(ANALYSIS_STORAGE_KEY, JSON.stringify(analysis));
-        localStorage.setItem(PENDING_REPORT_SAVE_KEY, "1");
-        await ensureReportSavedAfterLogin(analysis);
-        updateProgress(true);
-        renderChatBubble(
-          messagesEl,
-          deepGet(window.__BLEN_LOCALE__, "aiChat.reportReadyMessage") ||
-            "고마워, 충분히 이야기해줘서. 이제 너의 리포트를 준비했어.",
-          "ai"
-        );
-        unlockButton = renderReportUnlock(
-          messagesEl,
-          deepGet(window.__BLEN_LOCALE__, "aiChat.unlockCta") || "연애 성향 레포트 보기",
-          proceedToReportWithUnlock
-        );
-        if (input) input.disabled = true;
-        if (sendButton) sendButton.disabled = true;
-        return;
-      } catch (error) {
-        const fallbackAnalysis = createFallbackAnalysis();
-        analysisResult = fallbackAnalysis;
-        localStorage.setItem(ANALYSIS_STORAGE_KEY, JSON.stringify(fallbackAnalysis));
-        localStorage.setItem(PENDING_REPORT_SAVE_KEY, "1");
-        await ensureReportSavedAfterLogin(fallbackAnalysis);
-        updateProgress(true);
-        renderChatBubble(
-          messagesEl,
-          deepGet(window.__BLEN_LOCALE__, "aiChat.reportReadyMessage") ||
-            "고마워, 충분히 이야기해줘서. 이제 너의 리포트를 준비했어.",
-          "ai"
-        );
-        unlockButton = renderReportUnlock(
-          messagesEl,
-          deepGet(window.__BLEN_LOCALE__, "aiChat.unlockCta") || "연애 성향 레포트 보기",
-          proceedToReportWithUnlock
-        );
-        if (input) input.disabled = true;
-        if (sendButton) sendButton.disabled = true;
-        return;
       }
     }
   });
@@ -1139,55 +911,207 @@ function bindReportPage() {
     setText("[data-report-one-line]", report.one_line_summary || "");
   };
 
+  const parseShareIdFromLocation = () => {
+    const params = new URLSearchParams(window.location.search || "");
+    const fromQuery = params.get("id") || params.get("share");
+    if (fromQuery) return fromQuery;
+    const segments = location.pathname.split("/").filter(Boolean);
+    const shareIndex = segments.indexOf("share");
+    if (shareIndex !== -1 && segments[shareIndex + 1]) return segments[shareIndex + 1];
+    return null;
+  };
+
+  const parseReportInputsFromText = (text) => {
+    if (!text || typeof text !== "string") return null;
+    try {
+      const parsed = JSON.parse(text);
+      return parsed && typeof parsed === "object" ? parsed : null;
+    } catch (_) {
+      return null;
+    }
+  };
+
+  const toSharedAnalysis = (row) => {
+    const reportInputsFromIdeal = row?.ideal_partner_json?.report_inputs;
+    const reportInputsFromText = parseReportInputsFromText(row?.report_text);
+    return {
+      values: row?.values_json || fallback.values,
+      attachment: row?.attachment_json || fallback.attachment,
+      conflict_style: row?.conflict_json || fallback.conflict_style,
+      personality: row?.personality_json || fallback.personality,
+      report_inputs: reportInputsFromIdeal || reportInputsFromText || fallback.report_inputs,
+      confidence: fallback.confidence,
+    };
+  };
+
+  const fetchSharedReportById = async (shareId) => {
+    const supabase = await getSupabaseClient();
+    if (!supabase || !shareId) return null;
+    const { data, error } = await supabase
+      .from("shared_reports")
+      .select("*")
+      .eq("share_id", shareId)
+      .limit(1);
+    if (error || !Array.isArray(data) || !data[0]) return null;
+    return toSharedAnalysis(data[0]);
+  };
+
+  const buildSharePayload = (analysis, shareId) => {
+    const reportInputs = analysis?.report_inputs || fallback.report_inputs;
+    return {
+      share_id: shareId,
+      report_text: JSON.stringify(reportInputs),
+      values_json: analysis?.values || fallback.values,
+      attachment_json: analysis?.attachment || fallback.attachment,
+      conflict_json: analysis?.conflict_style || fallback.conflict_style,
+      personality_json: analysis?.personality || fallback.personality,
+      ideal_partner_json: {
+        ideal_partner_traits: reportInputs.ideal_partner_traits || [],
+        one_line_summary: reportInputs.one_line_summary || "",
+        report_inputs: reportInputs,
+      },
+    };
+  };
+
   const raw =
     localStorage.getItem(ANALYSIS_STORAGE_KEY) ||
     localStorage.getItem(LEGACY_ANALYSIS_STORAGE_KEY);
   const localAnalysis = raw ? JSON.parse(raw) : fallback;
-  setFromAnalysis(localAnalysis);
-
-  const token = getSupabaseAccessTokenFromStorage();
+  const shareId = parseShareIdFromLocation();
+  let activeAnalysis = localAnalysis;
+  setFromAnalysis(activeAnalysis);
   const gate = reportRoot.querySelector("[data-report-login-gate]");
   const content = reportRoot.querySelector("[data-report-content]");
-  if (!token) {
-    if (gate) gate.hidden = false;
-    if (content) content.hidden = true;
-    const loginButton = reportRoot.querySelector(".report__login-btn");
-    if (loginButton) {
-      const currentLang = getCurrentLang();
-      const redirect = encodeURIComponent(localeUrl(currentLang, "report"));
-      loginButton.setAttribute("href", `${localeUrl(currentLang, "login")}?redirect=${redirect}`);
-    }
-    return;
-  }
   if (gate) gate.hidden = true;
   if (content) content.hidden = false;
-  (async () => {
+  reportRoot.classList.remove("report--locked");
+
+  const copyButton = reportRoot.querySelector("[data-share-copy]");
+  const nativeButton = reportRoot.querySelector("[data-share-native]");
+  const kakaoButton = reportRoot.querySelector("[data-share-kakao]");
+  const instagramButton = reportRoot.querySelector("[data-share-instagram]");
+  const toast = reportRoot.querySelector("[data-share-toast]");
+  let generatedShareId = shareId || null;
+  let toastTimer = null;
+
+  function showToast(message) {
+    if (!toast) return;
+    toast.textContent = message;
+    toast.hidden = false;
+    if (toastTimer) window.clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => {
+      toast.hidden = true;
+    }, 1800);
+  }
+
+  async function ensureShareUrl() {
+    if (!generatedShareId) generatedShareId = createLocalReportShareId();
     const supabase = await getSupabaseClient();
-    if (!supabase) return;
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
-    if (userError) return;
-    if (!user) {
-      if (gate) gate.hidden = false;
-      if (content) content.hidden = true;
-      return;
+    if (!supabase) throw new Error("Supabase client unavailable");
+    const payload = buildSharePayload(activeAnalysis, generatedShareId);
+    const { error } = await supabase.from("shared_reports").insert(payload);
+    if (error && !String(error.message || "").toLowerCase().includes("duplicate")) {
+      throw error;
     }
-    const { data, error } = await supabase
-      .from("relationship_reports")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false })
-      .limit(1);
-    if (error) return;
-    const latest = Array.isArray(data) ? data[0] : null;
-    const serverAnalysis = latest?.analysis_json;
-    if (serverAnalysis && typeof serverAnalysis === "object") {
-      localStorage.setItem(ANALYSIS_STORAGE_KEY, JSON.stringify(serverAnalysis));
-      setFromAnalysis(serverAnalysis);
+    const lang = getCurrentLang();
+    return `${window.location.origin}/${lang}/report/share/${encodeURIComponent(generatedShareId)}`;
+  }
+
+  async function copyShareUrl() {
+    if (copyButton) {
+      copyButton.disabled = true;
+      copyButton.textContent =
+        deepGet(window.__BLEN_LOCALE__, "report.shareLoading") || "Saving link...";
     }
-  })();
+    try {
+      const url = await ensureShareUrl();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        const tempInput = document.createElement("input");
+        tempInput.value = url;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand("copy");
+        document.body.removeChild(tempInput);
+      }
+      showToast(deepGet(window.__BLEN_LOCALE__, "report.shareCopied") || "Link copied!");
+    } catch (_) {
+      showToast(
+        deepGet(window.__BLEN_LOCALE__, "report.shareFailed") ||
+          "공유 링크를 만드는 중 문제가 생겼어요. 다시 시도해 주세요."
+      );
+    } finally {
+      if (copyButton) {
+        copyButton.disabled = false;
+        copyButton.textContent = deepGet(window.__BLEN_LOCALE__, "report.shareCopy") || "Copy Link";
+      }
+    }
+  }
+
+  async function nativeShare() {
+    if (nativeButton) {
+      nativeButton.disabled = true;
+      nativeButton.textContent =
+        deepGet(window.__BLEN_LOCALE__, "report.shareLoading") || "Saving link...";
+    }
+    try {
+      if (navigator.share) {
+        const url = await ensureShareUrl();
+        await navigator.share({
+          title: "My Blen AI Relationship Report",
+          text: "I just discovered my relationship style with Blen AI.",
+          url,
+        });
+      } else {
+        await copyShareUrl();
+      }
+    } catch (_) {
+      showToast(
+        deepGet(window.__BLEN_LOCALE__, "report.shareFailed") ||
+          "공유 링크를 만드는 중 문제가 생겼어요. 다시 시도해 주세요."
+      );
+    } finally {
+      if (nativeButton) {
+        nativeButton.disabled = false;
+        nativeButton.textContent =
+          deepGet(window.__BLEN_LOCALE__, "report.shareNative") || "Native Share";
+      }
+    }
+  }
+
+  function showComingSoon() {
+    showToast(
+      deepGet(window.__BLEN_LOCALE__, "report.shareComingSoon") ||
+        "This share option is coming soon."
+    );
+  }
+
+  if (copyButton) copyButton.addEventListener("click", copyShareUrl);
+  if (nativeButton) nativeButton.addEventListener("click", nativeShare);
+  if (kakaoButton) kakaoButton.addEventListener("click", showComingSoon);
+  if (instagramButton) instagramButton.addEventListener("click", showComingSoon);
+
+  const startAnalysisButton = reportRoot.querySelector("[data-start-analysis]");
+  if (startAnalysisButton) {
+    startAnalysisButton.addEventListener("click", () => {
+      localStorage.removeItem(ANALYSIS_STORAGE_KEY);
+      localStorage.removeItem(LEGACY_ANALYSIS_STORAGE_KEY);
+      localStorage.removeItem(PENDING_REPORT_SAVE_KEY);
+      const aiChatPath = localeUrl(getCurrentLang(), "aiChat");
+      location.href = aiChatPath;
+    });
+  }
+
+  if (shareId) {
+    (async () => {
+      const sharedAnalysis = await fetchSharedReportById(shareId);
+      if (sharedAnalysis) {
+        activeAnalysis = sharedAnalysis;
+        setFromAnalysis(activeAnalysis);
+      }
+    })();
+  }
 }
 
 async function init() {

@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blen</title>
+    <script>
+      (function () {
+        var lang = localStorage.getItem("blen-lang");
+        if (lang !== "ko" && lang !== "en") lang = "en";
+        var query = location.search || "";
+        location.replace("/" + lang + "/report/share/" + query);
+      })();
+    </script>
+  </head>
+  <body></body>
+</html>
