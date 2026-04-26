@@ -1109,6 +1109,11 @@ body[data-page="support"] .support-form {
   40% { transform: translateY(-3px); opacity: 1; }
 }
 
+@keyframes reportShareFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 body[data-page="aiChat"] .site-footer {
   display: none;
 }
@@ -1249,28 +1254,106 @@ body[data-page="aiChat"] .site-footer {
 
 .report__share {
   width: min(820px, 100%);
-  margin: 36px auto 0;
+  margin: 52px auto 0;
   padding: 0 2px;
   border: none;
   background: transparent;
+  border-top: 1px solid rgba(26, 26, 26, 0.08);
+  padding-top: 22px;
+  animation: reportShareFadeIn 420ms ease both;
 }
 
 .report__share-title {
   margin: 0;
-  font-size: 1.16rem;
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: rgba(26, 26, 26, 0.82);
 }
 
 .report__share-copy {
-  margin: 10px 0 0;
-  color: rgba(26, 26, 26, 0.72);
+  margin: 8px 0 0;
+  text-align: center;
+  color: rgba(26, 26, 26, 0.56);
+  font-size: 0.9rem;
   line-height: 1.75;
 }
 
+.report__share-card {
+  margin-top: 16px;
+  background: #fff;
+  border-radius: 20px;
+  padding: 22px 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+}
+
 .report__share-actions {
-  margin-top: 14px;
+  margin-top: 0;
   display: flex;
+  justify-content: center;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 16px;
+}
+
+.report__share-action {
+  width: 72px;
+  border: none;
+  background: transparent;
+  padding: 0;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  color: #1a1a1a;
+  transition: transform 0.2s ease;
+}
+
+.report__share-action:hover {
+  transform: translateY(-1px);
+}
+
+.report__share-action:active {
+  transform: scale(0.95);
+}
+
+.report__share-action:disabled {
+  opacity: 0.56;
+  cursor: wait;
+}
+
+.report__share-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #f4f1eb;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.report__share-action:hover .report__share-icon {
+  transform: scale(1.04);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+}
+
+.report__share-action--kakao .report__share-icon {
+  background: #fee500;
+}
+
+.report__share-action--instagram .report__share-icon {
+  background: linear-gradient(135deg, #f8f0ff 0%, #fff4e6 100%);
+}
+
+.report__share-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(26, 26, 26, 0.64);
+  line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .report__share-btn {
@@ -1286,7 +1369,7 @@ body[data-page="aiChat"] .site-footer {
 }
 
 .report__share-btn--primary {
-  margin-top: 10px;
+  margin-top: 14px;
   width: 100%;
   min-height: 50px;
   border: none;
@@ -1298,7 +1381,8 @@ body[data-page="aiChat"] .site-footer {
 }
 
 .report__share-warning {
-  margin: 10px 0 0;
+  margin: 12px 0 0;
+  text-align: center;
   font-size: 0.82rem;
   color: rgba(26, 26, 26, 0.55);
 }
@@ -1920,7 +2004,12 @@ body.has-modal-open {
     margin-top: 30px;
   }
   .report__share-actions {
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .report__share-action {
+    width: 100%;
   }
   .report__share-btn {
     width: 100%;

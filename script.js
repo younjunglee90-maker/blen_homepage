@@ -1056,11 +1056,7 @@ function bindReportPage() {
   }
 
   async function copyShareUrl() {
-    if (copyButton) {
-      copyButton.disabled = true;
-      copyButton.textContent =
-        deepGet(window.__BLEN_LOCALE__, "report.shareLoading") || "Saving link...";
-    }
+    if (copyButton) copyButton.disabled = true;
     try {
       const url = await ensureShareUrl();
       if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -1080,19 +1076,12 @@ function bindReportPage() {
           "공유 링크를 만드는 중 문제가 생겼어요. 다시 시도해 주세요."
       );
     } finally {
-      if (copyButton) {
-        copyButton.disabled = false;
-        copyButton.textContent = deepGet(window.__BLEN_LOCALE__, "report.shareCopy") || "Copy Link";
-      }
+      if (copyButton) copyButton.disabled = false;
     }
   }
 
   async function nativeShare() {
-    if (nativeButton) {
-      nativeButton.disabled = true;
-      nativeButton.textContent =
-        deepGet(window.__BLEN_LOCALE__, "report.shareLoading") || "Saving link...";
-    }
+    if (nativeButton) nativeButton.disabled = true;
     try {
       if (navigator.share) {
         const url = await ensureShareUrl();
@@ -1110,11 +1099,7 @@ function bindReportPage() {
           "공유 링크를 만드는 중 문제가 생겼어요. 다시 시도해 주세요."
       );
     } finally {
-      if (nativeButton) {
-        nativeButton.disabled = false;
-        nativeButton.textContent =
-          deepGet(window.__BLEN_LOCALE__, "report.shareNative") || "Native Share";
-      }
+      if (nativeButton) nativeButton.disabled = false;
     }
   }
 

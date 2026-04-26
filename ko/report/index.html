@@ -62,43 +62,43 @@
 
       <section class="report__article">
         <article class="report__section">
-          <p class="report__section-label">연애 스타일</p>
+          <p class="report__section-label">너의 관계 기본 톤</p>
           <h2 class="report__section-title">연애 스타일</h2>
           <p data-report-relationship-style></p>
         </article>
         <article class="report__section">
-          <p class="report__section-label">핵심 가치관</p>
+          <p class="report__section-label">관계에서 가장 중요한 것</p>
           <h2 class="report__section-title">핵심 가치관</h2>
           <ul class="report__list" data-report-core-values></ul>
         </article>
         <article class="report__section">
-          <p class="report__section-label">끌림 패턴</p>
+          <p class="report__section-label">마음이 끌리는 포인트</p>
           <h2 class="report__section-title">끌림 패턴</h2>
           <p data-report-attraction-pattern></p>
         </article>
         <article class="report__section">
-          <p class="report__section-label">커뮤니케이션 스타일</p>
+          <p class="report__section-label">대화를 풀어가는 방식</p>
           <h2 class="report__section-title">커뮤니케이션 스타일</h2>
           <p data-report-communication-style></p>
         </article>
         <article class="report__section">
-          <p class="report__section-label">감정 패턴</p>
+          <p class="report__section-label">감정의 흐름</p>
           <h2 class="report__section-title">감정 패턴</h2>
           <p class="report__highlight" data-report-emotional-pattern></p>
         </article>
         <article class="report__section">
-          <p class="report__section-label">관계 속 경계선</p>
+          <p class="report__section-label">지키고 싶은 경계</p>
           <h2 class="report__section-title">관계 속 경계선</h2>
           <ul class="report__list" data-report-dealbreakers></ul>
         </article>
         <article class="report__section">
-          <p class="report__section-label">강점과 리스크</p>
+          <p class="report__section-label">강점과 주의 포인트</p>
           <h2 class="report__section-title">강점과 리스크</h2>
           <p data-report-strength></p>
           <p class="report__risk-line" data-report-risk></p>
         </article>
         <article class="report__section">
-          <p class="report__section-label">이상적인 인연</p>
+          <p class="report__section-label">가장 잘 맞는 인연</p>
           <h2 class="report__section-title">이상적인 인연</h2>
           <p data-report-ideal-partner></p>
         </article>
@@ -107,11 +107,33 @@
       <section class="report__share" data-report-share>
         <h2 class="report__share-title" data-i18n="report.shareTitle"></h2>
         <p class="report__share-copy" data-i18n="report.shareDescription"></p>
-        <div class="report__share-actions">
-          <button type="button" class="report__share-btn" data-share-copy data-i18n="report.shareCopy"></button>
-          <button type="button" class="report__share-btn" data-share-native data-i18n="report.shareNative"></button>
-          <button type="button" class="report__share-btn" data-share-kakao data-i18n="report.shareKakao"></button>
-          <button type="button" class="report__share-btn" data-share-instagram data-i18n="report.shareInstagram"></button>
+        <div class="report__share-card">
+          <div class="report__share-actions">
+            <button type="button" class="report__share-action" data-share-copy aria-label="링크 복사">
+              <span class="report__share-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none"><path d="M9 8h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="1.8"/><path d="M5 16H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="1.8"/></svg>
+              </span>
+              <span class="report__share-label" data-i18n="report.shareCopy"></span>
+            </button>
+            <button type="button" class="report__share-action" data-share-native aria-label="공유하기">
+              <span class="report__share-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none"><path d="M14 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 12h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M3 19v-2a5 5 0 0 1 5-5h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              </span>
+              <span class="report__share-label" data-i18n="report.shareNative"></span>
+            </button>
+            <button type="button" class="report__share-action report__share-action--kakao" data-share-kakao aria-label="카카오톡">
+              <span class="report__share-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 3c-4.97 0-9 3.13-9 6.98 0 2.49 1.68 4.66 4.2 5.88l-.94 3.48a.6.6 0 0 0 .9.66l4.24-2.7c.2.02.4.03.6.03 4.97 0 9-3.13 9-6.98S16.97 3 12 3Z"/></svg>
+              </span>
+              <span class="report__share-label" data-i18n="report.shareKakao"></span>
+            </button>
+            <button type="button" class="report__share-action report__share-action--instagram" data-share-instagram aria-label="인스타그램">
+              <span class="report__share-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none"><rect x="3.5" y="3.5" width="17" height="17" rx="5" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.8"/><circle cx="17.2" cy="6.8" r="1.2" fill="currentColor"/></svg>
+              </span>
+              <span class="report__share-label" data-i18n="report.shareInstagram"></span>
+            </button>
+          </div>
         </div>
         <button type="button" class="report__share-btn report__share-btn--primary" data-report-restart>다시 분석하기</button>
         <p class="report__share-warning" data-i18n="report.shareWarning"></p>
