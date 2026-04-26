@@ -393,8 +393,8 @@ html[lang="ko"] .hero__subtitle {
 
 .app-preview__slide-title {
   margin: 0 0 16px;
-  font-size: clamp(0.92rem, 1.8vw, 1rem);
-  font-weight: 600;
+  font-size: clamp(1.1rem, 2.16vw, 1.2rem);
+  font-weight: 700;
   color: #1a1a1a;
   text-align: center;
   line-height: 1.4;
@@ -748,6 +748,41 @@ html[lang="ko"] .hero__subtitle {
   color: rgba(47, 47, 47, 0.72);
 }
 
+/* Support page: remove boxed/card containers for a flat layout */
+body[data-page="support"] .content-card {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+body[data-page="support"] .support-layout {
+  margin-top: 24px;
+  align-items: start;
+}
+
+body[data-page="support"] .support-info {
+  gap: 20px;
+}
+
+body[data-page="support"] .support-info__block {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+body[data-page="support"] .support-form {
+  gap: 10px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
 .site-footer {
   position: static;
   z-index: auto;
@@ -934,7 +969,7 @@ html[lang="ko"] .hero__subtitle {
     padding: 0 18px;
   }
   .app-preview__slide-title {
-    font-size: 0.95rem;
+    font-size: 1.14rem;
   }
   .app-preview__image-card {
     padding: 18px;
