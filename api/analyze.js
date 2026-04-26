@@ -232,6 +232,15 @@ function warnIfReportShapeIncomplete(parsed) {
   }
 }
 
+function logAnalyzeDebug(message, extra) {
+  if (process.env.NODE_ENV === "production") return;
+  if (extra) {
+    console.warn(`[Blen][analyze] ${message}`, extra);
+  } else {
+    console.warn(`[Blen][analyze] ${message}`);
+  }
+}
+
 function toClientReportShape(raw) {
   const base = fallbackAnalysis();
   const structured = raw?.relationship_style ? raw : raw?.structured_json || raw || {};
@@ -398,6 +407,7 @@ module.exports = async (req, res) => {
       body: JSON.stringify({
         model: ANALYZE_MODEL,
         temperature: 0.2,
+        response_format: { type: "json_object" },
         messages: [
           { role: "system", content: ANALYZE_SYSTEM_PROMPT },
           ...messages,
@@ -414,13 +424,19 @@ module.exports = async (req, res) => {
     const rawText = data?.choices?.[0]?.message?.content || "";
     const parsed = extractJson(rawText);
     if (!parsed || typeof parsed !== "object") {
+      logAnalyzeDebug("JSON parse failed, using fallbackAnalysis", {
+        raw_preview: String(rawText || "").slice(0, 320),
+      });
       res.status(200).json(fallbackAnalysis());
       return;
     }
     warnIfReportShapeIncomplete(parsed);
 
     res.status(200).json(toClientReportShape(parsed));
-  } catch (_) {
+  } catch (error) {
+    logAnalyzeDebug("Analyze request failed, using fallbackAnalysis", {
+      error: error?.message || String(error),
+    });
     res.status(200).json(fallbackAnalysis());
   }
 };
