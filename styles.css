@@ -392,7 +392,7 @@ html[lang="ko"] .hero__subtitle {
 }
 
 .app-preview__slide-title {
-  margin: 0 0 16px;
+  margin: 0 0 12px;
   font-size: clamp(1.1rem, 2.16vw, 1.2rem);
   font-weight: 700;
   color: #1a1a1a;
@@ -403,6 +403,8 @@ html[lang="ko"] .hero__subtitle {
 .app-preview__image-card {
   width: 100%;
   display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
   background: #f1efed;
   border-radius: 24px;
