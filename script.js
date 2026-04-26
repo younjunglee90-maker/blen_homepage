@@ -491,6 +491,9 @@ function renderChatBubble(messagesEl, text, role) {
   const bubble = document.createElement("div");
   bubble.className = `ai-chat__bubble ai-chat__bubble--${role}`;
 
+  const block = document.createElement("div");
+  block.className = "ai-chat__message-block";
+
   const meta = document.createElement("div");
   meta.className = "ai-chat__meta";
 
@@ -511,10 +514,11 @@ function renderChatBubble(messagesEl, text, role) {
   content.className = "ai-chat__text";
   content.textContent = text;
 
-  bubble.appendChild(meta);
   bubble.appendChild(content);
+  block.appendChild(bubble);
+  block.appendChild(meta);
   row.appendChild(avatar);
-  row.appendChild(bubble);
+  row.appendChild(block);
   messagesEl.appendChild(row);
   messagesEl.scrollTop = messagesEl.scrollHeight;
   window.requestAnimationFrame(() => {
@@ -543,16 +547,45 @@ function renderTypingBubble(messagesEl) {
   const bubble = document.createElement("div");
   bubble.className = "ai-chat__bubble ai-chat__bubble--ai";
   bubble.innerHTML =
-    `<div class="ai-chat__meta"><time class="ai-chat__time">${typingTime}</time></div><span class="ai-chat__typing"><span class="ai-chat__typing-dot"></span><span class="ai-chat__typing-dot"></span><span class="ai-chat__typing-dot"></span></span>`;
+    '<span class="ai-chat__typing"><span class="ai-chat__typing-dot"></span><span class="ai-chat__typing-dot"></span><span class="ai-chat__typing-dot"></span></span>';
+
+  const block = document.createElement("div");
+  block.className = "ai-chat__message-block";
+
+  const meta = document.createElement("div");
+  meta.className = "ai-chat__meta";
+  meta.innerHTML = `<time class="ai-chat__time">${typingTime}</time>`;
 
   row.appendChild(avatar);
-  row.appendChild(bubble);
+  block.appendChild(bubble);
+  block.appendChild(meta);
+  row.appendChild(block);
   messagesEl.appendChild(row);
   messagesEl.scrollTop = messagesEl.scrollHeight;
   window.requestAnimationFrame(() => {
     messagesEl.scrollTop = messagesEl.scrollHeight;
   });
   return row;
+}
+
+function renderReportUnlock(messagesEl, label, onClick) {
+  const row = document.createElement("article");
+  row.className = "ai-chat__unlock";
+
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "ai-chat__unlock-btn";
+  button.textContent = label;
+  button.addEventListener("click", onClick);
+
+  row.appendChild(button);
+  messagesEl.appendChild(row);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+  window.requestAnimationFrame(() => {
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  });
+
+  return button;
 }
 
 function bindAiChatFlow() {
@@ -563,10 +596,48 @@ function bindAiChatFlow() {
   if (!chatRoot || !messagesEl || !form || !input) return;
 
   const firstMessage = deepGet(window.__BLEN_LOCALE__, "aiChat.firstMessage");
+  const guidanceMessage = deepGet(window.__BLEN_LOCALE__, "aiChat.guidanceMessage");
+  const totalQuestions = 12;
+
+  const headerEl = chatRoot.querySelector(".ai-chat__header");
+  const progressEl = document.createElement("section");
+  progressEl.className = "ai-chat__progress";
+  progressEl.hidden = true;
+  progressEl.innerHTML = `
+    <div class="ai-chat__progress-head">
+      <span class="ai-chat__progress-label">${
+        deepGet(window.__BLEN_LOCALE__, "aiChat.progressLabel") || "분석 진행률"
+      }</span>
+      <span class="ai-chat__progress-value" data-progress-value>0%</span>
+    </div>
+    <div class="ai-chat__progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+      <span class="ai-chat__progress-fill" data-progress-fill></span>
+    </div>
+  `;
+  if (headerEl && headerEl.nextSibling) {
+    chatRoot.insertBefore(progressEl, headerEl.nextSibling);
+  } else if (headerEl) {
+    chatRoot.appendChild(progressEl);
+  }
+  const progressValueEl = progressEl.querySelector("[data-progress-value]");
+  const progressFillEl = progressEl.querySelector("[data-progress-fill]");
+  const progressTrackEl = progressEl.querySelector(".ai-chat__progress-track");
+
+  function updateProgress(forceComplete = false) {
+    const percent = forceComplete
+      ? 100
+      : Math.max(0, Math.min(99, Math.round((userTurnCount / totalQuestions) * 100)));
+    if (progressValueEl) progressValueEl.textContent = `${percent}%`;
+    if (progressFillEl) progressFillEl.style.width = `${percent}%`;
+    if (progressTrackEl) progressTrackEl.setAttribute("aria-valuenow", String(percent));
+  }
 
   let userTurnCount = 0;
   let qualityScore = 0;
   let analysisRequested = false;
+  let analysisResult = null;
+  let unlockButton = null;
+  let unlockInProgress = false;
   let isRequesting = false;
   const conversationHistory = [];
   const sendButton = form.querySelector(".ai-chat__send");
@@ -627,7 +698,45 @@ function bindAiChatFlow() {
     localStorage.setItem(PENDING_REPORT_SAVE_KEY, "1");
     const redirectPath = localeUrl(getCurrentLang(), "report");
     localStorage.setItem(POST_LOGIN_REDIRECT_KEY, redirectPath);
-    openLoginModal();
+  }
+
+  async function proceedToReportWithUnlock() {
+    if (unlockInProgress || !analysisResult) return;
+    unlockInProgress = true;
+    if (unlockButton) {
+      unlockButton.disabled = true;
+      unlockButton.textContent =
+        deepGet(window.__BLEN_LOCALE__, "aiChat.unlockLoading") || "Preparing your report...";
+    }
+
+    const reportPath = localeUrl(getCurrentLang(), "report");
+    localStorage.setItem(POST_LOGIN_REDIRECT_KEY, reportPath);
+
+    try {
+      const user = await getLoggedInSupabaseUser();
+      if (!user) {
+        if (unlockButton) unlockButton.disabled = false;
+        unlockInProgress = false;
+        openLoginModal();
+        return;
+      }
+
+      const saved = await saveAnalysisToReportStore(analysisResult);
+      if (saved) {
+        localStorage.removeItem(PENDING_REPORT_SAVE_KEY);
+      } else {
+        localStorage.setItem(PENDING_REPORT_SAVE_KEY, "1");
+      }
+      location.href = reportPath;
+    } catch (_) {
+      localStorage.setItem(PENDING_REPORT_SAVE_KEY, "1");
+      if (unlockButton) {
+        unlockButton.disabled = false;
+        unlockButton.textContent =
+          deepGet(window.__BLEN_LOCALE__, "aiChat.unlockCta") || "View My Report";
+      }
+      unlockInProgress = false;
+    }
   }
 
   if (modalCloseButton) {
@@ -646,7 +755,7 @@ function bindAiChatFlow() {
       if (modalStatus) modalStatus.textContent = "";
       try {
         modalGoogleButton.disabled = true;
-        await signInWithGoogle(window.location.pathname);
+        await signInWithGoogle(localeUrl(getCurrentLang(), "report"));
       } catch (_) {
         if (modalStatus) {
           modalStatus.textContent =
@@ -665,7 +774,7 @@ function bindAiChatFlow() {
         modalStatus.textContent = deepGet(window.__BLEN_LOCALE__, "login.loading") || "Loading...";
       }
       try {
-        await signInWithOtp(email, window.location.pathname);
+        await signInWithOtp(email, localeUrl(getCurrentLang(), "report"));
         if (modalStatus) {
           modalStatus.textContent =
             deepGet(window.__BLEN_LOCALE__, "login.magicSent") ||
@@ -682,6 +791,10 @@ function bindAiChatFlow() {
 
   renderChatBubble(messagesEl, firstMessage, "ai");
   conversationHistory.push({ role: "assistant", content: firstMessage });
+  if (guidanceMessage) {
+    renderChatBubble(messagesEl, guidanceMessage, "ai");
+    conversationHistory.push({ role: "assistant", content: guidanceMessage });
+  }
 
   async function requestAIReply() {
     const response = await fetch("/api/chat", {
@@ -786,6 +899,8 @@ function bindAiChatFlow() {
     conversationHistory.push({ role: "user", content: raw });
     userTurnCount += 1;
     qualityScore += getMessageQualityScore(raw);
+    if (progressEl.hidden) progressEl.hidden = false;
+    updateProgress(false);
 
     let typingBubble = null;
     try {
@@ -818,24 +933,45 @@ function bindAiChatFlow() {
       analysisRequested = true;
       try {
         const analysis = await requestAnalysis();
+        analysisResult = analysis;
         localStorage.setItem(ANALYSIS_STORAGE_KEY, JSON.stringify(analysis));
         localStorage.setItem(PENDING_REPORT_SAVE_KEY, "1");
-        const saved = await saveAnalysisToReportStore(analysis);
-        if (saved) {
-          localStorage.removeItem(PENDING_REPORT_SAVE_KEY);
-          const currentLang = getCurrentLang();
-          window.setTimeout(() => {
-            location.href = localeUrl(currentLang, "report");
-          }, 520);
-          return;
-        }
         await ensureReportSavedAfterLogin(analysis);
+        updateProgress(true);
+        renderChatBubble(
+          messagesEl,
+          deepGet(window.__BLEN_LOCALE__, "aiChat.reportReadyMessage") ||
+            "고마워, 충분히 이야기해줘서. 이제 너의 리포트를 준비했어.",
+          "ai"
+        );
+        unlockButton = renderReportUnlock(
+          messagesEl,
+          deepGet(window.__BLEN_LOCALE__, "aiChat.unlockCta") || "연애 성향 레포트 보기",
+          proceedToReportWithUnlock
+        );
+        if (input) input.disabled = true;
+        if (sendButton) sendButton.disabled = true;
         return;
       } catch (error) {
         const fallbackAnalysis = createFallbackAnalysis();
+        analysisResult = fallbackAnalysis;
         localStorage.setItem(ANALYSIS_STORAGE_KEY, JSON.stringify(fallbackAnalysis));
         localStorage.setItem(PENDING_REPORT_SAVE_KEY, "1");
         await ensureReportSavedAfterLogin(fallbackAnalysis);
+        updateProgress(true);
+        renderChatBubble(
+          messagesEl,
+          deepGet(window.__BLEN_LOCALE__, "aiChat.reportReadyMessage") ||
+            "고마워, 충분히 이야기해줘서. 이제 너의 리포트를 준비했어.",
+          "ai"
+        );
+        unlockButton = renderReportUnlock(
+          messagesEl,
+          deepGet(window.__BLEN_LOCALE__, "aiChat.unlockCta") || "연애 성향 레포트 보기",
+          proceedToReportWithUnlock
+        );
+        if (input) input.disabled = true;
+        if (sendButton) sendButton.disabled = true;
         return;
       }
     }

@@ -278,6 +278,11 @@
     "title": "Blen AI",
     "subtitle": "너의 연애 성향을 천천히 알아볼게",
     "firstMessage": "안녕, 블렌에 온 걸 환영해. 나와 같이 너의 인연을 찾아볼래?",
+    "guidanceMessage": "답변을 길고 솔직하게 들려줄수록, Blen AI가 너의 연애 성향을 더 섬세하게 이해할 수 있어.",
+    "progressLabel": "분석 진행률",
+    "reportReadyMessage": "고마워, 충분히 이야기해줘서. 이제 너의 리포트를 준비했어.",
+    "unlockCta": "연애 성향 레포트 보기",
+    "unlockLoading": "리포트를 준비하고 있어...",
     "inputPlaceholder": "답변을 입력해 주세요",
     "send": "전송",
     "prompts": [

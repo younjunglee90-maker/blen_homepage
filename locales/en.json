@@ -285,6 +285,11 @@
     "title": "Blen AI",
     "subtitle": "I will learn your dating style step by step",
     "firstMessage": "Hi, welcome to Blen. Want to find your match with me?",
+    "guidanceMessage": "The more openly and in detail you share, the more accurately Blen AI can understand your dating style.",
+    "progressLabel": "Progress",
+    "reportReadyMessage": "Thanks for sharing so openly. Your report is ready now.",
+    "unlockCta": "View My Report",
+    "unlockLoading": "Preparing your report...",
     "inputPlaceholder": "Type your message...",
     "send": "Send",
     "prompts": [
