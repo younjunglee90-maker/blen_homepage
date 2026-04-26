@@ -467,10 +467,55 @@ function createFallbackAnalysis() {
 }
 
 function renderChatBubble(messagesEl, text, role) {
+  const currentLang = getCurrentLang();
+  const formatTime = () =>
+    new Date().toLocaleTimeString(currentLang === "ko" ? "ko-KR" : "en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: currentLang !== "ko",
+    });
+
+  const row = document.createElement("article");
+  row.className = `ai-chat__row ai-chat__row--${role}`;
+
+  const avatar = document.createElement("span");
+  avatar.className = `ai-chat__avatar ai-chat__avatar--${role}`;
+  avatar.setAttribute("aria-hidden", "true");
+  if (role === "ai") {
+    avatar.innerHTML =
+      '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 20.2c-.27 0-.53-.1-.73-.28-1.4-1.26-2.62-2.35-3.67-3.3-3.08-2.78-5.12-4.62-5.12-7.45 0-2.32 1.8-4.12 4.13-4.12 1.44 0 2.82.68 3.7 1.82.88-1.14 2.26-1.82 3.7-1.82 2.33 0 4.13 1.8 4.13 4.12 0 2.83-2.04 4.67-5.12 7.45-1.05.95-2.27 2.04-3.67 3.3-.2.18-.46.28-.73.28Z" fill="currentColor"/></svg>';
+  } else {
+    avatar.textContent = "◌";
+  }
+
   const bubble = document.createElement("div");
   bubble.className = `ai-chat__bubble ai-chat__bubble--${role}`;
-  bubble.textContent = text;
-  messagesEl.appendChild(bubble);
+
+  const meta = document.createElement("div");
+  meta.className = "ai-chat__meta";
+
+  const timestamp = document.createElement("time");
+  timestamp.className = "ai-chat__time";
+  timestamp.textContent = formatTime();
+  meta.appendChild(timestamp);
+
+  if (role === "user") {
+    const check = document.createElement("span");
+    check.className = "ai-chat__check";
+    check.setAttribute("aria-hidden", "true");
+    check.textContent = "✓";
+    meta.appendChild(check);
+  }
+
+  const content = document.createElement("p");
+  content.className = "ai-chat__text";
+  content.textContent = text;
+
+  bubble.appendChild(meta);
+  bubble.appendChild(content);
+  row.appendChild(avatar);
+  row.appendChild(bubble);
+  messagesEl.appendChild(row);
   messagesEl.scrollTop = messagesEl.scrollHeight;
   window.requestAnimationFrame(() => {
     messagesEl.scrollTop = messagesEl.scrollHeight;
@@ -478,17 +523,36 @@ function renderChatBubble(messagesEl, text, role) {
 }
 
 function renderTypingBubble(messagesEl) {
+  const currentLang = getCurrentLang();
+  const typingTime = new Date().toLocaleTimeString(currentLang === "ko" ? "ko-KR" : "en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: currentLang !== "ko",
+  });
+
+  const row = document.createElement("article");
+  row.className = "ai-chat__row ai-chat__row--ai";
+  row.setAttribute("data-typing-bubble", "true");
+
+  const avatar = document.createElement("span");
+  avatar.className = "ai-chat__avatar ai-chat__avatar--ai";
+  avatar.setAttribute("aria-hidden", "true");
+  avatar.innerHTML =
+    '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 20.2c-.27 0-.53-.1-.73-.28-1.4-1.26-2.62-2.35-3.67-3.3-3.08-2.78-5.12-4.62-5.12-7.45 0-2.32 1.8-4.12 4.13-4.12 1.44 0 2.82.68 3.7 1.82.88-1.14 2.26-1.82 3.7-1.82 2.33 0 4.13 1.8 4.13 4.12 0 2.83-2.04 4.67-5.12 7.45-1.05.95-2.27 2.04-3.67 3.3-.2.18-.46.28-.73.28Z" fill="currentColor"/></svg>';
+
   const bubble = document.createElement("div");
   bubble.className = "ai-chat__bubble ai-chat__bubble--ai";
-  bubble.setAttribute("data-typing-bubble", "true");
   bubble.innerHTML =
-    '<span class="ai-chat__typing"><span class="ai-chat__typing-dot"></span><span class="ai-chat__typing-dot"></span><span class="ai-chat__typing-dot"></span></span>';
-  messagesEl.appendChild(bubble);
+    `<div class="ai-chat__meta"><time class="ai-chat__time">${typingTime}</time></div><span class="ai-chat__typing"><span class="ai-chat__typing-dot"></span><span class="ai-chat__typing-dot"></span><span class="ai-chat__typing-dot"></span></span>`;
+
+  row.appendChild(avatar);
+  row.appendChild(bubble);
+  messagesEl.appendChild(row);
   messagesEl.scrollTop = messagesEl.scrollHeight;
   window.requestAnimationFrame(() => {
     messagesEl.scrollTop = messagesEl.scrollHeight;
   });
-  return bubble;
+  return row;
 }
 
 function bindAiChatFlow() {

@@ -45,3 +45,86 @@ Rules:
 "고마워, 얘기해줘서. 이제 너에 대해 조금 정리해볼게."
 Then stop asking questions.
 `.trim();
+
+const CHAT_MODEL = "gpt-4o-mini";
+
+function detectLanguage(text) {
+  if (!text) return "ko";
+  return /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(text) ? "ko" : "en";
+}
+
+function normalizeMessages(messages) {
+  if (!Array.isArray(messages)) return [];
+  return messages
+    .filter((m) => m && typeof m === "object")
+    .map((m) => ({
+      role: m.role === "assistant" ? "assistant" : "user",
+      content: typeof m.content === "string" ? m.content.trim() : "",
+    }))
+    .filter((m) => m.content.length > 0);
+}
+
+async function requestOpenAI(messages, responseLanguage) {
+  const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: CHAT_MODEL,
+      temperature: 0.9,
+      messages: [
+        {
+          role: "system",
+          content:
+            `${CHAT_SYSTEM_PROMPT}\n\n` +
+            (responseLanguage === "ko"
+              ? "Respond in Korean only (casual 반말)."
+              : "Respond in English only."),
+        },
+        ...messages,
+      ],
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`OpenAI chat error: ${errorText}`);
+  }
+
+  const data = await response.json();
+  const reply = data?.choices?.[0]?.message?.content?.trim();
+  if (!reply) throw new Error("OpenAI returned empty reply");
+  return reply;
+}
+
+module.exports = async (req, res) => {
+  if (req.method !== "POST") {
+    res.status(405).json({ error: "Method not allowed" });
+    return;
+  }
+
+  if (!process.env.OPENAI_API_KEY) {
+    res.status(500).json({ error: "OPENAI_API_KEY is missing on server" });
+    return;
+  }
+
+  try {
+    const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body || {};
+    const messages = normalizeMessages(body.messages);
+    if (!messages.length) {
+      res.status(400).json({ error: "messages is required" });
+      return;
+    }
+
+    const firstUserMessage = messages.find((m) => m.role === "user")?.content || "";
+    const requestedLanguage = body.language === "en" || body.language === "ko" ? body.language : null;
+    const responseLanguage = requestedLanguage || detectLanguage(firstUserMessage);
+
+    const reply = await requestOpenAI(messages, responseLanguage);
+    res.status(200).json({ reply });
+  } catch (error) {
+    res.status(500).json({ error: error?.message || "Unexpected server error" });
+  }
+};

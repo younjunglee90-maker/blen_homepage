@@ -285,7 +285,7 @@
     "title": "Blen AI",
     "subtitle": "I will learn your dating style step by step",
     "firstMessage": "Hi, welcome to Blen. Want to find your match with me?",
-    "inputPlaceholder": "Type your answer",
+    "inputPlaceholder": "Type your message...",
     "send": "Send",
     "prompts": [
       "What feels most important to you in a relationship these days?",
