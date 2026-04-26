@@ -113,6 +113,14 @@ Report generation rules:
   - "~인 편이야"
   - "~하는 경향이 있어"
   - "~일 가능성이 커"
+- NO generic statements. Every section must include specific situations and behavior.
+- Always describe WHEN/HOW the pattern appears (e.g., 연락이 느려질 때, 갈등이 생겼을 때, 상대가 애매할 때, 무시당한다고 느낄 때).
+- Show inner thoughts explicitly (e.g., 겉으로는 괜찮다 해도 속으로는 이유를 찾음).
+- Include outside-vs-inside contrast whenever relevant ("겉으로는..., 속으로는...").
+- In attraction section, include both what sparks attraction and what quickly cools it down.
+- In conflict section, describe concrete behavior sequence during conflict.
+- In risk section, include emotionally vivid, slightly uncomfortable but fair insights.
+- Write as flowing storytelling, not label dumping.
 - "한 줄 요약": one strong, bold hook line that feels personal and slightly provocative.
 - "너의 연애 핵심": summarize 3 short traits in natural sentence form.
 - Each of the other final_report sections: 3-5 sentences, personal and specific.
@@ -126,6 +134,7 @@ Final quality check before output:
 - Does this feel like a real person wrote it?
 - Would the user want to screenshot and share it?
 - Does each section feel specific and tailored?
+- Ask: "이 문장이 특정 사람한테만 해당되나?" If not, rewrite.
 - If not, rewrite internally before returning final JSON.
 `.trim();
 
