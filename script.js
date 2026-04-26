@@ -649,10 +649,15 @@ function bindAiChatFlow() {
   }
 
   async function requestAnalysis() {
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), 25000);
     const response = await fetch("/api/analyze", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ messages: conversationHistory }),
+      signal: controller.signal,
+    }).finally(() => {
+      window.clearTimeout(timeoutId);
     });
     if (!response.ok) {
       const payload = await response.json().catch(() => ({}));

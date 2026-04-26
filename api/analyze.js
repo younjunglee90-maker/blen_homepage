@@ -398,6 +398,9 @@ module.exports = async (req, res) => {
       return;
     }
 
+    const controller = new AbortController();
+    const timeoutMs = 22000;
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -413,6 +416,9 @@ module.exports = async (req, res) => {
           ...messages,
         ],
       }),
+      signal: controller.signal,
+    }).finally(() => {
+      clearTimeout(timeoutId);
     });
 
     if (!response.ok) {
