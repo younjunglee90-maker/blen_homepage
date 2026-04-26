@@ -6,7 +6,9 @@
     "titlePrivacy": "개인정보처리방침 | Blen",
     "titleSupport": "고객센터 | Blen",
     "titleRelationshipTest": "연애 성향 분석 테스트 | Blen",
-    "titleAiChat": "Blen AI 채팅 | Blen"
+    "titleAiChat": "Blen AI 채팅 | Blen",
+    "titleReport": "관계 리포트 | Blen",
+    "titleLogin": "로그인 | Blen"
   },
   "common": {
     "languageAria": "언어 선택",
@@ -277,6 +279,33 @@
     "subtitle": "너의 연애 성향을 천천히 알아볼게",
     "firstMessage": "안녕, 블렌에 온 걸 환영해. 나와 같이 너의 인연을 찾아볼래?",
     "inputPlaceholder": "답변을 입력해 주세요",
-    "send": "전송"
+    "send": "전송",
+    "prompts": [
+      "요즘 연애를 떠올리면 제일 중요하게 느끼는 게 뭐야?",
+      "돈 쓰는 방식은 어떤 사람이 편해? 아끼는 편, 쓰는 편, 아니면 균형형?",
+      "하루를 보내는 스타일은 어때? 바쁘게 움직이는 편이야, 여유형이야?",
+      "가족과의 관계는 연애할 때 어느 정도 중요해?",
+      "일과 삶의 균형에서는 어디에 더 마음이 가?",
+      "상대가 연락이 늦으면 너는 어떤 마음이 들어?",
+      "다투면 보통 어떻게 풀려고 해?",
+      "연애할 때 너 스스로 가장 자주 보이는 모습은 뭐야?",
+      "연애에서 꼭 지키고 싶은 기준 하나만 말해줄래?",
+      "반대로 이건 절대 안 맞다 싶은 포인트도 궁금해."
+    ]
+  },
+  "login": {
+    "title": "로그인하고 리포트 저장하기",
+    "subtitle": "연애 성향 리포트를 저장하고 다시 보려면 로그인이 필요해요.",
+    "emailLabel": "이메일",
+    "passwordLabel": "비밀번호",
+    "submit": "로그인",
+    "helper": "로그인 정보를 입력해 주세요.",
+    "loading": "로그인 중...",
+    "error": "로그인에 실패했어. 정보를 다시 확인해줘."
+  },
+  "report": {
+    "loginRequiredTitle": "로그인이 필요해",
+    "loginRequiredBody": "연애 성향 리포트를 저장하고 다시 보려면 로그인이 필요해요.",
+    "loginButton": "로그인하기"
   }
 }

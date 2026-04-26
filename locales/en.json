@@ -6,7 +6,9 @@
     "titlePrivacy": "Privacy Policy | Blen",
     "titleSupport": "Customer Support | Blen",
     "titleRelationshipTest": "Relationship Tendency Test | Blen",
-    "titleAiChat": "Blen AI Chat | Blen"
+    "titleAiChat": "Blen AI Chat | Blen",
+    "titleReport": "Relationship Report | Blen",
+    "titleLogin": "Login | Blen"
   },
   "common": {
     "languageAria": "Language selector",
@@ -284,6 +286,33 @@
     "subtitle": "I will learn your dating style step by step",
     "firstMessage": "Hi, welcome to Blen. Want to find your match with me?",
     "inputPlaceholder": "Type your answer",
-    "send": "Send"
+    "send": "Send",
+    "prompts": [
+      "What feels most important to you in a relationship these days?",
+      "Which money style feels easier for you: saving, spending, or balanced?",
+      "What is your daily rhythm like: active, relaxed, or work-focused?",
+      "How important is family context when you are dating someone?",
+      "When life gets busy, where does your heart lean: career, balance, or life-first?",
+      "How do you usually feel when the other person replies late?",
+      "When conflict happens, how do you usually respond first?",
+      "In love, what kind of side of you appears most often?",
+      "What is one value you definitely want to protect in a relationship?",
+      "And what is one pattern you absolutely cannot accept?"
+    ]
+  },
+  "login": {
+    "title": "Log in to Save Your Report",
+    "subtitle": "Log in to save your relationship report and view it again later.",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "submit": "Log In",
+    "helper": "Enter your account details to continue.",
+    "loading": "Signing in...",
+    "error": "Login failed. Please check your credentials."
+  },
+  "report": {
+    "loginRequiredTitle": "Login Required",
+    "loginRequiredBody": "Log in to save your relationship report and view it again later.",
+    "loginButton": "Log In"
   }
 }

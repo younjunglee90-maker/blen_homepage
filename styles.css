@@ -29,7 +29,7 @@ body {
 .site-header {
   position: sticky;
   top: 0;
-  z-index: 20;
+  z-index: 1000;
   width: 100%;
   background: rgba(255, 221, 135, 0.92);
   backdrop-filter: blur(8px);
@@ -927,6 +927,200 @@ body[data-page="support"] .support-form {
   cursor: pointer;
 }
 
+.ai-chat__bubble--user {
+  margin-left: auto;
+  background: rgba(22, 22, 22, 0.86);
+  color: #fff;
+}
+
+.report {
+  background: #f6f2ea;
+  padding: clamp(30px, 6vw, 54px) clamp(16px, 5vw, 32px) clamp(56px, 9vw, 90px);
+}
+
+.report__hero {
+  width: min(920px, 100%);
+  margin: 0 auto 20px;
+}
+
+.report__kicker {
+  margin: 0;
+  color: rgba(26, 26, 26, 0.55);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.report__headline {
+  margin: 12px 0 0;
+  color: #1a1a1a;
+  font-size: clamp(1.7rem, 4.8vw, 2.5rem);
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+}
+
+.report__grid {
+  width: min(920px, 100%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.report__card {
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px solid rgba(26, 26, 26, 0.1);
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 10px 24px rgba(26, 26, 26, 0.05);
+}
+
+.report__card h2,
+.report__summary h2 {
+  margin: 0 0 10px;
+  font-size: 1.06rem;
+}
+
+.report__card h3 {
+  margin: 14px 0 8px;
+  font-size: 0.94rem;
+  color: rgba(26, 26, 26, 0.75);
+}
+
+.report__card p,
+.report__summary p,
+.report__card li {
+  margin: 0;
+  line-height: 1.65;
+  color: rgba(26, 26, 26, 0.86);
+  font-size: 0.98rem;
+}
+
+.report__card ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.report__card li + li {
+  margin-top: 6px;
+}
+
+.report__summary {
+  width: min(920px, 100%);
+  margin: 14px auto 0;
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px solid rgba(26, 26, 26, 0.1);
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.report__login-gate {
+  width: min(720px, 100%);
+  margin: 8vh auto 0;
+  padding: 28px 24px;
+  border-radius: 16px;
+  border: 1px solid rgba(26, 26, 26, 0.1);
+  background: rgba(255, 255, 255, 0.82);
+  text-align: center;
+}
+
+.report__login-title {
+  margin: 0;
+  font-size: clamp(1.45rem, 4.2vw, 2rem);
+}
+
+.report__login-copy {
+  margin: 10px 0 0;
+  color: rgba(26, 26, 26, 0.7);
+  line-height: 1.6;
+}
+
+.report__login-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 18px;
+  border-radius: 14px;
+  padding: 12px 20px;
+  text-decoration: none;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.7);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.login-page {
+  min-height: calc(100vh - 70px);
+  padding: 34px 16px 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-page__panel {
+  width: min(460px, 100%);
+  padding: 22px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.58);
+  border: 1px solid rgba(26, 26, 26, 0.1);
+}
+
+.login-page__title {
+  margin: 0;
+  font-size: clamp(1.45rem, 4vw, 2rem);
+}
+
+.login-page__subtitle {
+  margin: 10px 0 0;
+  color: rgba(26, 26, 26, 0.68);
+  line-height: 1.55;
+}
+
+.login-page__form {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.login-page__label {
+  margin-top: 6px;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.login-page__input {
+  min-height: 44px;
+  border: 1px solid rgba(26, 26, 26, 0.2);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 0 12px;
+  font: inherit;
+}
+
+.login-page__submit {
+  margin-top: 12px;
+  min-height: 46px;
+  border: none;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.72);
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.login-page__submit:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.login-page__status {
+  margin: 8px 0 0;
+  color: rgba(26, 26, 26, 0.65);
+  font-size: 0.9rem;
+}
+
 .site-footer {
   position: static;
   z-index: auto;
@@ -1141,6 +1335,15 @@ body[data-page="support"] .support-form {
   }
   .content-table {
     min-width: 560px;
+  }
+  .report {
+    padding-top: 24px;
+  }
+  .report__grid {
+    grid-template-columns: 1fr;
+  }
+  .ai-chat__messages {
+    padding-bottom: 94px;
   }
 }
 

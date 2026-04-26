@@ -4,7 +4,7 @@ const SUPPORT_RECIPIENT = "hello@blenmatch.com";
 
 const LANG_KEY = "blen-lang";
 const SUPPORTED_LANGS = ["en", "ko"];
-const PAGE_KEYS = ["home", "about", "terms", "privacy", "support", "relationshipTest", "aiChat"];
+const PAGE_KEYS = ["home", "about", "terms", "privacy", "support", "relationshipTest", "aiChat", "report", "login"];
 
 const PAGE_PATHS = {
   home: "",
@@ -14,7 +14,59 @@ const PAGE_PATHS = {
   support: "support",
   relationshipTest: "relationship-test",
   aiChat: "ai-chat",
+  report: "report",
+  login: "login",
 };
+
+const ANALYSIS_STORAGE_KEY = "blen_report";
+const LEGACY_ANALYSIS_STORAGE_KEY = "blen-analysis-result";
+const AUTH_SESSION_KEY = "blen_auth_session";
+const PENDING_REPORT_SAVE_KEY = "blen_pending_report_save";
+let supabaseClientPromise = null;
+
+function getSupabaseAccessTokenFromStorage() {
+  try {
+    const ownSessionRaw = localStorage.getItem(AUTH_SESSION_KEY);
+    if (ownSessionRaw) {
+      const ownSession = JSON.parse(ownSessionRaw);
+      if (ownSession?.access_token) return ownSession.access_token;
+    }
+    for (let i = 0; i < localStorage.length; i += 1) {
+      const key = localStorage.key(i);
+      if (!key || !key.startsWith("sb-") || !key.endsWith("-auth-token")) continue;
+      const raw = localStorage.getItem(key);
+      if (!raw) continue;
+      const parsed = JSON.parse(raw);
+      if (parsed?.access_token) return parsed.access_token;
+      if (Array.isArray(parsed) && parsed[0]?.access_token) return parsed[0].access_token;
+      if (parsed?.currentSession?.access_token) return parsed.currentSession.access_token;
+    }
+  } catch (_) {
+    return null;
+  }
+  return null;
+}
+
+async function getSupabaseClient() {
+  if (supabaseClientPromise) return supabaseClientPromise;
+  supabaseClientPromise = (async () => {
+    if (!window.supabase || typeof window.supabase.createClient !== "function") return null;
+    const response = await fetch("/api/supabase-config");
+    if (!response.ok) return null;
+    const config = await response.json();
+    if (!config?.url || !config?.anonKey) return null;
+    return window.supabase.createClient(config.url, config.anonKey);
+  })();
+  return supabaseClientPromise;
+}
+
+async function getLoggedInSupabaseUser() {
+  const supabase = await getSupabaseClient();
+  if (!supabase) return null;
+  const { data, error } = await supabase.auth.getUser();
+  if (error) return null;
+  return data?.user || null;
+}
 
 function getSavedLang() {
   const lang = localStorage.getItem(LANG_KEY);
@@ -92,6 +144,8 @@ function applyI18n(locale) {
     support: "meta.titleSupport",
     relationshipTest: "meta.titleRelationshipTest",
     aiChat: "meta.titleAiChat",
+    report: "meta.titleReport",
+    login: "meta.titleLogin",
   };
   const pageTitle = deepGet(window.__BLEN_LOCALE__, titleMap[page]);
   if (typeof pageTitle === "string") document.title = pageTitle;
@@ -333,6 +387,368 @@ function bindRelationshipTestCTA() {
   });
 }
 
+function createFallbackAnalysis() {
+  return {
+    values: {
+      relationship_goal: "unclear",
+      money_values: "unclear",
+      lifestyle: "unclear",
+      family_values: "unclear",
+      work_life_balance: "unclear",
+    },
+    attachment: {
+      secure: 0.5,
+      anxious: 0.5,
+      avoidant: 0.5,
+      primary_attachment: "unclear",
+    },
+    conflict_style: {
+      avoidant: 0.5,
+      aggressive: 0.5,
+      defensive: 0.5,
+      solution_oriented: 0.5,
+      primary_conflict_style: "unclear",
+    },
+    personality: {
+      impulsivity: 0.5,
+      anxiety: 0.5,
+      empathy: 0.5,
+      self_control: 0.5,
+    },
+    report_inputs: {
+      headline_keyword: "천천히 맞춰가는 연결",
+      relationship_style: "아직 데이터가 충분하지 않아서, 더 많은 대화가 필요해.",
+      core_values: ["가치관 정보가 아직 부족해."],
+      attraction_pattern: "끌림 패턴을 판단할 대화가 조금 더 필요해.",
+      communication_style: "갈등 대화 스타일 단서가 충분하지 않아.",
+      emotional_pattern: "감정 반응 패턴을 정교하게 보기 위해 추가 대화가 필요해.",
+      dealbreakers: ["상호 존중이 없는 관계", "감정 대화를 피하는 패턴"],
+      strengths: ["대화를 통해 더 정확한 프로필을 만들 수 있어."],
+      risks: ["데이터 부족으로 해석 신뢰도가 낮아질 수 있어."],
+      ideal_partner_traits: ["대화를 존중하는 사람", "감정적으로 안정적인 사람"],
+      one_line_summary: "지금은 너를 더 깊게 알아가기 위한 첫 단계야.",
+    },
+    confidence: {
+      overall: 0.2,
+      missing_data: ["conversation_depth"],
+    },
+  };
+}
+
+function renderChatBubble(messagesEl, text, role) {
+  const bubble = document.createElement("div");
+  bubble.className = `ai-chat__bubble ai-chat__bubble--${role}`;
+  bubble.textContent = text;
+  messagesEl.appendChild(bubble);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function bindAiChatFlow() {
+  const chatRoot = document.querySelector(".ai-chat");
+  const messagesEl = chatRoot ? chatRoot.querySelector(".ai-chat__messages") : null;
+  const form = chatRoot ? chatRoot.querySelector(".ai-chat__input-wrap") : null;
+  const input = form ? form.querySelector(".ai-chat__input") : null;
+  if (!chatRoot || !messagesEl || !form || !input) return;
+
+  const firstMessage = deepGet(window.__BLEN_LOCALE__, "aiChat.firstMessage");
+
+  let userTurnCount = 0;
+  let qualityScore = 0;
+  let analysisRequested = false;
+  let isRequesting = false;
+  const conversationHistory = [];
+  const sendButton = form.querySelector(".ai-chat__send");
+  const sendLabel = sendButton ? sendButton.textContent : "";
+
+  renderChatBubble(messagesEl, firstMessage, "ai");
+  conversationHistory.push({ role: "assistant", content: firstMessage });
+
+  async function requestAIReply() {
+    const response = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messages: conversationHistory, language: getCurrentLang() }),
+    });
+    if (!response.ok) {
+      const payload = await response.json().catch(() => ({}));
+      throw new Error(payload.error || "Failed to get AI response");
+    }
+    const data = await response.json();
+    return data.reply;
+  }
+
+  async function requestAnalysis() {
+    const response = await fetch("/api/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messages: conversationHistory }),
+    });
+    if (!response.ok) {
+      const payload = await response.json().catch(() => ({}));
+      throw new Error(payload.error || "Failed to analyze conversation");
+    }
+    return response.json();
+  }
+
+  async function saveAnalysisToReportStore(analysis) {
+    const supabase = await getSupabaseClient();
+    if (!supabase) return false;
+    const { data: userResult } = await supabase.auth.getUser();
+    const user = userResult?.user;
+    if (!user) return false;
+    const { error } = await supabase
+      .from("relationship_reports")
+      .insert({
+        user_id: user.id,
+        analysis_json: analysis,
+      });
+    return !error;
+  }
+
+  function getMessageQualityScore(text) {
+    const trimmed = text.trim();
+    if (!trimmed) return 0;
+
+    let score = 0;
+    const charLength = trimmed.length;
+    if (charLength >= 6) score += 0.6;
+    if (charLength >= 14) score += 0.7;
+    if (charLength >= 28) score += 0.8;
+
+    const sentenceCount = trimmed.split(/[.!?。！？\n]/).filter(Boolean).length;
+    if (sentenceCount >= 2) score += 0.4;
+
+    const emotionalKeywords = [
+      "좋아",
+      "싫어",
+      "불안",
+      "걱정",
+      "편해",
+      "서운",
+      "외로",
+      "화나",
+      "기대",
+      "두려",
+      "행복",
+      "anxious",
+      "worried",
+      "comfortable",
+      "upset",
+      "lonely",
+      "happy",
+      "afraid",
+      "angry",
+      "trust",
+    ];
+    const lowered = trimmed.toLowerCase();
+    if (emotionalKeywords.some((k) => lowered.includes(k))) score += 0.6;
+
+    return Math.min(2.8, score);
+  }
+
+  function shouldRunAnalysis() {
+    if (userTurnCount >= 12) return true;
+    if (userTurnCount < 10) return false;
+    return qualityScore >= 10.0;
+  }
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (isRequesting || analysisRequested) return;
+    const raw = input.value.trim();
+    if (!raw) return;
+
+    renderChatBubble(messagesEl, raw, "user");
+    input.value = "";
+    conversationHistory.push({ role: "user", content: raw });
+    userTurnCount += 1;
+    qualityScore += getMessageQualityScore(raw);
+
+    try {
+      isRequesting = true;
+      if (sendButton) {
+        sendButton.disabled = true;
+        sendButton.textContent = "...";
+      }
+      const reply = await requestAIReply();
+      renderChatBubble(messagesEl, reply, "ai");
+      conversationHistory.push({ role: "assistant", content: reply });
+    } catch (error) {
+      renderChatBubble(
+        messagesEl,
+        "잠깐만, 지금 연결이 살짝 불안정해. 다시 한 번 말해줄래?",
+        "ai"
+      );
+    } finally {
+      isRequesting = false;
+      if (sendButton) {
+        sendButton.disabled = false;
+        sendButton.textContent = sendLabel || deepGet(window.__BLEN_LOCALE__, "aiChat.send") || "Send";
+      }
+    }
+
+    if (shouldRunAnalysis() && !analysisRequested) {
+      analysisRequested = true;
+      try {
+        const analysis = await requestAnalysis();
+        localStorage.setItem(ANALYSIS_STORAGE_KEY, JSON.stringify(analysis));
+        localStorage.setItem(PENDING_REPORT_SAVE_KEY, "1");
+        const saved = await saveAnalysisToReportStore(analysis);
+        if (saved) {
+          localStorage.removeItem(PENDING_REPORT_SAVE_KEY);
+          const currentLang = getCurrentLang();
+          window.setTimeout(() => {
+            location.href = localeUrl(currentLang, "report");
+          }, 520);
+          return;
+        }
+        const currentLang = getCurrentLang();
+        window.setTimeout(() => {
+          location.href = localeUrl(currentLang, "login");
+        }, 520);
+        return;
+      } catch (error) {
+        localStorage.setItem(ANALYSIS_STORAGE_KEY, JSON.stringify(createFallbackAnalysis()));
+        localStorage.setItem(PENDING_REPORT_SAVE_KEY, "1");
+        const currentLang = getCurrentLang();
+        window.setTimeout(() => {
+          location.href = localeUrl(currentLang, "login");
+        }, 520);
+        return;
+      }
+    }
+  });
+}
+
+function bindLoginPage() {
+  const form = document.querySelector("[data-login-form]");
+  if (!form) return;
+  const emailInput = form.querySelector('[data-login-input="email"]');
+  const passwordInput = form.querySelector('[data-login-input="password"]');
+  const submitButton = form.querySelector("[data-login-submit]");
+  const statusText = form.querySelector("[data-login-status]");
+  if (!emailInput || !passwordInput || !submitButton || !statusText) return;
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
+    if (!email || !password) return;
+
+    submitButton.disabled = true;
+    statusText.textContent = deepGet(window.__BLEN_LOCALE__, "login.loading") || "Loading...";
+
+    try {
+      const supabase = await getSupabaseClient();
+      if (!supabase) throw new Error("Supabase client unavailable");
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error || !data?.session) {
+        throw new Error(error?.message || "Login failed");
+      }
+      localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(data.session));
+      setSavedLang(getCurrentLang());
+
+      const hasPendingReport = localStorage.getItem(PENDING_REPORT_SAVE_KEY) === "1";
+      const reportRaw =
+        localStorage.getItem(ANALYSIS_STORAGE_KEY) ||
+        localStorage.getItem(LEGACY_ANALYSIS_STORAGE_KEY);
+      const reportAnalysis = reportRaw ? JSON.parse(reportRaw) : null;
+
+      if (hasPendingReport && reportAnalysis) {
+        await supabase.from("relationship_reports").insert({
+          user_id: data.user.id,
+          analysis_json: reportAnalysis,
+        });
+      }
+
+      localStorage.removeItem(PENDING_REPORT_SAVE_KEY);
+      const currentLang = getCurrentLang();
+      location.href = localeUrl(currentLang, "report");
+    } catch (error) {
+      statusText.textContent =
+        deepGet(window.__BLEN_LOCALE__, "login.error") || "Login failed. Try again.";
+      submitButton.disabled = false;
+    }
+  });
+}
+
+function bindReportPage() {
+  const reportRoot = document.querySelector(".report");
+  if (!reportRoot) return;
+
+  const fallback = createFallbackAnalysis();
+  const setFromAnalysis = (analysis) => {
+    const report = analysis.report_inputs || fallback.report_inputs;
+    const setText = (selector, value) => {
+      const el = reportRoot.querySelector(selector);
+      if (el) el.textContent = value;
+    };
+    const setList = (selector, items) => {
+      const el = reportRoot.querySelector(selector);
+      if (!el) return;
+      el.innerHTML = "";
+      items.forEach((item) => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        el.appendChild(li);
+      });
+    };
+
+    setText("[data-report-headline]", report.headline_keyword || "");
+    setText("[data-report-relationship-style]", report.relationship_style || "");
+    setList("[data-report-core-values]", report.core_values || []);
+    setText("[data-report-attraction-pattern]", report.attraction_pattern || "");
+    setText("[data-report-communication-style]", report.communication_style || "");
+    setText("[data-report-emotional-pattern]", report.emotional_pattern || "");
+    setList("[data-report-dealbreakers]", report.dealbreakers || []);
+    setText("[data-report-strength]", (report.strengths || []).join(" "));
+    setText("[data-report-risk]", (report.risks || []).join(" "));
+    setText("[data-report-ideal-partner]", (report.ideal_partner_traits || []).join(", "));
+    setText("[data-report-one-line]", report.one_line_summary || "");
+  };
+
+  const raw =
+    localStorage.getItem(ANALYSIS_STORAGE_KEY) ||
+    localStorage.getItem(LEGACY_ANALYSIS_STORAGE_KEY);
+  const localAnalysis = raw ? JSON.parse(raw) : fallback;
+  setFromAnalysis(localAnalysis);
+
+  const token = getSupabaseAccessTokenFromStorage();
+  const gate = reportRoot.querySelector("[data-report-login-gate]");
+  const content = reportRoot.querySelector("[data-report-content]");
+  if (!token) {
+    if (gate) gate.hidden = false;
+    if (content) content.hidden = true;
+    return;
+  }
+  if (gate) gate.hidden = true;
+  if (content) content.hidden = false;
+  (async () => {
+    const supabase = await getSupabaseClient();
+    if (!supabase) return;
+    const { data: userResult } = await supabase.auth.getUser();
+    const user = userResult?.user;
+    if (!user) {
+      if (gate) gate.hidden = false;
+      if (content) content.hidden = true;
+      return;
+    }
+    const { data, error } = await supabase
+      .from("relationship_reports")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(1);
+    if (error) return;
+    const latest = Array.isArray(data) ? data[0] : null;
+    const serverAnalysis = latest?.analysis_json;
+    if (serverAnalysis && typeof serverAnalysis === "object") {
+      localStorage.setItem(ANALYSIS_STORAGE_KEY, JSON.stringify(serverAnalysis));
+      setFromAnalysis(serverAnalysis);
+    }
+  })();
+}
+
 async function init() {
   const currentLang = getCurrentLang();
   const savedLang = getSavedLang();
@@ -363,6 +779,9 @@ async function init() {
   bindPreviewCarousel();
   bindPreviewCTA();
   bindRelationshipTestCTA();
+  bindAiChatFlow();
+  bindLoginPage();
+  bindReportPage();
 }
 
 if (document.readyState === "loading") {

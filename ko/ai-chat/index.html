@@ -7,6 +7,80 @@
     <link rel="stylesheet" href="../../../styles.css" />
   </head>
   <body data-page="aiChat" data-locale="ko">
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="site-brand" href="/ko" aria-label="Blen Home">Blen</a>
+
+        <button
+          type="button"
+          class="site-nav-toggle"
+          aria-expanded="false"
+          aria-controls="primary-nav"
+          data-i18n-attr="aria-label"
+          data-i18n-key="common.menuToggle"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <nav
+          id="primary-nav"
+          class="site-nav"
+          aria-label="Primary navigation"
+          data-i18n-attr="aria-label"
+          data-i18n-key="common.navAria"
+        >
+          <ul class="site-nav__list">
+            <li><a class="site-nav__link" data-nav="home" href="/ko" data-i18n="common.navHome"></a></li>
+            <li><a class="site-nav__link" data-nav="about" href="/ko/about" data-i18n="common.navAbout"></a></li>
+            <li><a class="site-nav__link" data-nav="support" href="/ko/support" data-i18n="common.navSupport"></a></li>
+          </ul>
+        </nav>
+        <div
+          class="site-lang"
+          role="group"
+          aria-label="Language selector"
+          data-i18n-attr="aria-label"
+          data-i18n-key="common.languageAria"
+        >
+          <button
+            type="button"
+            class="site-lang__trigger"
+            aria-expanded="false"
+            aria-controls="language-menu"
+            data-i18n-attr="aria-label"
+            data-i18n-key="common.languageAria"
+          >
+            <span class="site-lang__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2Zm6.92 9h-3.03c-.2-2.18-.98-4.11-2.1-5.46A8.04 8.04 0 0 1 18.92 11ZM12 4.04c1.39 1.48 2.34 3.98 2.55 6.96H9.45c.21-2.98 1.16-5.48 2.55-6.96ZM4.26 13h3.03c.2 2.18.98 4.11 2.1 5.46A8.04 8.04 0 0 1 4.26 13Zm3.03-2H4.26a8.04 8.04 0 0 1 5.13-5.46C8.27 6.89 7.49 8.82 7.29 11Zm4.71 8.96c-1.39-1.48-2.34-3.98-2.55-6.96h5.1c-.21 2.98-1.16 5.48-2.55 6.96ZM14.61 18.46c1.12-1.35 1.9-3.28 2.1-5.46h3.03a8.04 8.04 0 0 1-5.13 5.46Z" fill="currentColor"/>
+              </svg>
+            </span>
+            <span class="site-lang__current" data-lang-current>English</span>
+            <span class="site-lang__chevron" aria-hidden="true">▾</span>
+          </button>
+          <div id="language-menu" class="site-lang__menu" role="menu">
+            <button
+              type="button"
+              class="site-lang__btn"
+              data-set-lang="en"
+              aria-pressed="false"
+              role="menuitemradio"
+              data-i18n="common.langEng"
+            ></button>
+            <button
+              type="button"
+              class="site-lang__btn"
+              data-set-lang="ko"
+              aria-pressed="false"
+              role="menuitemradio"
+              data-i18n="common.langKo"
+            ></button>
+          </div>
+        </div>
+      </div>
+    </header>
     <main class="ai-chat">
       <header class="ai-chat__header">
         <h1 class="ai-chat__title" data-i18n="aiChat.title"></h1>
@@ -22,6 +96,18 @@
         <button class="ai-chat__send" type="submit" data-i18n="aiChat.send"></button>
       </form>
     </main>
+    <footer class="site-footer">
+      <div class="site-footer__inner">
+        <ul class="footer-nav" aria-label="Footer Menu">
+          <li><a class="footer-nav__link" data-footer-link="about" data-i18n="common.footerAbout" href="../about/"></a></li>
+          <li><a class="footer-nav__link" data-footer-link="terms" data-i18n="common.footerTerms" href="../terms/"></a></li>
+          <li><a class="footer-nav__link" data-footer-link="privacy" data-i18n="common.footerPrivacy" href="../privacy/"></a></li>
+          <li><a class="footer-nav__link" data-footer-link="support" data-i18n="common.footerSupport" href="../support/"></a></li>
+        </ul>
+        <p class="site-footer__text" data-i18n="common.copyright"></p>
+      </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../../../script.js"></script>
   </body>
 </html>
