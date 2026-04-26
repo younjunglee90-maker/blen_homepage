@@ -7,7 +7,7 @@
     "titleSupport": "고객센터 | Blen",
     "titleRelationshipTest": "연애 성향 분석 테스트 | Blen",
     "titleAiChat": "Blen AI 채팅 | Blen",
-    "titleReport": "관계 리포트 | Blen",
+    "titleReport": "Blen AI 연애 성향 레포트 | Blen",
     "titleLogin": "로그인 | Blen"
   },
   "common": {
@@ -280,7 +280,7 @@
     "firstMessage": "안녕, 블렌에 온 걸 환영해. 나와 같이 너의 인연을 찾아볼래?",
     "guidanceMessage": "답변을 길고 솔직하게 들려줄수록, Blen AI가 너의 연애 성향을 더 섬세하게 이해할 수 있어.",
     "progressLabel": "분석 진행률",
-    "finalAckMessage": "좋아, 충분히 알겠어. 지금 너의 연애 성향을 분석해볼게.",
+    "finalAckMessage": "좋아, 이제 너에 대해 꽤 잘 알 것 같아. 지금까지 얘기한 걸 바탕으로 너의 연애 성향을 정리해볼게.",
     "analyzingMessage": "분석 중...",
     "reportReadyMessage": "고마워, 충분히 이야기해줘서. 이제 너의 리포트를 준비했어.",
     "unlockCta": "연애 성향 레포트 보기",
@@ -332,17 +332,17 @@
     "unlockButton": "내 레포트 확인하기",
     "lockedHelper": "몇 초면 바로 확인할 수 있어요.",
     "shareTitle": "내 레포트 공유하기",
-    "shareDescription": "신뢰하는 사람에게 Blen AI 결과를 공유해보세요.",
+    "shareDescription": "너의 Blen AI 리포트를 소중한 사람과 나눠보자.",
     "shareCopy": "링크 복사",
-    "shareNative": "기기 공유",
+    "shareNative": "공유하기",
     "shareKakao": "카카오톡",
     "shareInstagram": "인스타그램",
-    "shareWarning": "이 링크를 가진 사람은 레포트를 볼 수 있어요.",
+    "shareWarning": "이 링크를 받은 사람은 누구나 이 레포트를 볼 수 있어요.",
     "shareCopied": "링크가 복사됐어요!",
     "shareLoading": "링크를 만들고 있어요...",
     "shareFailed": "공유 링크를 만드는 중 문제가 생겼어요. 다시 시도해 주세요.",
     "shareComingSoon": "이 공유 옵션은 곧 지원될 예정이에요.",
-    "sharedNote": "친구가 공유한 연애 성향 레포트예요.",
-    "sharedStartCta": "나도 연애 성향 분석 시작하기"
+    "sharedNote": "지금 보고 있는 건 공유된 Blen AI 연애 성향 레포트야.",
+    "sharedStartCta": "나도 Blen AI 분석 시작하기"
   }
 }

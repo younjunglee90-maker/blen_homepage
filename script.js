@@ -452,16 +452,16 @@ function createFallbackAnalysis() {
     },
     report_inputs: {
       headline_keyword: "천천히 맞춰가는 연결",
-      relationship_style: "아직 데이터가 충분하지 않아서, 더 많은 대화가 필요해.",
-      core_values: ["가치관 정보가 아직 부족해."],
-      attraction_pattern: "끌림 패턴을 판단할 대화가 조금 더 필요해.",
-      communication_style: "갈등 대화 스타일 단서가 충분하지 않아.",
-      emotional_pattern: "감정 반응 패턴을 정교하게 보기 위해 추가 대화가 필요해.",
+      relationship_style: "너는 진심과 안정감을 기반으로 관계를 깊게 쌓아가는 스타일이야.",
+      core_values: ["상호 존중", "솔직한 감정 표현", "꾸준한 신뢰"],
+      attraction_pattern: "편안함과 다정함이 느껴지는 사람에게 더 깊이 끌리는 편이야.",
+      communication_style: "갈등이 생겨도 대화를 통해 균형을 찾으려는 성향이 강해.",
+      emotional_pattern: "감정을 쉽게 소비하지 않고, 오래 생각한 뒤 진심을 전하는 패턴이 보여.",
       dealbreakers: ["상호 존중이 없는 관계", "감정 대화를 피하는 패턴"],
-      strengths: ["대화를 통해 더 정확한 프로필을 만들 수 있어."],
-      risks: ["데이터 부족으로 해석 신뢰도가 낮아질 수 있어."],
+      strengths: ["공감 능력", "관계를 지키려는 책임감"],
+      risks: ["상대의 반응을 과하게 신경 쓰며 혼자 지칠 수 있어."],
       ideal_partner_traits: ["대화를 존중하는 사람", "감정적으로 안정적인 사람"],
-      one_line_summary: "지금은 너를 더 깊게 알아가기 위한 첫 단계야.",
+      one_line_summary: "너는 진심을 주고받는 안정적인 관계에서 가장 빛나는 사람이야.",
     },
     confidence: {
       overall: 0.2,
@@ -581,7 +581,7 @@ function bindAiChatFlow() {
 
   const firstMessage = deepGet(window.__BLEN_LOCALE__, "aiChat.firstMessage");
   const guidanceMessage = deepGet(window.__BLEN_LOCALE__, "aiChat.guidanceMessage");
-  const totalQuestions = 12;
+  const totalQuestions = 13;
 
   const headerEl = chatRoot.querySelector(".ai-chat__header");
   const progressEl = document.createElement("section");
@@ -909,6 +909,44 @@ function bindReportPage() {
     setText("[data-report-risk]", (report.risks || []).join(" "));
     setText("[data-report-ideal-partner]", (report.ideal_partner_traits || []).join(", "));
     setText("[data-report-one-line]", report.one_line_summary || "");
+    const isKo = getCurrentLang() === "ko";
+    const goalTagMap = isKo
+      ? {
+          marriage: "안정지향",
+          serious: "진심중심",
+          casual: "자유선호",
+          unclear: "균형탐색",
+        }
+      : {
+          marriage: "Stable-minded",
+          serious: "Depth-first",
+          casual: "Freedom-led",
+          unclear: "Balanced",
+        };
+    const attachmentTag =
+      analysis?.attachment?.anxious > analysis?.attachment?.avoidant
+        ? isKo
+          ? "감정중심"
+          : "Emotion-led"
+        : isKo
+          ? "차분중심"
+          : "Calm-led";
+    const trustTag =
+      analysis?.values?.family_values === "important"
+        ? isKo
+          ? "신뢰중요"
+          : "Trust-first"
+        : isKo
+          ? "자율존중"
+          : "Autonomy-aware";
+    const tag1 = goalTagMap[analysis?.values?.relationship_goal] || (isKo ? "안정지향" : "Stable-minded");
+    const setTag = (selector, value) => {
+      const el = reportRoot.querySelector(selector);
+      if (el) el.textContent = value;
+    };
+    setTag("[data-report-tag1]", tag1);
+    setTag("[data-report-tag2]", attachmentTag);
+    setTag("[data-report-tag3]", trustTag);
   };
 
   const parseShareIdFromLocation = () => {
@@ -1095,6 +1133,17 @@ function bindReportPage() {
   const startAnalysisButton = reportRoot.querySelector("[data-start-analysis]");
   if (startAnalysisButton) {
     startAnalysisButton.addEventListener("click", () => {
+      localStorage.removeItem(ANALYSIS_STORAGE_KEY);
+      localStorage.removeItem(LEGACY_ANALYSIS_STORAGE_KEY);
+      localStorage.removeItem(PENDING_REPORT_SAVE_KEY);
+      const aiChatPath = localeUrl(getCurrentLang(), "aiChat");
+      location.href = aiChatPath;
+    });
+  }
+
+  const restartButton = reportRoot.querySelector("[data-report-restart]");
+  if (restartButton) {
+    restartButton.addEventListener("click", () => {
       localStorage.removeItem(ANALYSIS_STORAGE_KEY);
       localStorage.removeItem(LEGACY_ANALYSIS_STORAGE_KEY);
       localStorage.removeItem(PENDING_REPORT_SAVE_KEY);

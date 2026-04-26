@@ -46,24 +46,62 @@
     <main class="report">
       <div data-report-content>
       <section class="report__hero">
-        <p class="report__kicker">Blen Relationship Report</p>
+        <p class="report__kicker">Blen AI 연애 성향 레포트</p>
         <h1 class="report__headline" data-report-headline></h1>
+        <p class="report__hero-subtitle">대화를 바탕으로 정리한 너의 관계 패턴이야</p>
+        <div class="report__hero-summary">
+          <p class="report__hero-summary-label">한 줄 요약</p>
+          <p class="report__hero-summary-text" data-report-one-line></p>
+          <div class="report__hero-tags">
+            <span class="report__hero-tag" data-report-tag1>안정지향</span>
+            <span class="report__hero-tag" data-report-tag2>감정중심</span>
+            <span class="report__hero-tag" data-report-tag3>신뢰중요</span>
+          </div>
+        </div>
       </section>
 
-      <section class="report__grid">
-        <article class="report__card"><h2>연애 스타일</h2><p data-report-relationship-style></p></article>
-        <article class="report__card"><h2>핵심 가치관</h2><ul data-report-core-values></ul></article>
-        <article class="report__card"><h2>끌림 패턴</h2><p data-report-attraction-pattern></p></article>
-        <article class="report__card"><h2>커뮤니케이션 스타일</h2><p data-report-communication-style></p></article>
-        <article class="report__card"><h2>감정 패턴</h2><p data-report-emotional-pattern></p></article>
-        <article class="report__card"><h2>관계 속 경계선</h2><ul data-report-dealbreakers></ul></article>
-        <article class="report__card"><h2>강점</h2><p data-report-strength></p><h3>리스크</h3><p data-report-risk></p></article>
-        <article class="report__card"><h2>이상적인 인연</h2><p data-report-ideal-partner></p></article>
-      </section>
-
-      <section class="report__summary">
-        <h2>한 줄 요약</h2>
-        <p data-report-one-line></p>
+      <section class="report__article">
+        <article class="report__section">
+          <p class="report__section-label">연애 스타일</p>
+          <h2 class="report__section-title">연애 스타일</h2>
+          <p data-report-relationship-style></p>
+        </article>
+        <article class="report__section">
+          <p class="report__section-label">핵심 가치관</p>
+          <h2 class="report__section-title">핵심 가치관</h2>
+          <ul class="report__list" data-report-core-values></ul>
+        </article>
+        <article class="report__section">
+          <p class="report__section-label">끌림 패턴</p>
+          <h2 class="report__section-title">끌림 패턴</h2>
+          <p data-report-attraction-pattern></p>
+        </article>
+        <article class="report__section">
+          <p class="report__section-label">커뮤니케이션 스타일</p>
+          <h2 class="report__section-title">커뮤니케이션 스타일</h2>
+          <p data-report-communication-style></p>
+        </article>
+        <article class="report__section">
+          <p class="report__section-label">감정 패턴</p>
+          <h2 class="report__section-title">감정 패턴</h2>
+          <p class="report__highlight" data-report-emotional-pattern></p>
+        </article>
+        <article class="report__section">
+          <p class="report__section-label">관계 속 경계선</p>
+          <h2 class="report__section-title">관계 속 경계선</h2>
+          <ul class="report__list" data-report-dealbreakers></ul>
+        </article>
+        <article class="report__section">
+          <p class="report__section-label">강점과 리스크</p>
+          <h2 class="report__section-title">강점과 리스크</h2>
+          <p data-report-strength></p>
+          <p class="report__risk-line" data-report-risk></p>
+        </article>
+        <article class="report__section">
+          <p class="report__section-label">이상적인 인연</p>
+          <h2 class="report__section-title">이상적인 인연</h2>
+          <p data-report-ideal-partner></p>
+        </article>
       </section>
 
       <section class="report__share" data-report-share>
@@ -75,6 +113,7 @@
           <button type="button" class="report__share-btn" data-share-kakao data-i18n="report.shareKakao"></button>
           <button type="button" class="report__share-btn" data-share-instagram data-i18n="report.shareInstagram"></button>
         </div>
+        <button type="button" class="report__share-btn report__share-btn--primary" data-report-restart>다시 분석하기</button>
         <p class="report__share-warning" data-i18n="report.shareWarning"></p>
       </section>
       <p class="report__share-toast" data-share-toast hidden></p>

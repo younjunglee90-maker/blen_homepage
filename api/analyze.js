@@ -79,6 +79,8 @@ Report writing rules:
 - Avoid generic statements.
 - Do not mention ENRICH, ECR, Gottman, TCI, JSON, or scores.
 - Do not label the user negatively.
+- Never say data is insufficient.
+- Always provide complete content for every report section, using best-fit inference from conversation context.
 - "strength_and_risk" should include both strength and gentle caution.
 - "one_line_summary" should feel like an emotional closing sentence.
 `.trim();
@@ -115,16 +117,16 @@ function fallbackAnalysis() {
     },
     report_inputs: {
       headline_keyword: "천천히 맞춰가는 연결",
-      relationship_style: "아직 데이터가 충분하지 않아 조금 더 대화가 필요해.",
-      core_values: ["대화 데이터가 더 필요해."],
-      attraction_pattern: "끌림 패턴을 더 파악해볼 필요가 있어.",
-      communication_style: "갈등/소통 패턴 정보가 아직 부족해.",
-      emotional_pattern: "감정 반응 패턴을 정교하게 보기엔 데이터가 부족해.",
+      relationship_style: "너는 관계에서 안정감과 진심을 중요하게 여기는 편이야.",
+      core_values: ["상호 존중", "일상 속 꾸준한 신뢰", "감정 표현의 진정성"],
+      attraction_pattern: "편안함과 배려가 느껴지는 사람에게 더 깊게 끌리는 패턴이 있어.",
+      communication_style: "감정이 생기면 피하기보다 대화로 풀어가려는 성향이 보여.",
+      emotional_pattern: "겉으로는 차분해도 마음속으로는 관계의 균형을 섬세하게 살피는 편이야.",
       dealbreakers: ["상호 존중이 없는 관계"],
-      strengths: ["대화를 통해 더 정확한 분석이 가능해."],
-      risks: ["데이터 부족으로 정확도가 낮을 수 있어."],
-      ideal_partner_traits: ["감정적으로 안정적인 사람"],
-      one_line_summary: "너를 더 깊게 이해하는 첫 단계야.",
+      strengths: ["감정 공감 능력", "관계를 지키려는 책임감"],
+      risks: ["상대 반응에 과하게 신경 쓰며 스스로 지칠 수 있어."],
+      ideal_partner_traits: ["감정적으로 안정적인 사람", "갈등을 대화로 풀 수 있는 사람"],
+      one_line_summary: "너는 진심을 오래 지켜줄 수 있는 관계에서 가장 빛나는 사람이야.",
     },
     confidence: {
       overall: 0.2,

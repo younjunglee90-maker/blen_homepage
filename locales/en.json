@@ -7,7 +7,7 @@
     "titleSupport": "Customer Support | Blen",
     "titleRelationshipTest": "Relationship Tendency Test | Blen",
     "titleAiChat": "Blen AI Chat | Blen",
-    "titleReport": "Relationship Report | Blen",
+    "titleReport": "Blen AI Relationship Report | Blen",
     "titleLogin": "Login | Blen"
   },
   "common": {
@@ -338,18 +338,18 @@
     "lockedSubtitle": "Sign up to unlock your full Blen AI analysis.",
     "unlockButton": "Unlock My Report",
     "lockedHelper": "It only takes a few seconds.",
-    "shareTitle": "Share your report",
-    "shareDescription": "Send your Blen AI result to someone you trust.",
+    "shareTitle": "Share My Report",
+    "shareDescription": "Share your Blen AI story with someone you trust.",
     "shareCopy": "Copy Link",
-    "shareNative": "Native Share",
+    "shareNative": "Share",
     "shareKakao": "KakaoTalk",
     "shareInstagram": "Instagram",
-    "shareWarning": "Anyone with this link may be able to view your report.",
+    "shareWarning": "Anyone with this link can view this report.",
     "shareCopied": "Link copied!",
     "shareLoading": "Saving link...",
     "shareFailed": "There was a problem creating the share link. Please try again.",
     "shareComingSoon": "This share option is coming soon.",
-    "sharedNote": "This is a relationship report shared with you.",
-    "sharedStartCta": "Start My Relationship Analysis"
+    "sharedNote": "You are viewing a Blen AI report shared with you.",
+    "sharedStartCta": "Start My Blen AI Analysis"
   }
 }
