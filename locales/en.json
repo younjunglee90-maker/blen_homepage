@@ -288,6 +288,7 @@
     "firstMessage": "Hi, welcome to Blen. Want to find your match with me?",
     "guidanceMessage": "The more openly and in detail you share, the more accurately Blen AI can understand your dating style.",
     "progressLabel": "Progress",
+    "progressMessage": "We are gently uncovering your relationship story",
     "finalAckMessage": "Got it, I have enough context now. I will analyze your relationship style.",
     "analyzingMessage": "Analyzing...",
     "reportReadyMessage": "Thanks for sharing so openly. Your report is ready now.",

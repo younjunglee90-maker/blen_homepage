@@ -507,7 +507,7 @@ function renderTypingBubble(messagesEl) {
   const bubble = document.createElement("div");
   bubble.className = "ai-chat__bubble ai-chat__bubble--ai";
   bubble.innerHTML =
-    '<span class="ai-chat__typing"><span class="ai-chat__typing-dot"></span><span class="ai-chat__typing-dot"></span><span class="ai-chat__typing-dot"></span></span>';
+    '<span class="ai-chat__typing"><span class="ai-chat__typing-ellipsis">...</span></span>';
 
   const block = document.createElement("div");
   block.className = "ai-chat__message-block";
@@ -546,7 +546,7 @@ function bindAiChatFlow() {
   progressEl.innerHTML = `
     <div class="ai-chat__progress-head">
       <span class="ai-chat__progress-label">${
-        deepGet(window.__BLEN_LOCALE__, "aiChat.progressLabel") || "분석 진행률"
+        deepGet(window.__BLEN_LOCALE__, "aiChat.progressMessage") || "지금 너의 연애 스토리를 천천히 맞춰보고 있어"
       }</span>
       <span class="ai-chat__progress-value" data-progress-value>0%</span>
     </div>
@@ -581,9 +581,60 @@ function bindAiChatFlow() {
   const conversationHistory = [];
   const sendButton = form.querySelector(".ai-chat__send");
   const sendLabel = sendButton ? sendButton.textContent : "";
+  const quickPrompts =
+    getCurrentLang() === "ko"
+      ? ["가볍게 만나고 싶어", "진지한 관계", "잘 모르겠어"]
+      : ["Something casual", "A serious relationship", "I'm not sure yet"];
+
+  const sleep = (ms) => new Promise((resolve) => window.setTimeout(resolve, ms));
+
+  function removeQuickRepliesRow() {
+    const existing = messagesEl.querySelector("[data-quick-replies-row]");
+    if (existing) existing.remove();
+  }
+
+  function renderQuickReplies() {
+    removeQuickRepliesRow();
+    if (!quickPrompts.length) return;
+    const row = document.createElement("article");
+    row.className = "ai-chat__row ai-chat__row--ai ai-chat__row--quick";
+    row.setAttribute("data-quick-replies-row", "true");
+
+    const avatarSpacer = document.createElement("span");
+    avatarSpacer.className = "ai-chat__avatar ai-chat__avatar--spacer";
+    avatarSpacer.setAttribute("aria-hidden", "true");
+
+    const wrap = document.createElement("div");
+    wrap.className = "ai-chat__quick-replies";
+    quickPrompts.forEach((prompt) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "ai-chat__quick-reply";
+      button.textContent = prompt;
+      button.addEventListener("click", () => {
+        if (isRequesting || analysisRequested) return;
+        input.value = prompt;
+        if (typeof form.requestSubmit === "function") {
+          form.requestSubmit();
+        } else {
+          form.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
+        }
+      });
+      wrap.appendChild(button);
+    });
+    row.appendChild(avatarSpacer);
+    row.appendChild(wrap);
+    messagesEl.appendChild(row);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function hideQuickReplies() {
+    removeQuickRepliesRow();
+  }
 
   renderChatBubble(messagesEl, firstMessage, "ai");
   conversationHistory.push({ role: "assistant", content: firstMessage });
+  renderQuickReplies();
 
   async function requestAIReply() {
     const response = await fetch("/api/chat", {
@@ -690,6 +741,7 @@ function bindAiChatFlow() {
     if (!raw) return;
 
     renderChatBubble(messagesEl, raw, "user");
+    hideQuickReplies();
     input.value = "";
     conversationHistory.push({ role: "user", content: raw });
     userTurnCount += 1;
@@ -700,6 +752,7 @@ function bindAiChatFlow() {
       hasSentGuidanceMessage = true;
       renderChatBubble(messagesEl, guidanceMessage, "ai");
       conversationHistory.push({ role: "assistant", content: guidanceMessage });
+      renderQuickReplies();
     }
 
     if (isWaitingForFinalAnswer) {
@@ -716,10 +769,17 @@ function bindAiChatFlow() {
         sendButton.textContent = "...";
       }
       typingBubble = renderTypingBubble(messagesEl);
+      const startedAt = Date.now();
       const reply = await requestAIReply();
+      const elapsed = Date.now() - startedAt;
+      const minTypingMs = 650;
+      if (elapsed < minTypingMs) {
+        await sleep(minTypingMs - elapsed);
+      }
       if (typingBubble) typingBubble.remove();
       renderChatBubble(messagesEl, reply, "ai");
       conversationHistory.push({ role: "assistant", content: reply });
+      renderQuickReplies();
       if (currentQuestionIndex < totalQuestions - 1) {
         currentQuestionIndex += 1;
         if (currentQuestionIndex === totalQuestions - 1) {
@@ -1342,7 +1402,7 @@ function bindReportPage() {
   const renderMissingAnalysisFallback = () => {
     if (!content) return;
     content.innerHTML = `
-      <section class="report__story">
+      <section class="report__story report__story--empty">
         <h2 class="report__story-title">${
           getCurrentLang() === "ko" ? "아직 분석 결과가 없어요" : "Your analysis is not ready yet"
         }</h2>
