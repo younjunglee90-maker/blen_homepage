@@ -47,6 +47,7 @@
     <main class="report">
       <div data-report-content>
       <section class="report__hero">
+        <div class="report__hero-illu" aria-hidden="true">💞</div>
         <p class="report__kicker">Blen AI Relationship Report</p>
         <h1 class="report__headline" data-report-headline></h1>
         <p class="report__hero-subtitle">Your relationship patterns, distilled from your conversation with Blen AI.</p>
@@ -64,20 +65,43 @@
 
       <section class="report__insights">
         <article class="report__insight-card">
-          <p class="report__insight-label">Relationship Style</p>
+          <p class="report__insight-label">💗 Your Love Style</p>
           <p class="report__insight-value" data-report-card-style></p>
         </article>
         <article class="report__insight-card">
-          <p class="report__insight-label">Strengths</p>
+          <p class="report__insight-label">🌿 Your Strengths</p>
           <p class="report__insight-value" data-report-card-strength></p>
         </article>
         <article class="report__insight-card">
-          <p class="report__insight-label">Challenges</p>
+          <p class="report__insight-label">⚠️ Things to Watch</p>
           <p class="report__insight-value" data-report-card-challenge></p>
         </article>
         <article class="report__insight-card">
-          <p class="report__insight-label">Best Match</p>
+          <p class="report__insight-label">💘 Your Best Match</p>
           <p class="report__insight-value" data-report-card-bestmatch></p>
+        </article>
+      </section>
+
+      <section class="report__mini">
+        <article class="report__mini-card">
+          <p class="report__mini-title">💬 Conflict Style</p>
+          <p class="report__mini-text" data-report-mini-conflict></p>
+          <span class="report__mini-bar"><span data-report-mini-conflict-bar></span></span>
+        </article>
+        <article class="report__mini-card">
+          <p class="report__mini-title">🫶 Attachment Style</p>
+          <p class="report__mini-text" data-report-mini-attachment></p>
+          <span class="report__mini-bar"><span data-report-mini-attachment-bar></span></span>
+        </article>
+        <article class="report__mini-card">
+          <p class="report__mini-title">🗨️ Communication Style</p>
+          <p class="report__mini-text" data-report-mini-communication></p>
+          <span class="report__mini-bar"><span data-report-mini-communication-bar></span></span>
+        </article>
+        <article class="report__mini-card">
+          <p class="report__mini-title">🌸 Relationship Boundaries</p>
+          <p class="report__mini-text" data-report-mini-boundaries></p>
+          <span class="report__mini-bar"><span data-report-mini-boundaries-bar></span></span>
         </article>
       </section>
 
@@ -132,6 +156,14 @@
           <h2 class="report__section-title">Advice for Your Next Love</h2>
           <p class="report__highlight" data-report-advice></p>
         </article>
+      </section>
+
+      <section class="report__story">
+        <h2 class="report__story-title">Your Relationship Story</h2>
+        <p data-report-story-love></p>
+        <p data-report-story-safe></p>
+        <p data-report-story-hurt></p>
+        <p data-report-story-match></p>
       </section>
 
       <section class="report__matching">

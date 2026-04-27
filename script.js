@@ -21,6 +21,7 @@ const PAGE_PATHS = {
 const ANALYSIS_STORAGE_KEY = "blen_report";
 const LEGACY_ANALYSIS_STORAGE_KEY = "blen-analysis-result";
 const PENDING_ANALYSIS_MESSAGES_KEY = "blen_pending_analysis_messages";
+const PENDING_ANALYSIS_OVERLAY_KEY = "blen_pending_analysis_overlay";
 const ANALYSIS_SCHEMA_VERSION_KEY = "blen_report_schema_version";
 const ANALYSIS_SCHEMA_VERSION = "2026-04-27-story-v2";
 const AUTH_SESSION_KEY = "blen_auth_session";
@@ -652,22 +653,11 @@ function bindAiChatFlow() {
     if (analysisRequested) return;
     analysisRequested = true;
 
-    renderChatBubble(
-      messagesEl,
-      deepGet(window.__BLEN_LOCALE__, "aiChat.finalAckMessage") ||
-        "좋아, 충분히 알겠어. 지금 너의 연애 성향을 분석해볼게.",
-      "ai"
-    );
-    renderChatBubble(
-      messagesEl,
-      deepGet(window.__BLEN_LOCALE__, "aiChat.analyzingMessage") || "분석 중...",
-      "ai"
-    );
-
     // Navigate to report immediately and analyze there for premium loading UX
     localStorage.removeItem(ANALYSIS_STORAGE_KEY);
     localStorage.removeItem(LEGACY_ANALYSIS_STORAGE_KEY);
     localStorage.removeItem(ANALYSIS_SCHEMA_VERSION_KEY);
+    localStorage.setItem(PENDING_ANALYSIS_OVERLAY_KEY, "1");
     localStorage.setItem(
       PENDING_ANALYSIS_MESSAGES_KEY,
       JSON.stringify(conversationHistory)
@@ -676,7 +666,7 @@ function bindAiChatFlow() {
     const reportPath = localeUrl(getCurrentLang(), "report");
     window.setTimeout(() => {
       location.href = reportPath;
-    }, 260);
+    }, 120);
   }
 
   form.addEventListener("submit", async (event) => {
@@ -971,7 +961,128 @@ function bindReportPage() {
       const el = reportRoot.querySelector(selector);
       if (el) el.textContent = value;
     };
+    const setBar = (selector, percent) => {
+      const el = reportRoot.querySelector(selector);
+      if (!el) return;
+      const safe = Number.isFinite(percent) ? Math.max(12, Math.min(96, percent)) : 44;
+      el.style.width = `${safe}%`;
+    };
+    const scoreToPercent = (raw, fallbackPercent = 48) => {
+      if (typeof raw !== "number" || Number.isNaN(raw)) return fallbackPercent;
+      const normalized = raw <= 1 ? raw * 5 : raw;
+      return Math.round((Math.max(1, Math.min(5, normalized)) / 5) * 100);
+    };
+    const pickPrimaryScore = (scores, key, fallback = 2.8) => {
+      if (!scores || typeof scores !== "object") return fallback;
+      const raw = scores[key];
+      return typeof raw === "number" ? raw : fallback;
+    };
     const isKo = getCurrentLang() === "ko";
+
+    const conflictPrimary =
+      analysis?.conflict_style?.primary ||
+      analysis?.conflict_style?.primary_conflict_style ||
+      "resolution_oriented";
+    const attachmentPrimary =
+      analysis?.attachment_style?.primary ||
+      analysis?.attachment?.primary_attachment ||
+      "secure";
+    const communicationPrimary =
+      analysis?.communication?.primary ||
+      "direct_open";
+    const boundaryPrimary =
+      analysis?.boundaries?.primary ||
+      "moderate_boundary";
+
+    const conflictLabelMap = isKo
+      ? {
+          resolution_oriented: "갈등이 생기면 대화로 풀고 관계를 회복하려는 편이야.",
+          avoidant: "감정이 올라오면 잠깐 거리를 두고 정리하려는 경향이 있어.",
+          defensive: "상처받지 않으려 먼저 방어적으로 반응할 때가 있어.",
+          aggressive: "답답함이 쌓이면 말이 강해질 수 있어서 톤 조절이 중요해.",
+          mixed: "상황에 따라 회피와 대화 시도가 번갈아 나오는 편이야.",
+        }
+      : {
+          resolution_oriented: "You try to solve conflict through conversation and repair.",
+          avoidant: "When emotions rise, you tend to pause and take space first.",
+          defensive: "You can become self-protective when you feel misunderstood.",
+          aggressive: "When frustration builds, your tone can become sharper.",
+          mixed: "Your conflict approach changes depending on the situation.",
+        };
+    const attachmentLabelMap = isKo
+      ? {
+          secure: "관계가 깊어져도 비교적 안정적으로 감정을 표현하는 편이야.",
+          anxious: "상대 반응의 온도에 예민해서 확신이 필요할 때가 많아.",
+          avoidant: "가까워질수록 혼자 정리할 시간이 필요해지는 패턴이 있어.",
+          mixed: "가까워지고 싶다가도 동시에 거리도 필요해지는 흐름이 보여.",
+        }
+      : {
+          secure: "You stay emotionally steady even as intimacy grows.",
+          anxious: "You are sensitive to response changes and need reassurance.",
+          avoidant: "As closeness deepens, you need more space to regulate.",
+          mixed: "You want closeness but also need distance at times.",
+        };
+    const communicationLabelMap = isKo
+      ? {
+          direct_open: "마음을 비교적 솔직하게 말하며 오해를 줄이려는 편이야.",
+          indirect: "직접 말하기보다 분위기와 뉘앙스로 신호를 주는 경향이 있어.",
+          emotion_suppressing: "감정을 바로 꺼내기보다 안에서 오래 정리하는 편이야.",
+          reactive_explosive: "감정이 쌓이면 한 번에 크게 표현될 수 있어.",
+          mixed: "상황에 따라 직접표현과 참는 흐름이 함께 나타나.",
+        }
+      : {
+          direct_open: "You usually express feelings clearly and early.",
+          indirect: "You often communicate through tone and context first.",
+          emotion_suppressing: "You tend to hold feelings in before sharing them.",
+          reactive_explosive: "When emotions pile up, expression can come out strong.",
+          mixed: "Your communication style shifts with context.",
+        };
+    const boundaryLabelMap = isKo
+      ? {
+          high_boundary: "관계에서도 나만의 리듬과 경계를 꽤 분명하게 지키는 편이야.",
+          moderate_boundary: "함께하는 시간과 개인 시간을 균형 있게 맞추려는 타입이야.",
+          low_boundary: "가까운 관계에서는 유연하게 맞춰주며 연결감을 더 중시해.",
+        }
+      : {
+          high_boundary: "You keep clear personal boundaries even in close relationships.",
+          moderate_boundary: "You aim for a healthy balance of closeness and space.",
+          low_boundary: "You prioritize emotional closeness with flexible boundaries.",
+        };
+
+    setText("[data-report-mini-conflict]", conflictLabelMap[conflictPrimary] || conflictLabelMap.resolution_oriented);
+    setText("[data-report-mini-attachment]", attachmentLabelMap[attachmentPrimary] || attachmentLabelMap.secure);
+    setText("[data-report-mini-communication]", communicationLabelMap[communicationPrimary] || communicationLabelMap.direct_open);
+    setText("[data-report-mini-boundaries]", boundaryLabelMap[boundaryPrimary] || boundaryLabelMap.moderate_boundary);
+
+    const conflictScore = pickPrimaryScore(analysis?.conflict_style?.scores, conflictPrimary, 3.2);
+    const attachmentScore = pickPrimaryScore(analysis?.attachment_style?.scores, attachmentPrimary, 3.1);
+    const communicationScore = pickPrimaryScore(analysis?.communication?.scores, communicationPrimary, 3.0);
+    const boundaryScore =
+      typeof analysis?.boundaries?.alone_time_need === "number"
+        ? analysis.boundaries.alone_time_need
+        : 3.0;
+    setBar("[data-report-mini-conflict-bar]", scoreToPercent(conflictScore, 56));
+    setBar("[data-report-mini-attachment-bar]", scoreToPercent(attachmentScore, 54));
+    setBar("[data-report-mini-communication-bar]", scoreToPercent(communicationScore, 52));
+    setBar("[data-report-mini-boundaries-bar]", scoreToPercent(boundaryScore, 50));
+
+    const storyLove = isKo
+      ? `너는 ${report.relationship_style || "관계를 천천히 쌓아가는 타입"}에 가깝고, 마음이 열리기 전까지는 신중하게 사람을 보는 편이야.`
+      : `You tend to ${report.relationship_style || "build love slowly"}, and you open up with care instead of rushing.`;
+    const storySafe = isKo
+      ? `특히 ${firstItem(report.core_values) || "신뢰"} 같은 기준이 지켜질 때 가장 편안함을 느끼고, 관계 안에서 진짜 너다운 모습이 더 잘 나와.`
+      : `You feel safest when values like ${firstItem(report.core_values) || "trust"} are consistent, and that is when your warm side shines most.`;
+    const storyHurt = isKo
+      ? `${firstItem(report.risks) || "애매한 신호가 이어질 때"} 마음이 빨리 지칠 수 있어서, 초반에 기준을 맞추는 대화가 특히 중요해.`
+      : `When ${firstItem(report.risks) || "signals feel unclear for too long"}, your energy can drain fast, so early clarity really helps.`;
+    const storyMatch = isKo
+      ? `너랑 잘 맞는 사람은 ${firstItem(report.ideal_partner_traits) || "감정적으로 안정적인 사람"}처럼 말과 행동이 일관되고, 서로의 감정을 존중해주는 사람이야.`
+      : `Your best match is someone like ${firstItem(report.ideal_partner_traits) || "an emotionally steady partner"} who is consistent in both words and actions.`;
+    setText("[data-report-story-love]", storyLove);
+    setText("[data-report-story-safe]", storySafe);
+    setText("[data-report-story-hurt]", storyHurt);
+    setText("[data-report-story-match]", storyMatch);
+
     const analysisTags = Array.isArray(analysis?.tags)
       ? analysis.tags.filter((tag) => typeof tag === "string" && tag.trim().length > 0)
       : [];
@@ -1182,6 +1293,7 @@ function bindReportPage() {
   const localAnalysis = raw ? JSON.parse(raw) : fallback;
   const shareId = parseShareIdFromLocation();
   const pendingMessagesRaw = localStorage.getItem(PENDING_ANALYSIS_MESSAGES_KEY);
+  const shouldShowPendingOverlay = localStorage.getItem(PENDING_ANALYSIS_OVERLAY_KEY) === "1";
   let pendingMessages = null;
   try {
     pendingMessages = pendingMessagesRaw ? JSON.parse(pendingMessagesRaw) : null;
@@ -1196,7 +1308,7 @@ function bindReportPage() {
   if (content) content.hidden = false;
   reportRoot.classList.remove("report--locked");
 
-  if (!shareId && Array.isArray(pendingMessages) && pendingMessages.length) {
+  if (!shareId && (shouldShowPendingOverlay || (Array.isArray(pendingMessages) && pendingMessages.length))) {
     const overlay = ensureAnalyzingOverlay();
     const stopMessageRotation = startAnalyzingOverlayMessages();
     setAnalyzingState(true);
@@ -1205,10 +1317,12 @@ function bindReportPage() {
     const startedAt = Date.now();
     (async () => {
       try {
-        const analysis = await requestAnalysisForReport(pendingMessages);
-        activeAnalysis = analysis;
-        localStorage.setItem(ANALYSIS_STORAGE_KEY, JSON.stringify(analysis));
-        localStorage.setItem(ANALYSIS_SCHEMA_VERSION_KEY, ANALYSIS_SCHEMA_VERSION);
+        if (Array.isArray(pendingMessages) && pendingMessages.length) {
+          const analysis = await requestAnalysisForReport(pendingMessages);
+          activeAnalysis = analysis;
+          localStorage.setItem(ANALYSIS_STORAGE_KEY, JSON.stringify(analysis));
+          localStorage.setItem(ANALYSIS_SCHEMA_VERSION_KEY, ANALYSIS_SCHEMA_VERSION);
+        }
       } catch (_) {
         const fallbackAnalysis = createFallbackAnalysis();
         activeAnalysis = fallbackAnalysis;
@@ -1216,6 +1330,7 @@ function bindReportPage() {
         localStorage.setItem(ANALYSIS_SCHEMA_VERSION_KEY, ANALYSIS_SCHEMA_VERSION);
       } finally {
         localStorage.removeItem(PENDING_ANALYSIS_MESSAGES_KEY);
+        localStorage.removeItem(PENDING_ANALYSIS_OVERLAY_KEY);
         const elapsed = Date.now() - startedAt;
         const remain = Math.max(0, minDelay - elapsed);
         window.setTimeout(() => {
@@ -1326,6 +1441,7 @@ function bindReportPage() {
       localStorage.removeItem(ANALYSIS_SCHEMA_VERSION_KEY);
       localStorage.removeItem(PENDING_REPORT_SAVE_KEY);
       localStorage.removeItem(PENDING_ANALYSIS_MESSAGES_KEY);
+      localStorage.removeItem(PENDING_ANALYSIS_OVERLAY_KEY);
       const aiChatPath = localeUrl(getCurrentLang(), "aiChat");
       location.href = aiChatPath;
     });
@@ -1339,6 +1455,7 @@ function bindReportPage() {
       localStorage.removeItem(ANALYSIS_SCHEMA_VERSION_KEY);
       localStorage.removeItem(PENDING_REPORT_SAVE_KEY);
       localStorage.removeItem(PENDING_ANALYSIS_MESSAGES_KEY);
+      localStorage.removeItem(PENDING_ANALYSIS_OVERLAY_KEY);
       const aiChatPath = localeUrl(getCurrentLang(), "aiChat");
       location.href = aiChatPath;
     });

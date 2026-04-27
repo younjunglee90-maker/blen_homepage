@@ -47,6 +47,7 @@
     <main class="report">
       <div data-report-content>
       <section class="report__hero">
+        <div class="report__hero-illu" aria-hidden="true">💞</div>
         <p class="report__kicker">Blen AI 연애 성향 레포트</p>
         <h1 class="report__headline" data-report-headline></h1>
         <p class="report__hero-subtitle">대화를 바탕으로 정리한 너의 관계 패턴이야</p>
@@ -64,20 +65,43 @@
 
       <section class="report__insights">
         <article class="report__insight-card">
-          <p class="report__insight-label">연애 스타일</p>
+          <p class="report__insight-label">💗 너의 연애 스타일</p>
           <p class="report__insight-value" data-report-card-style></p>
         </article>
         <article class="report__insight-card">
-          <p class="report__insight-label">강점</p>
+          <p class="report__insight-label">🌿 너의 강점</p>
           <p class="report__insight-value" data-report-card-strength></p>
         </article>
         <article class="report__insight-card">
-          <p class="report__insight-label">리스크</p>
+          <p class="report__insight-label">⚠️ 주의할 포인트</p>
           <p class="report__insight-value" data-report-card-challenge></p>
         </article>
         <article class="report__insight-card">
-          <p class="report__insight-label">잘 맞는 인연</p>
+          <p class="report__insight-label">💘 잘 맞는 인연</p>
           <p class="report__insight-value" data-report-card-bestmatch></p>
+        </article>
+      </section>
+
+      <section class="report__mini">
+        <article class="report__mini-card">
+          <p class="report__mini-title">💬 갈등을 다루는 방식</p>
+          <p class="report__mini-text" data-report-mini-conflict></p>
+          <span class="report__mini-bar"><span data-report-mini-conflict-bar></span></span>
+        </article>
+        <article class="report__mini-card">
+          <p class="report__mini-title">🫶 애착 흐름</p>
+          <p class="report__mini-text" data-report-mini-attachment></p>
+          <span class="report__mini-bar"><span data-report-mini-attachment-bar></span></span>
+        </article>
+        <article class="report__mini-card">
+          <p class="report__mini-title">🗨️ 대화 스타일</p>
+          <p class="report__mini-text" data-report-mini-communication></p>
+          <span class="report__mini-bar"><span data-report-mini-communication-bar></span></span>
+        </article>
+        <article class="report__mini-card">
+          <p class="report__mini-title">🌸 관계 경계선</p>
+          <p class="report__mini-text" data-report-mini-boundaries></p>
+          <span class="report__mini-bar"><span data-report-mini-boundaries-bar></span></span>
         </article>
       </section>
 
@@ -132,6 +156,14 @@
           <h2 class="report__section-title">너를 위한 연애 조언</h2>
           <p class="report__highlight" data-report-advice></p>
         </article>
+      </section>
+
+      <section class="report__story">
+        <h2 class="report__story-title">너의 연애 스토리</h2>
+        <p data-report-story-love></p>
+        <p data-report-story-safe></p>
+        <p data-report-story-hurt></p>
+        <p data-report-story-match></p>
       </section>
 
       <section class="report__matching">
