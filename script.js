@@ -23,7 +23,7 @@ const LEGACY_ANALYSIS_STORAGE_KEY = "blen-analysis-result";
 const PENDING_ANALYSIS_MESSAGES_KEY = "blen_pending_analysis_messages";
 const PENDING_ANALYSIS_OVERLAY_KEY = "blen_pending_analysis_overlay";
 const ANALYSIS_SCHEMA_VERSION_KEY = "blen_report_schema_version";
-const ANALYSIS_SCHEMA_VERSION = "2026-04-27-story-v2";
+const ANALYSIS_SCHEMA_VERSION = "2026-04-27-story-v4";
 const AUTH_SESSION_KEY = "blen_auth_session";
 const PENDING_REPORT_SAVE_KEY = "blen_pending_report_save";
 const POST_LOGIN_REDIRECT_KEY = "blen_post_login_redirect";
@@ -442,10 +442,9 @@ function renderChatBubble(messagesEl, text, role) {
   avatar.className = `ai-chat__avatar ai-chat__avatar--${role}`;
   avatar.setAttribute("aria-hidden", "true");
   if (role === "ai") {
-    avatar.innerHTML =
-      '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 20.2c-.27 0-.53-.1-.73-.28-1.4-1.26-2.62-2.35-3.67-3.3-3.08-2.78-5.12-4.62-5.12-7.45 0-2.32 1.8-4.12 4.13-4.12 1.44 0 2.82.68 3.7 1.82.88-1.14 2.26-1.82 3.7-1.82 2.33 0 4.13 1.8 4.13 4.12 0 2.83-2.04 4.67-5.12 7.45-1.05.95-2.27 2.04-3.67 3.3-.2.18-.46.28-.73.28Z" fill="currentColor"/></svg>';
+    avatar.textContent = "✦";
   } else {
-    avatar.textContent = "◌";
+    avatar.textContent = "♥";
   }
 
   const bubble = document.createElement("div");
@@ -477,8 +476,13 @@ function renderChatBubble(messagesEl, text, role) {
   bubble.appendChild(content);
   block.appendChild(bubble);
   block.appendChild(meta);
-  row.appendChild(avatar);
-  row.appendChild(block);
+  if (role === "user") {
+    row.appendChild(block);
+    row.appendChild(avatar);
+  } else {
+    row.appendChild(avatar);
+    row.appendChild(block);
+  }
   messagesEl.appendChild(row);
   messagesEl.scrollTop = messagesEl.scrollHeight;
   window.requestAnimationFrame(() => {
@@ -501,8 +505,7 @@ function renderTypingBubble(messagesEl) {
   const avatar = document.createElement("span");
   avatar.className = "ai-chat__avatar ai-chat__avatar--ai";
   avatar.setAttribute("aria-hidden", "true");
-  avatar.innerHTML =
-    '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 20.2c-.27 0-.53-.1-.73-.28-1.4-1.26-2.62-2.35-3.67-3.3-3.08-2.78-5.12-4.62-5.12-7.45 0-2.32 1.8-4.12 4.13-4.12 1.44 0 2.82.68 3.7 1.82.88-1.14 2.26-1.82 3.7-1.82 2.33 0 4.13 1.8 4.13 4.12 0 2.83-2.04 4.67-5.12 7.45-1.05.95-2.27 2.04-3.67 3.3-.2.18-.46.28-.73.28Z" fill="currentColor"/></svg>';
+  avatar.textContent = "✦";
 
   const bubble = document.createElement("div");
   bubble.className = "ai-chat__bubble ai-chat__bubble--ai";
@@ -581,60 +584,11 @@ function bindAiChatFlow() {
   const conversationHistory = [];
   const sendButton = form.querySelector(".ai-chat__send");
   const sendLabel = sendButton ? sendButton.textContent : "";
-  const quickPrompts =
-    getCurrentLang() === "ko"
-      ? ["가볍게 만나고 싶어", "진지한 관계", "잘 모르겠어"]
-      : ["Something casual", "A serious relationship", "I'm not sure yet"];
 
   const sleep = (ms) => new Promise((resolve) => window.setTimeout(resolve, ms));
 
-  function removeQuickRepliesRow() {
-    const existing = messagesEl.querySelector("[data-quick-replies-row]");
-    if (existing) existing.remove();
-  }
-
-  function renderQuickReplies() {
-    removeQuickRepliesRow();
-    if (!quickPrompts.length) return;
-    const row = document.createElement("article");
-    row.className = "ai-chat__row ai-chat__row--ai ai-chat__row--quick";
-    row.setAttribute("data-quick-replies-row", "true");
-
-    const avatarSpacer = document.createElement("span");
-    avatarSpacer.className = "ai-chat__avatar ai-chat__avatar--spacer";
-    avatarSpacer.setAttribute("aria-hidden", "true");
-
-    const wrap = document.createElement("div");
-    wrap.className = "ai-chat__quick-replies";
-    quickPrompts.forEach((prompt) => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "ai-chat__quick-reply";
-      button.textContent = prompt;
-      button.addEventListener("click", () => {
-        if (isRequesting || analysisRequested) return;
-        input.value = prompt;
-        if (typeof form.requestSubmit === "function") {
-          form.requestSubmit();
-        } else {
-          form.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
-        }
-      });
-      wrap.appendChild(button);
-    });
-    row.appendChild(avatarSpacer);
-    row.appendChild(wrap);
-    messagesEl.appendChild(row);
-    messagesEl.scrollTop = messagesEl.scrollHeight;
-  }
-
-  function hideQuickReplies() {
-    removeQuickRepliesRow();
-  }
-
   renderChatBubble(messagesEl, firstMessage, "ai");
   conversationHistory.push({ role: "assistant", content: firstMessage });
-  renderQuickReplies();
 
   async function requestAIReply() {
     const response = await fetch("/api/chat", {
@@ -741,7 +695,6 @@ function bindAiChatFlow() {
     if (!raw) return;
 
     renderChatBubble(messagesEl, raw, "user");
-    hideQuickReplies();
     input.value = "";
     conversationHistory.push({ role: "user", content: raw });
     userTurnCount += 1;
@@ -752,7 +705,6 @@ function bindAiChatFlow() {
       hasSentGuidanceMessage = true;
       renderChatBubble(messagesEl, guidanceMessage, "ai");
       conversationHistory.push({ role: "assistant", content: guidanceMessage });
-      renderQuickReplies();
     }
 
     if (isWaitingForFinalAnswer) {
@@ -779,7 +731,6 @@ function bindAiChatFlow() {
       if (typingBubble) typingBubble.remove();
       renderChatBubble(messagesEl, reply, "ai");
       conversationHistory.push({ role: "assistant", content: reply });
-      renderQuickReplies();
       if (currentQuestionIndex < totalQuestions - 1) {
         currentQuestionIndex += 1;
         if (currentQuestionIndex === totalQuestions - 1) {
@@ -938,6 +889,14 @@ function bindReportPage() {
     if (analysis?.report_inputs) return analysis.report_inputs;
 
     const summary = analysis?.summary || {};
+    const finalReport = analysis?.ai_report?.final_report || {};
+    const sectionText = (...keys) => {
+      for (const key of keys) {
+        const value = finalReport?.[key];
+        if (typeof value === "string" && value.trim().length > 0) return value.trim();
+      }
+      return "";
+    };
     const coreValuesTop = Array.isArray(analysis?.core_values?.top_values)
       ? analysis.core_values.top_values
       : [];
@@ -956,43 +915,93 @@ function bindReportPage() {
       : [];
     const styleType = analysis?.relationship_style?.type || "관계 탐색형";
     const styleSummary = analysis?.relationship_style?.summary || "";
-    const oneLine = summary?.one_sentence_summary || "";
     const challengeLine = challenges[0] || "";
 
     return {
-      headline_keyword: summary?.relationship_style_title || styleType || "",
+      headline_keyword:
+        sectionText("너의 연애 스타일", "Your Relationship Style") ||
+        summary?.relationship_style_title ||
+        styleType ||
+        "",
       relationship_style:
+        sectionText("너의 연애 스타일", "Your Relationship Style") ||
         styleSummary ||
         `너는 연애에서 ${styleType}에 가까운 흐름을 보이고, 상황에 따라 태도를 유연하게 조절하는 편이야.`,
       core_values:
-        coreValuesTop.length
-          ? coreValuesTop
-          : inferredCoreValues.length
-            ? inferredCoreValues
-            : [],
+        (() => {
+          const generatedCore = sectionText("너의 연애 핵심", "Your Core in Love", "Your Core Values");
+          if (generatedCore) return [generatedCore];
+          return coreValuesTop.length
+            ? coreValuesTop
+            : inferredCoreValues.length
+              ? inferredCoreValues
+              : [];
+        })(),
       attraction_pattern:
-        analysis?.attraction_pattern?.primary
+        sectionText("너가 사랑에 빠지는 방식", "How You Fall in Love") ||
+        (analysis?.attraction_pattern?.primary
           ? `${analysis.attraction_pattern.primary} 성향이 끌림의 핵심으로 보이고, 반복되는 감정 패턴도 함께 나타나는 편이야.`
-          : "",
+          : ""),
       communication_style:
-        analysis?.communication?.primary
+        sectionText("연애할 때 너의 모습", "Your Way in Relationships") ||
+        (analysis?.communication?.primary
           ? `감정 대화에서는 ${analysis.communication.primary} 쪽 반응이 두드러지고, 갈등 상황에서 말의 톤과 타이밍을 조절하는 경향이 있어.`
-          : "",
+          : ""),
       emotional_pattern:
-        analysis?.attachment_style?.primary
+        sectionText("갈등 생기면 너는 이렇게 함", "How You Handle Conflict") ||
+        (analysis?.attachment_style?.primary
           ? `관계가 깊어질수록 ${analysis.attachment_style.primary} 성향이 드러나고, 연락/반응 변화에 감정 속도가 달라지는 편이야.`
-          : "",
-      dealbreakers: challenges.length ? challenges : [],
-      strengths: strengths.length ? strengths : [],
-      risks: challenges.length ? challenges : [],
-      ideal_partner_traits: bestMatchTraits.length
-        ? bestMatchTraits
-        : [],
-      one_line_summary: oneLine || "",
+          : ""),
+      dealbreakers: (() => {
+        const generatedRisk = sectionText("너의 연애 리스크", "Your Relationship Risks");
+        if (generatedRisk) return [generatedRisk];
+        return challenges.length ? challenges : [];
+      })(),
+      strengths: (() => {
+        const generatedStrength = sectionText("너의 연애 강점", "Your Strengths in Love");
+        if (generatedStrength) return [generatedStrength];
+        return strengths.length ? strengths : [];
+      })(),
+      risks: (() => {
+        const generatedRisk = sectionText("너의 연애 리스크", "Your Relationship Risks");
+        if (generatedRisk) return [generatedRisk];
+        return challenges.length ? challenges : [];
+      })(),
+      ideal_partner_traits: (() => {
+        const generatedBestMatch = sectionText("너랑 잘 맞는 사람", "Who Matches You Best");
+        if (generatedBestMatch) return [generatedBestMatch];
+        return bestMatchTraits.length ? bestMatchTraits : [];
+      })(),
+      one_line_summary:
+        sectionText("한 줄 요약", "One-line Summary") ||
+        summary?.one_sentence_summary ||
+        "",
       dating_advice:
+        sectionText("너를 위한 연애 조언", "Advice for Your Next Love") ||
         challengeLine ||
         "",
     };
+  };
+
+  const getAiReportSection = (analysis, keys = []) => {
+    const finalReport = analysis?.ai_report?.final_report;
+    if (!finalReport || typeof finalReport !== "object") return "";
+    for (const key of keys) {
+      const value = finalReport[key];
+      if (typeof value === "string" && value.trim().length > 0) {
+        return value.trim();
+      }
+    }
+    return "";
+  };
+
+  const getAiCoreKeywords = (analysis) => {
+    const keywordsRaw = analysis?.ai_report?.core_keywords;
+    if (!Array.isArray(keywordsRaw)) return [];
+    return keywordsRaw
+      .map((item) => (typeof item === "string" ? item.trim() : ""))
+      .filter((item) => item.length > 0)
+      .slice(0, 3);
   };
 
   const setFromAnalysis = (analysis) => {
@@ -1069,63 +1078,84 @@ function bindReportPage() {
 
     const conflictLabelMap = isKo
       ? {
-          resolution_oriented: "갈등이 생기면 대화로 풀고 관계를 회복하려는 편이야.",
-          avoidant: "감정이 올라오면 잠깐 거리를 두고 정리하려는 경향이 있어.",
-          defensive: "상처받지 않으려 먼저 방어적으로 반응할 때가 있어.",
-          aggressive: "답답함이 쌓이면 말이 강해질 수 있어서 톤 조절이 중요해.",
-          mixed: "상황에 따라 회피와 대화 시도가 번갈아 나오는 편이야.",
+          resolution_oriented: "회복 대화형",
+          avoidant: "거리두기형",
+          defensive: "방어 반응형",
+          aggressive: "직진 표현형",
+          mixed: "혼합형",
         }
       : {
-          resolution_oriented: "You try to solve conflict through conversation and repair.",
-          avoidant: "When emotions rise, you tend to pause and take space first.",
-          defensive: "You can become self-protective when you feel misunderstood.",
-          aggressive: "When frustration builds, your tone can become sharper.",
-          mixed: "Your conflict approach changes depending on the situation.",
+          resolution_oriented: "Repair-through-talk type",
+          avoidant: "Space-first type",
+          defensive: "Defensive-response type",
+          aggressive: "Direct-intense type",
+          mixed: "Mixed type",
         };
     const attachmentLabelMap = isKo
       ? {
-          secure: "관계가 깊어져도 비교적 안정적으로 감정을 표현하는 편이야.",
-          anxious: "상대 반응의 온도에 예민해서 확신이 필요할 때가 많아.",
-          avoidant: "가까워질수록 혼자 정리할 시간이 필요해지는 패턴이 있어.",
-          mixed: "가까워지고 싶다가도 동시에 거리도 필요해지는 흐름이 보여.",
+          secure: "안정 애착형",
+          anxious: "불안 애착형",
+          avoidant: "회피 애착형",
+          mixed: "혼합 애착형",
         }
       : {
-          secure: "You stay emotionally steady even as intimacy grows.",
-          anxious: "You are sensitive to response changes and need reassurance.",
-          avoidant: "As closeness deepens, you need more space to regulate.",
-          mixed: "You want closeness but also need distance at times.",
+          secure: "Secure attachment",
+          anxious: "Anxious attachment",
+          avoidant: "Avoidant attachment",
+          mixed: "Mixed attachment",
         };
     const communicationLabelMap = isKo
       ? {
-          direct_open: "마음을 비교적 솔직하게 말하며 오해를 줄이려는 편이야.",
-          indirect: "직접 말하기보다 분위기와 뉘앙스로 신호를 주는 경향이 있어.",
-          emotion_suppressing: "감정을 바로 꺼내기보다 안에서 오래 정리하는 편이야.",
-          reactive_explosive: "감정이 쌓이면 한 번에 크게 표현될 수 있어.",
-          mixed: "상황에 따라 직접표현과 참는 흐름이 함께 나타나.",
+          direct_open: "직접 표현형",
+          indirect: "간접 표현형",
+          emotion_suppressing: "감정 억제형",
+          reactive_explosive: "감정 폭발형",
+          mixed: "혼합 표현형",
         }
       : {
-          direct_open: "You usually express feelings clearly and early.",
-          indirect: "You often communicate through tone and context first.",
-          emotion_suppressing: "You tend to hold feelings in before sharing them.",
-          reactive_explosive: "When emotions pile up, expression can come out strong.",
-          mixed: "Your communication style shifts with context.",
+          direct_open: "Direct expression",
+          indirect: "Indirect expression",
+          emotion_suppressing: "Emotion suppressing",
+          reactive_explosive: "Reactive expression",
+          mixed: "Mixed expression",
         };
     const boundaryLabelMap = isKo
       ? {
-          high_boundary: "관계에서도 나만의 리듬과 경계를 꽤 분명하게 지키는 편이야.",
-          moderate_boundary: "함께하는 시간과 개인 시간을 균형 있게 맞추려는 타입이야.",
-          low_boundary: "가까운 관계에서는 유연하게 맞춰주며 연결감을 더 중시해.",
+          high_boundary: "경계 강한 편",
+          moderate_boundary: "경계 균형형",
+          low_boundary: "경계 유연형",
         }
       : {
-          high_boundary: "You keep clear personal boundaries even in close relationships.",
-          moderate_boundary: "You aim for a healthy balance of closeness and space.",
-          low_boundary: "You prioritize emotional closeness with flexible boundaries.",
+          high_boundary: "Strong boundaries",
+          moderate_boundary: "Balanced boundaries",
+          low_boundary: "Flexible boundaries",
         };
 
-    setText("[data-report-mini-conflict]", conflictLabelMap[conflictPrimary] || conflictLabelMap.resolution_oriented);
-    setText("[data-report-mini-attachment]", attachmentLabelMap[attachmentPrimary] || attachmentLabelMap.secure);
-    setText("[data-report-mini-communication]", communicationLabelMap[communicationPrimary] || communicationLabelMap.direct_open);
-    setText("[data-report-mini-boundaries]", boundaryLabelMap[boundaryPrimary] || boundaryLabelMap.moderate_boundary);
+    const conflictNarrative =
+      getAiReportSection(analysis, [
+        "갈등을 다루는 방식 설명",
+        "How You Handle Conflict",
+      ]) || (conflictLabelMap[conflictPrimary] || conflictLabelMap.resolution_oriented);
+    const attachmentNarrative =
+      getAiReportSection(analysis, [
+        "애착 흐름 설명",
+        "Your Attachment Flow",
+      ]) || (attachmentLabelMap[attachmentPrimary] || attachmentLabelMap.secure);
+    const communicationNarrative =
+      getAiReportSection(analysis, [
+        "대화 스타일 설명",
+        "Your Communication Style",
+      ]) || (communicationLabelMap[communicationPrimary] || communicationLabelMap.direct_open);
+    const boundaryNarrative =
+      getAiReportSection(analysis, [
+        "관계 경계선 설명",
+        "Your Relationship Boundaries",
+      ]) || (boundaryLabelMap[boundaryPrimary] || boundaryLabelMap.moderate_boundary);
+
+    setText("[data-report-mini-conflict]", conflictNarrative);
+    setText("[data-report-mini-attachment]", attachmentNarrative);
+    setText("[data-report-mini-communication]", communicationNarrative);
+    setText("[data-report-mini-boundaries]", boundaryNarrative);
 
     const conflictScore = pickPrimaryScore(analysis?.conflict_style?.scores, conflictPrimary, 3.2);
     const attachmentScore = pickPrimaryScore(analysis?.attachment_style?.scores, attachmentPrimary, 3.1);
@@ -1134,35 +1164,83 @@ function bindReportPage() {
       typeof analysis?.boundaries?.alone_time_need === "number"
         ? analysis.boundaries.alone_time_need
         : 3.0;
-    setBar("[data-report-mini-conflict-bar]", scoreToPercent(conflictScore, 56));
-    setBar("[data-report-mini-attachment-bar]", scoreToPercent(attachmentScore, 54));
-    setBar("[data-report-mini-communication-bar]", scoreToPercent(communicationScore, 52));
-    setBar("[data-report-mini-boundaries-bar]", scoreToPercent(boundaryScore, 50));
+    const conflictPercent = scoreToPercent(conflictScore, 56);
+    const attachmentPercent = scoreToPercent(attachmentScore, 54);
+    const communicationPercent = scoreToPercent(communicationScore, 52);
+    const boundaryPercent = scoreToPercent(boundaryScore, 50);
+    setBar("[data-report-mini-conflict-bar]", conflictPercent);
+    setBar("[data-report-mini-attachment-bar]", attachmentPercent);
+    setBar("[data-report-mini-communication-bar]", communicationPercent);
+    setBar("[data-report-mini-boundaries-bar]", boundaryPercent);
+    setText(
+      "[data-report-mini-conflict-score]",
+      isKo ? `지수 ${conflictPercent}` : `Index ${conflictPercent}`
+    );
+    setText(
+      "[data-report-mini-attachment-score]",
+      isKo ? `지수 ${attachmentPercent}` : `Index ${attachmentPercent}`
+    );
+    setText(
+      "[data-report-mini-communication-score]",
+      isKo ? `지수 ${communicationPercent}` : `Index ${communicationPercent}`
+    );
+    setText(
+      "[data-report-mini-boundaries-score]",
+      isKo ? `지수 ${boundaryPercent}` : `Index ${boundaryPercent}`
+    );
 
-    const storyLove = isKo
-      ? `너는 ${report.relationship_style || "관계를 천천히 쌓아가는 타입"}에 가깝고, 마음이 열리기 전까지는 신중하게 사람을 보는 편이야.`
-      : `You tend to ${report.relationship_style || "build love slowly"}, and you open up with care instead of rushing.`;
-    const storySafe = isKo
-      ? `특히 ${firstItem(report.core_values) || "신뢰"} 같은 기준이 지켜질 때 가장 편안함을 느끼고, 관계 안에서 진짜 너다운 모습이 더 잘 나와.`
-      : `You feel safest when values like ${firstItem(report.core_values) || "trust"} are consistent, and that is when your warm side shines most.`;
-    const storyHurt = isKo
-      ? `${firstItem(report.risks) || "애매한 신호가 이어질 때"} 마음이 빨리 지칠 수 있어서, 초반에 기준을 맞추는 대화가 특히 중요해.`
-      : `When ${firstItem(report.risks) || "signals feel unclear for too long"}, your energy can drain fast, so early clarity really helps.`;
-    const storyMatch = isKo
-      ? `너랑 잘 맞는 사람은 ${firstItem(report.ideal_partner_traits) || "감정적으로 안정적인 사람"}처럼 말과 행동이 일관되고, 서로의 감정을 존중해주는 사람이야.`
-      : `Your best match is someone like ${firstItem(report.ideal_partner_traits) || "an emotionally steady partner"} who is consistent in both words and actions.`;
+    const storyLove =
+      getAiReportSection(analysis, [
+        "너의 연애 스타일",
+        "Your Relationship Style",
+      ]) ||
+      (isKo
+        ? (report.relationship_style || "너는 관계를 서두르기보다 천천히 의미를 쌓아가는 편이야.")
+        : (report.relationship_style || "You build relationships with care and steady trust."));
+    const storySafe =
+      getAiReportSection(analysis, [
+        "너의 연애 핵심",
+        "Your Core in Love",
+        "Your Core Values",
+      ]) ||
+      (isKo
+        ? "너는 기준이 선명하고 일관될 때 가장 편안함을 느끼고, 그때 진짜 너다운 다정함이 잘 드러나."
+        : "You feel safest when your core values are respected and consistent.");
+    const storyHurt =
+      getAiReportSection(analysis, [
+        "너의 연애 리스크",
+        "Your Relationship Risks",
+      ]) ||
+      (isKo
+        ? "신호가 오래 애매하면 마음이 빨리 지칠 수 있어서, 초반에 기준을 맞추는 대화가 중요해."
+        : "When signals stay unclear for too long, your emotional energy can drain quickly.");
+    const storyMatch =
+      getAiReportSection(analysis, [
+        "너랑 잘 맞는 사람",
+        "Who Matches You Best",
+      ]) ||
+      (isKo
+        ? "너와 잘 맞는 사람은 감정적으로 안정적이고 말과 행동이 일관된 사람이야."
+        : "Your best match is emotionally steady and consistent in both words and actions.");
     setText("[data-report-story-love]", storyLove);
     setText("[data-report-story-safe]", storySafe);
     setText("[data-report-story-hurt]", storyHurt);
     setText("[data-report-story-match]", storyMatch);
 
+    const aiKeywords = getAiCoreKeywords(analysis);
+    if (aiKeywords.length === 3) {
+      setTag("[data-report-tag1]", aiKeywords[0]);
+      setTag("[data-report-tag2]", aiKeywords[1]);
+      setTag("[data-report-tag3]", aiKeywords[2]);
+      return;
+    }
     const analysisTags = Array.isArray(analysis?.tags)
       ? analysis.tags.filter((tag) => typeof tag === "string" && tag.trim().length > 0)
       : [];
-    if (analysisTags.length) {
-      setTag("[data-report-tag1]", analysisTags[0] || "");
-      setTag("[data-report-tag2]", analysisTags[1] || "");
-      setTag("[data-report-tag3]", analysisTags[2] || "");
+    if (analysisTags.length >= 3) {
+      setTag("[data-report-tag1]", analysisTags[0]);
+      setTag("[data-report-tag2]", analysisTags[1]);
+      setTag("[data-report-tag3]", analysisTags[2]);
       return;
     }
     const goalTagMap = isKo

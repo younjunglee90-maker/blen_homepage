@@ -938,7 +938,6 @@ body[data-page="support"] .support-form {
 .ai-chat__row--user {
   margin-left: auto;
   justify-content: flex-end;
-  flex-direction: row-reverse;
   gap: 6px;
 }
 
@@ -1079,37 +1078,6 @@ body[data-page="support"] .support-form {
   white-space: pre-wrap;
   word-break: keep-all;
   overflow-wrap: anywhere;
-}
-
-.ai-chat__quick-replies {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.ai-chat__row--quick {
-  margin-top: 8px;
-}
-
-.ai-chat__avatar--spacer {
-  visibility: hidden;
-}
-
-.ai-chat__quick-reply {
-  border: none;
-  background: #f1efed;
-  color: #3d3d3d;
-  border-radius: 999px;
-  padding: 8px 14px;
-  font: inherit;
-  font-size: 0.82rem;
-  white-space: nowrap;
-  cursor: pointer;
-  margin-right: 8px;
-}
-
-.ai-chat__quick-reply:active {
-  transform: scale(0.98);
 }
 
 .ai-chat__typing {
@@ -2472,6 +2440,14 @@ body[data-page="report"] .report {
   color: #666;
   line-height: 1.62;
   font-size: 0.92rem;
+}
+
+.report__mini-score {
+  margin: 8px 0 0;
+  color: #8d7d60;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
 }
 
 .report__mini-bar {

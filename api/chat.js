@@ -204,7 +204,12 @@ module.exports = async (req, res) => {
         analysisResult?.analysis && typeof analysisResult.analysis === "object"
           ? analysisResult.analysis
           : analysisResult;
-      report = await generateReport(analysis, responseLanguage);
+      const reportPayload = await generateReport(analysis, responseLanguage);
+      report = reportPayload?.report_text || "";
+      analysis = {
+        ...analysis,
+        ai_report: reportPayload,
+      };
     }
 
     res.status(200).json({

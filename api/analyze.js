@@ -209,7 +209,7 @@ Rules:
 - If data is incomplete, infer carefully and phrase softly.
 
 Structure:
-Return exactly these 10 sections as keys inside "final_report":
+Return exactly these 14 sections as keys inside "final_report":
 1. "한 줄 요약"
 2. "너의 연애 핵심"
 3. "너의 연애 스타일"
@@ -220,10 +220,15 @@ Return exactly these 10 sections as keys inside "final_report":
 8. "너의 연애 리스크"
 9. "너랑 잘 맞는 사람"
 10. "너를 위한 연애 조언"
+11. "갈등을 다루는 방식 설명"
+12. "애착 흐름 설명"
+13. "대화 스타일 설명"
+14. "관계 경계선 설명"
 
 Output JSON shape:
 {
   "report_text": "full readable report in markdown-like plain text",
+  "core_keywords": ["", "", ""],
   "final_report": {
     "한 줄 요약": "",
     "너의 연애 핵심": "",
@@ -234,9 +239,20 @@ Output JSON shape:
     "너의 연애 강점": "",
     "너의 연애 리스크": "",
     "너랑 잘 맞는 사람": "",
-    "너를 위한 연애 조언": ""
+    "너를 위한 연애 조언": "",
+    "갈등을 다루는 방식 설명": "",
+    "애착 흐름 설명": "",
+    "대화 스타일 설명": "",
+    "관계 경계선 설명": ""
   }
 }
+
+core_keywords rules:
+- 반드시 3개를 반환해.
+- 각 키워드는 2~6글자(영문은 2~14자) 정도의 짧은 핵심 단어/짧은 구로 작성.
+- 태그 UI에 들어갈 표현이라 문장형 금지.
+- 서로 겹치지 않게 성향의 다른 측면을 반영.
+- 한국어 보고서면 한국어 키워드, 영어 보고서면 영어 키워드.
 
 Tone:
 - Warm, insightful, slightly emotional and shareable
@@ -326,6 +342,7 @@ async function generateReport(analysis, language = "ko") {
     body: JSON.stringify({
       model: "gpt-4o",
       temperature: 0.8,
+      response_format: { type: "json_object" },
       messages: [
         {
           role: "system",
@@ -349,11 +366,16 @@ async function generateReport(analysis, language = "ko") {
   }
 
   const data = await response.json();
-  const reportText = data?.choices?.[0]?.message?.content?.trim();
-  if (!reportText) {
-    throw new Error("OpenAI returned empty report text");
+  const raw = data?.choices?.[0]?.message?.content?.trim();
+  if (!raw) {
+    throw new Error("OpenAI returned empty report payload");
   }
-  return reportText;
+  const parsed = extractJson(raw);
+  if (!parsed || typeof parsed !== "object") {
+    throw new Error("OpenAI returned invalid report JSON");
+  }
+  warnIfReportShapeIncomplete(parsed);
+  return parsed;
 }
 
 async function analyzeRelationshipProfile(messages, responseLanguage = "ko") {
@@ -774,7 +796,13 @@ module.exports = async (req, res) => {
       body.language === "en" || body.language === "ko" ? body.language : null;
     const responseLanguage = requestedLanguage || detectLanguage(firstUserMessage);
     const analysis = await analyzeRelationshipProfile(messages, responseLanguage);
-    res.status(200).json({ analysis });
+    const reportPayload = await generateReport(analysis, responseLanguage);
+    res.status(200).json({
+      analysis: {
+        ...analysis,
+        ai_report: reportPayload,
+      },
+    });
   } catch (error) {
     logAnalyzeDebug("Analyze request failed", {
       error: error?.message || String(error),
