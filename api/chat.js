@@ -199,7 +199,11 @@ module.exports = async (req, res) => {
     let report = null;
     if (isFinalReply(finalReply)) {
       const messagesForAnalysis = [...messages, { role: "assistant", content: finalReply }];
-      analysis = await analyzeRelationshipProfile(messagesForAnalysis, responseLanguage);
+      const analysisResult = await analyzeRelationshipProfile(messagesForAnalysis, responseLanguage);
+      analysis =
+        analysisResult?.analysis && typeof analysisResult.analysis === "object"
+          ? analysisResult.analysis
+          : analysisResult;
       report = await generateReport(analysis, responseLanguage);
     }
 

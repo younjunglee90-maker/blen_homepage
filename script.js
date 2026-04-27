@@ -426,56 +426,6 @@ function bindRelationshipTestCTA() {
   });
 }
 
-function createFallbackAnalysis() {
-  return {
-    values: {
-      relationship_goal: "unclear",
-      money_values: "unclear",
-      lifestyle: "unclear",
-      family_values: "unclear",
-      work_life_balance: "unclear",
-    },
-    attachment: {
-      secure: 0.5,
-      anxious: 0.5,
-      avoidant: 0.5,
-      primary_attachment: "unclear",
-    },
-    conflict_style: {
-      avoidant: 0.5,
-      aggressive: 0.5,
-      defensive: 0.5,
-      solution_oriented: 0.5,
-      primary_conflict_style: "unclear",
-    },
-    personality: {
-      impulsivity: 0.5,
-      anxiety: 0.5,
-      empathy: 0.5,
-      self_control: 0.5,
-    },
-    report_inputs: {
-      headline_keyword: "천천히 맞춰가는 연결",
-      relationship_style: "너는 진심과 안정감을 기반으로 관계를 깊게 쌓아가는 스타일이야.",
-      core_values: ["상호 존중", "솔직한 감정 표현", "꾸준한 신뢰"],
-      attraction_pattern: "편안함과 다정함이 느껴지는 사람에게 더 깊이 끌리는 편이야.",
-      communication_style: "갈등이 생겨도 대화를 통해 균형을 찾으려는 성향이 강해.",
-      emotional_pattern: "감정을 쉽게 소비하지 않고, 오래 생각한 뒤 진심을 전하는 패턴이 보여.",
-      dealbreakers: ["상호 존중이 없는 관계", "감정 대화를 피하는 패턴"],
-      strengths: ["공감 능력", "관계를 지키려는 책임감"],
-      risks: ["상대의 반응을 과하게 신경 쓰며 혼자 지칠 수 있어."],
-      ideal_partner_traits: ["대화를 존중하는 사람", "감정적으로 안정적인 사람"],
-      one_line_summary: "너는 확신 없는 관계를 오래 버티기보다, 마음이 맞는 사람에게 깊게 몰입하는 타입이야.",
-      dating_advice:
-        "애매한 신호를 오래 견디기보다 초반에 기준을 분명히 말해줘. 너한테 맞지 않는 패턴은 빨리 정리할수록 마음이 훨씬 덜 지쳐.",
-    },
-    confidence: {
-      overall: 0.2,
-      missing_data: ["conversation_depth"],
-    },
-  };
-}
-
 function renderChatBubble(messagesEl, text, role) {
   const currentLang = getCurrentLang();
   const formatTime = () =>
@@ -649,24 +599,88 @@ function bindAiChatFlow() {
     return data.reply;
   }
 
+  async function requestAnalysisFromChat(messages) {
+    console.log("[Blen][analysis] API start", { messageCount: Array.isArray(messages) ? messages.length : 0 });
+    const response = await fetch("/api/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messages, language: getCurrentLang() }),
+    });
+    if (!response.ok) {
+      const payload = await response.json().catch(() => ({}));
+      const error = new Error(payload.error || "Failed to analyze conversation");
+      error.status = response.status;
+      throw error;
+    }
+    const data = await response.json();
+    console.log("[Blen][analysis] API returned");
+    console.log("[Blen][analysis] response JSON", data);
+    return data;
+  }
+
+  function getAnalysisErrorMessage(error, lang) {
+    const message = String(error?.message || "").toLowerCase();
+    const status = Number(error?.status || 0);
+    const isKo = lang === "ko";
+    if (message.includes("abort") || message.includes("timeout")) {
+      return isKo
+        ? "분석 시간이 조금 길어지고 있어. 네트워크를 확인한 뒤 마지막 답변을 한 번만 다시 보내줘."
+        : "Analysis is taking longer than expected. Check your network and send your last answer once more.";
+    }
+    if (status >= 500) {
+      return isKo
+        ? "지금 분석 서버가 잠시 바쁜 상태야. 10초 뒤 마지막 답변을 다시 보내주면 바로 이어서 분석할게."
+        : "The analysis server is busy right now. Try sending your last answer again in about 10 seconds.";
+    }
+    if (status >= 400) {
+      return isKo
+        ? "분석 요청 형식에 문제가 있었어. 마지막 답변을 다시 보내주면 다시 시도할게."
+        : "There was a format issue in the analysis request. Send your last answer once more to retry.";
+    }
+    return isKo
+      ? "분석을 불러오는 중 문제가 생겼어. 마지막 답변을 한 번만 다시 보내주면 바로 이어서 분석할게."
+      : "There was a problem loading your analysis. Send your last answer once more and I will analyze it right away.";
+  }
+
   async function completeAfterFinalAnswer() {
     if (analysisRequested) return;
     analysisRequested = true;
 
-    // Navigate to report immediately and analyze there for premium loading UX
-    localStorage.removeItem(ANALYSIS_STORAGE_KEY);
-    localStorage.removeItem(LEGACY_ANALYSIS_STORAGE_KEY);
-    localStorage.removeItem(ANALYSIS_SCHEMA_VERSION_KEY);
-    localStorage.setItem(PENDING_ANALYSIS_OVERLAY_KEY, "1");
-    localStorage.setItem(
-      PENDING_ANALYSIS_MESSAGES_KEY,
-      JSON.stringify(conversationHistory)
-    );
-    updateProgress(true);
-    const reportPath = localeUrl(getCurrentLang(), "report");
-    window.setTimeout(() => {
-      location.href = reportPath;
-    }, 120);
+    try {
+      const responseData = await requestAnalysisFromChat(conversationHistory);
+      const analysis =
+        responseData?.analysis && typeof responseData.analysis === "object"
+          ? responseData.analysis
+          : responseData;
+      if (!analysis || typeof analysis !== "object") {
+        throw new Error("Analysis JSON is missing");
+      }
+
+      localStorage.setItem(ANALYSIS_STORAGE_KEY, JSON.stringify(analysis));
+      localStorage.setItem(ANALYSIS_SCHEMA_VERSION_KEY, ANALYSIS_SCHEMA_VERSION);
+      localStorage.removeItem(LEGACY_ANALYSIS_STORAGE_KEY);
+      localStorage.removeItem(PENDING_ANALYSIS_MESSAGES_KEY);
+      localStorage.removeItem(PENDING_ANALYSIS_OVERLAY_KEY);
+      console.log("[Blen][analysis] saved to localStorage", {
+        key: ANALYSIS_STORAGE_KEY,
+        schema: ANALYSIS_SCHEMA_VERSION,
+      });
+
+      updateProgress(true);
+      const reportPath = localeUrl(getCurrentLang(), "report");
+      window.setTimeout(() => {
+        location.href = reportPath;
+      }, 80);
+    } catch (error) {
+      analysisRequested = false;
+      isWaitingForFinalAnswer = true;
+      renderChatBubble(
+        messagesEl,
+        getAnalysisErrorMessage(error, getCurrentLang()),
+        "ai"
+      );
+      console.log("[Blen][analysis] API error", error);
+    }
   }
 
   form.addEventListener("submit", async (event) => {
@@ -860,7 +874,6 @@ function bindReportPage() {
   const reportRoot = document.querySelector(".report");
   if (!reportRoot) return;
 
-  const fallback = createFallbackAnalysis();
   const deriveReportInputs = (analysis) => {
     if (analysis?.report_inputs) return analysis.report_inputs;
 
@@ -887,7 +900,7 @@ function bindReportPage() {
     const challengeLine = challenges[0] || "";
 
     return {
-      headline_keyword: summary?.relationship_style_title || styleType || fallback.report_inputs.headline_keyword,
+      headline_keyword: summary?.relationship_style_title || styleType || "",
       relationship_style:
         styleSummary ||
         `너는 연애에서 ${styleType}에 가까운 흐름을 보이고, 상황에 따라 태도를 유연하게 조절하는 편이야.`,
@@ -896,29 +909,29 @@ function bindReportPage() {
           ? coreValuesTop
           : inferredCoreValues.length
             ? inferredCoreValues
-            : fallback.report_inputs.core_values,
+            : [],
       attraction_pattern:
         analysis?.attraction_pattern?.primary
           ? `${analysis.attraction_pattern.primary} 성향이 끌림의 핵심으로 보이고, 반복되는 감정 패턴도 함께 나타나는 편이야.`
-          : fallback.report_inputs.attraction_pattern,
+          : "",
       communication_style:
         analysis?.communication?.primary
           ? `감정 대화에서는 ${analysis.communication.primary} 쪽 반응이 두드러지고, 갈등 상황에서 말의 톤과 타이밍을 조절하는 경향이 있어.`
-          : fallback.report_inputs.communication_style,
+          : "",
       emotional_pattern:
         analysis?.attachment_style?.primary
           ? `관계가 깊어질수록 ${analysis.attachment_style.primary} 성향이 드러나고, 연락/반응 변화에 감정 속도가 달라지는 편이야.`
-          : fallback.report_inputs.emotional_pattern,
-      dealbreakers: challenges.length ? challenges : fallback.report_inputs.dealbreakers,
-      strengths: strengths.length ? strengths : fallback.report_inputs.strengths,
-      risks: challenges.length ? challenges : fallback.report_inputs.risks,
+          : "",
+      dealbreakers: challenges.length ? challenges : [],
+      strengths: strengths.length ? strengths : [],
+      risks: challenges.length ? challenges : [],
       ideal_partner_traits: bestMatchTraits.length
         ? bestMatchTraits
-        : fallback.report_inputs.ideal_partner_traits,
-      one_line_summary: oneLine || fallback.report_inputs.one_line_summary,
+        : [],
+      one_line_summary: oneLine || "",
       dating_advice:
         challengeLine ||
-        "관계에서 애매한 신호가 반복되면 오래 참기보다 기준을 빨리 확인하는 게 너를 더 편하게 해줄 거야.",
+        "",
     };
   };
 
@@ -1201,6 +1214,9 @@ function bindReportPage() {
   };
 
   const requestAnalysisForReport = async (messages) => {
+    console.log("[Blen][analysis] API start (report)", {
+      messageCount: Array.isArray(messages) ? messages.length : 0,
+    });
     const controller = new AbortController();
     const timeoutId = window.setTimeout(() => controller.abort(), 25000);
     const response = await fetch("/api/analyze", {
@@ -1213,9 +1229,21 @@ function bindReportPage() {
     });
     if (!response.ok) {
       const payload = await response.json().catch(() => ({}));
-      throw new Error(payload.error || "Failed to analyze conversation");
+      const error = new Error(payload.error || "Failed to analyze conversation");
+      error.status = response.status;
+      throw error;
     }
-    return response.json();
+    const data = await response.json();
+    console.log("[Blen][analysis] API returned (report)");
+    console.log("[Blen][analysis] response JSON (report)", data);
+    const analysis =
+      data?.analysis && typeof data.analysis === "object"
+        ? data.analysis
+        : data;
+    if (!analysis || typeof analysis !== "object") {
+      throw new Error("Analysis JSON is missing");
+    }
+    return analysis;
   };
 
   const parseShareIdFromLocation = () => {
@@ -1242,12 +1270,12 @@ function bindReportPage() {
     const reportInputsFromIdeal = row?.ideal_partner_json?.report_inputs;
     const reportInputsFromText = parseReportInputsFromText(row?.report_text);
     return {
-      values: row?.values_json || fallback.values,
-      attachment: row?.attachment_json || fallback.attachment,
-      conflict_style: row?.conflict_json || fallback.conflict_style,
-      personality: row?.personality_json || fallback.personality,
-      report_inputs: reportInputsFromIdeal || reportInputsFromText || fallback.report_inputs,
-      confidence: fallback.confidence,
+      values: row?.values_json || {},
+      attachment: row?.attachment_json || {},
+      conflict_style: row?.conflict_json || {},
+      personality: row?.personality_json || {},
+      report_inputs: reportInputsFromIdeal || reportInputsFromText || null,
+      confidence: {},
     };
   };
 
@@ -1268,10 +1296,10 @@ function bindReportPage() {
     return {
       share_id: shareId,
       report_text: JSON.stringify(reportInputs),
-      values_json: analysis?.values || fallback.values,
-      attachment_json: analysis?.attachment || fallback.attachment,
-      conflict_json: analysis?.conflict_style || fallback.conflict_style,
-      personality_json: analysis?.personality || fallback.personality,
+      values_json: analysis?.values || {},
+      attachment_json: analysis?.attachment || {},
+      conflict_json: analysis?.conflict_style || {},
+      personality_json: analysis?.personality || {},
       ideal_partner_json: {
         ideal_partner_traits: reportInputs.ideal_partner_traits || [],
         one_line_summary: reportInputs.one_line_summary || "",
@@ -1290,7 +1318,7 @@ function bindReportPage() {
     localStorage.removeItem(LEGACY_ANALYSIS_STORAGE_KEY);
     localStorage.removeItem(ANALYSIS_SCHEMA_VERSION_KEY);
   }
-  const localAnalysis = raw ? JSON.parse(raw) : fallback;
+  const localAnalysis = raw ? JSON.parse(raw) : null;
   const shareId = parseShareIdFromLocation();
   const pendingMessagesRaw = localStorage.getItem(PENDING_ANALYSIS_MESSAGES_KEY);
   const shouldShowPendingOverlay = localStorage.getItem(PENDING_ANALYSIS_OVERLAY_KEY) === "1";
@@ -1301,12 +1329,75 @@ function bindReportPage() {
     pendingMessages = null;
   }
   let activeAnalysis = localAnalysis;
-  setFromAnalysis(activeAnalysis);
   const gate = reportRoot.querySelector("[data-report-login-gate]");
   const content = reportRoot.querySelector("[data-report-content]");
   if (gate) gate.hidden = true;
   if (content) content.hidden = false;
   reportRoot.classList.remove("report--locked");
+  console.log("[Blen][report] loading analysis", {
+    hasLocalAnalysis: Boolean(localAnalysis),
+    hasShareId: Boolean(shareId),
+  });
+
+  const renderMissingAnalysisFallback = () => {
+    if (!content) return;
+    content.innerHTML = `
+      <section class="report__story">
+        <h2 class="report__story-title">${
+          getCurrentLang() === "ko" ? "아직 분석 결과가 없어요" : "Your analysis is not ready yet"
+        }</h2>
+        <p>${
+          getCurrentLang() === "ko"
+            ? "채팅을 완료하면 맞춤 연애 리포트를 바로 보여줄게."
+            : "Finish the chat and we will show your personalized relationship report."
+        }</p>
+        <p>${
+          getCurrentLang() === "ko"
+            ? "서버가 잠시 바쁠 수 있으니 잠깐 뒤에 다시 시도해줘."
+            : "The server may be temporarily busy, so please try again shortly."
+        }</p>
+        <button type="button" class="report__share-btn report__share-btn--secondary" data-report-retry-analysis>${
+          getCurrentLang() === "ko" ? "다시 분석 시도" : "Retry Analysis"
+        }</button>
+        <button type="button" class="report__matching-btn" data-report-back-chat>${
+          getCurrentLang() === "ko" ? "채팅으로 돌아가기" : "Back to Chat"
+        }</button>
+      </section>
+    `;
+    const backButton = content.querySelector("[data-report-back-chat]");
+    const retryButton = content.querySelector("[data-report-retry-analysis]");
+    if (retryButton) {
+      retryButton.addEventListener("click", async () => {
+        if (!(Array.isArray(pendingMessages) && pendingMessages.length)) {
+          location.href = localeUrl(getCurrentLang(), "aiChat");
+          return;
+        }
+        retryButton.disabled = true;
+        const originalLabel = retryButton.textContent;
+        retryButton.textContent = getCurrentLang() === "ko" ? "다시 분석 중..." : "Retrying...";
+        try {
+          const analysis = await requestAnalysisForReport(pendingMessages);
+          localStorage.setItem(ANALYSIS_STORAGE_KEY, JSON.stringify(analysis));
+          localStorage.setItem(ANALYSIS_SCHEMA_VERSION_KEY, ANALYSIS_SCHEMA_VERSION);
+          location.reload();
+        } catch (error) {
+          console.log("[Blen][analysis] retry failed", error);
+          retryButton.disabled = false;
+          retryButton.textContent = originalLabel;
+        }
+      });
+    }
+    if (backButton) {
+      backButton.addEventListener("click", () => {
+        location.href = localeUrl(getCurrentLang(), "aiChat");
+      });
+    }
+  };
+
+  if (activeAnalysis) {
+    setFromAnalysis(activeAnalysis);
+    console.log("[Blen][report] analysis loaded", activeAnalysis);
+  }
 
   if (!shareId && (shouldShowPendingOverlay || (Array.isArray(pendingMessages) && pendingMessages.length))) {
     const overlay = ensureAnalyzingOverlay();
@@ -1323,23 +1414,33 @@ function bindReportPage() {
           localStorage.setItem(ANALYSIS_STORAGE_KEY, JSON.stringify(analysis));
           localStorage.setItem(ANALYSIS_SCHEMA_VERSION_KEY, ANALYSIS_SCHEMA_VERSION);
         }
-      } catch (_) {
-        const fallbackAnalysis = createFallbackAnalysis();
-        activeAnalysis = fallbackAnalysis;
-        localStorage.setItem(ANALYSIS_STORAGE_KEY, JSON.stringify(fallbackAnalysis));
-        localStorage.setItem(ANALYSIS_SCHEMA_VERSION_KEY, ANALYSIS_SCHEMA_VERSION);
+      } catch (error) {
+        console.log("[Blen][analysis] report analysis failed", error);
+        activeAnalysis = null;
+        localStorage.removeItem(ANALYSIS_STORAGE_KEY);
+        localStorage.removeItem(ANALYSIS_SCHEMA_VERSION_KEY);
       } finally {
         localStorage.removeItem(PENDING_ANALYSIS_MESSAGES_KEY);
         localStorage.removeItem(PENDING_ANALYSIS_OVERLAY_KEY);
         const elapsed = Date.now() - startedAt;
         const remain = Math.max(0, minDelay - elapsed);
         window.setTimeout(() => {
-          setFromAnalysis(activeAnalysis);
+          if (activeAnalysis) {
+            setFromAnalysis(activeAnalysis);
+          }
           setAnalyzingState(false);
           playReportEntrance(overlay, stopMessageRotation);
+          if (!activeAnalysis) {
+            renderMissingAnalysisFallback();
+          }
         }, remain);
       }
     })();
+  }
+
+  if (!shareId && !activeAnalysis && !(Array.isArray(pendingMessages) && pendingMessages.length)) {
+    renderMissingAnalysisFallback();
+    return;
   }
 
   const copyButton = reportRoot.querySelector("[data-share-copy]");
@@ -1513,6 +1614,7 @@ function bindReportPage() {
       if (sharedAnalysis) {
         activeAnalysis = sharedAnalysis;
         setFromAnalysis(activeAnalysis);
+        console.log("[Blen][report] shared analysis loaded", activeAnalysis);
       }
     })();
   }

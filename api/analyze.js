@@ -774,83 +774,13 @@ module.exports = async (req, res) => {
       body.language === "en" || body.language === "ko" ? body.language : null;
     const responseLanguage = requestedLanguage || detectLanguage(firstUserMessage);
     const analysis = await analyzeRelationshipProfile(messages, responseLanguage);
-    res.status(200).json(analysis);
+    res.status(200).json({ analysis });
   } catch (error) {
-    logAnalyzeDebug("Analyze request failed, using fallback structured result", {
+    logAnalyzeDebug("Analyze request failed", {
       error: error?.message || String(error),
     });
-    res.status(200).json({
-      core_values: {
-        relationship_goal: { type: "unsure", confidence: 0.2 },
-        money_values: {
-          present_enjoyment: 3.0,
-          future_stability: 3.0,
-          spending_tolerance: 3.0,
-          primary: "balanced",
-          confidence: 0.2,
-        },
-        family_values: {
-          family_centered: 3.0,
-          individual_centered: 3.0,
-          family_involvement_tolerance: 3.0,
-          primary: "balanced",
-          confidence: 0.2,
-        },
-        work_life_balance: {
-          career_priority: 3.0,
-          life_balance_priority: 3.0,
-          relationship_priority: 3.0,
-          primary: "balanced",
-          confidence: 0.2,
-        },
-        children_preference: { type: "unsure", confidence: 0.2 },
-      },
-      conflict_style: {
-        scores: { avoidant: 3.0, aggressive: 3.0, defensive: 3.0, resolution_oriented: 3.0 },
-        primary: "mixed",
-        mixed: true,
-        confidence: 0.2,
-      },
-      attachment_style: {
-        scores: { secure: 3.0, anxious: 3.0, avoidant: 3.0 },
-        primary: "mixed",
-        mixed: true,
-        confidence: 0.2,
-      },
-      lifestyle: {
-        activity_level: { active: 3.0, homebody: 3.0, primary: "balanced", confidence: 0.2 },
-        daily_rhythm: { morning_type: 3.0, night_type: 3.0, primary: "flexible", confidence: 0.2 },
-        organization: { clean_organized: 3.0, relaxed_flexible: 3.0, primary: "balanced", confidence: 0.2 },
-        sociability: { social: 3.0, quiet: 3.0, primary: "balanced", confidence: 0.2 },
-      },
-      communication: {
-        scores: { direct_open: 3.0, indirect: 3.0, emotion_suppressing: 3.0, reactive_explosive: 3.0 },
-        primary: "mixed",
-        mixed: true,
-        confidence: 0.2,
-      },
-      attraction_pattern: {
-        scores: { comfort_seeking: 3.0, intensity_seeking: 3.0, rescuer: 3.0, unavailable_attraction: 3.0 },
-        primary: "mixed",
-        mixed: true,
-        confidence: 0.2,
-      },
-      boundaries: {
-        alone_time_need: 3.0,
-        contact_expectation: 3.0,
-        opposite_sex_friend_boundary: 3.0,
-        privacy_boundary: 3.0,
-        primary: "moderate_boundary",
-        confidence: 0.2,
-      },
-      summary: {
-        relationship_style_title: "관계를 신중하게 맞춰가는 타입",
-        one_sentence_summary: "너는 진심과 균형을 함께 보면서 관계를 만들어가는 편이야.",
-        strengths: ["상대를 배려하려는 마음이 커."],
-        possible_challenges: ["애매한 신호가 반복되면 혼자 생각이 길어질 수 있어."],
-        best_match_traits: ["대화가 솔직하고 꾸준한 사람"],
-        risk_match_traits: ["태도가 자주 바뀌고 애매한 사람"],
-      },
+    res.status(500).json({
+      error: error?.message || "Failed to analyze conversation",
     });
   }
 };

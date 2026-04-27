@@ -2268,10 +2268,16 @@ body[data-page="report"] {
   background: #fff;
 }
 
+body[data-page="report"] .site-header {
+  background: transparent;
+  backdrop-filter: none;
+  border-bottom: none;
+}
+
 body[data-page="report"] .report {
   background-color: #fff;
   background-image: url("./assets/report-background.svg");
-  background-repeat: no-repeat;
+  background-repeat: repeat-y;
   background-position: center top;
   background-size: 100% auto;
 }
