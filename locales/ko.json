@@ -345,6 +345,15 @@
     "shareComingSoon": "이 공유 옵션은 곧 지원될 예정이에요.",
     "sharedNote": "지금 보고 있는 건 공유된 Blen AI 연애 성향 레포트야.",
     "sharedStartCta": "나도 Blen AI 분석 시작하기",
-    "matchingCta": "매칭 시작하기"
+    "heroCta": "잘 맞는 인연 보기",
+    "matchingCta": "매칭 시작하기",
+    "quickShareCta": "결과 공유하기",
+    "analyzingTitle": "연애 성향을 분석하고 있어...",
+    "analyzingSubtitle": "너만의 Blen 리포트를 만들고 있어.",
+    "analyzingSteps": [
+      "너의 관계 패턴을 이해하는 중...",
+      "감정 반응과 연결 방식을 분석하는 중...",
+      "개인화된 리포트를 정리하는 중..."
+    ]
   }
 }

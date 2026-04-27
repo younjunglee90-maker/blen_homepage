@@ -352,6 +352,15 @@
     "shareComingSoon": "This share option is coming soon.",
     "sharedNote": "You are viewing a Blen AI report shared with you.",
     "sharedStartCta": "Start My Blen AI Analysis",
-    "matchingCta": "Start Matching"
+    "heroCta": "See your best match",
+    "matchingCta": "Start Matching",
+    "quickShareCta": "Share your result",
+    "analyzingTitle": "Analyzing your relationship style...",
+    "analyzingSubtitle": "Building your personalized Blen report.",
+    "analyzingSteps": [
+      "Understanding your relationship patterns...",
+      "Analyzing your emotional tendencies...",
+      "Building your personalized report..."
+    ]
   }
 }

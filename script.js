@@ -20,6 +20,9 @@ const PAGE_PATHS = {
 
 const ANALYSIS_STORAGE_KEY = "blen_report";
 const LEGACY_ANALYSIS_STORAGE_KEY = "blen-analysis-result";
+const PENDING_ANALYSIS_MESSAGES_KEY = "blen_pending_analysis_messages";
+const ANALYSIS_SCHEMA_VERSION_KEY = "blen_report_schema_version";
+const ANALYSIS_SCHEMA_VERSION = "2026-04-27-story-v2";
 const AUTH_SESSION_KEY = "blen_auth_session";
 const PENDING_REPORT_SAVE_KEY = "blen_pending_report_save";
 const POST_LOGIN_REDIRECT_KEY = "blen_post_login_redirect";
@@ -645,24 +648,6 @@ function bindAiChatFlow() {
     return data.reply;
   }
 
-  async function requestAnalysis() {
-    const controller = new AbortController();
-    const timeoutId = window.setTimeout(() => controller.abort(), 25000);
-    const response = await fetch("/api/analyze", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages: conversationHistory, language: getCurrentLang() }),
-      signal: controller.signal,
-    }).finally(() => {
-      window.clearTimeout(timeoutId);
-    });
-    if (!response.ok) {
-      const payload = await response.json().catch(() => ({}));
-      throw new Error(payload.error || "Failed to analyze conversation");
-    }
-    return response.json();
-  }
-
   async function completeAfterFinalAnswer() {
     if (analysisRequested) return;
     analysisRequested = true;
@@ -679,25 +664,19 @@ function bindAiChatFlow() {
       "ai"
     );
 
-    try {
-      const analysis = await requestAnalysis();
-      localStorage.setItem(ANALYSIS_STORAGE_KEY, JSON.stringify(analysis));
-      updateProgress(true);
-      const reportPath = localeUrl(getCurrentLang(), "report");
-      window.setTimeout(() => {
-        location.href = reportPath;
-      }, 420);
-      return;
-    } catch (error) {
-      const fallbackAnalysis = createFallbackAnalysis();
-      localStorage.setItem(ANALYSIS_STORAGE_KEY, JSON.stringify(fallbackAnalysis));
-      updateProgress(true);
-      const reportPath = localeUrl(getCurrentLang(), "report");
-      window.setTimeout(() => {
-        location.href = reportPath;
-      }, 420);
-      return;
-    }
+    // Navigate to report immediately and analyze there for premium loading UX
+    localStorage.removeItem(ANALYSIS_STORAGE_KEY);
+    localStorage.removeItem(LEGACY_ANALYSIS_STORAGE_KEY);
+    localStorage.removeItem(ANALYSIS_SCHEMA_VERSION_KEY);
+    localStorage.setItem(
+      PENDING_ANALYSIS_MESSAGES_KEY,
+      JSON.stringify(conversationHistory)
+    );
+    updateProgress(true);
+    const reportPath = localeUrl(getCurrentLang(), "report");
+    window.setTimeout(() => {
+      location.href = reportPath;
+    }, 260);
   }
 
   form.addEventListener("submit", async (event) => {
@@ -796,6 +775,7 @@ function bindLoginPage() {
         analysis_json: reportAnalysis,
       });
       localStorage.removeItem(PENDING_REPORT_SAVE_KEY);
+      localStorage.removeItem(PENDING_ANALYSIS_MESSAGES_KEY);
     }
 
     const finalPath = consumeStoredRedirect(redirectTarget);
@@ -1036,6 +1016,97 @@ function bindReportPage() {
     setTag("[data-report-tag3]", trustTag);
   };
 
+  const setAnalyzingState = (active) => {
+    reportRoot.classList.toggle("report--analyzing", active);
+  };
+
+  const playReportEntrance = (overlay, stopMessageRotation) => {
+    reportRoot.classList.add("report--entrance-prep");
+    if (overlay) overlay.classList.add("report__analyzing-overlay--exit");
+    window.setTimeout(() => {
+      if (overlay) {
+        overlay.hidden = true;
+        overlay.classList.remove("report__analyzing-overlay--exit");
+      }
+      if (typeof stopMessageRotation === "function") stopMessageRotation();
+      window.requestAnimationFrame(() => {
+        reportRoot.classList.add("report--entrance-run");
+      });
+      window.setTimeout(() => {
+        reportRoot.classList.add("report--entrance-cta");
+      }, 520);
+      window.setTimeout(() => {
+        reportRoot.classList.remove(
+          "report--entrance-prep",
+          "report--entrance-run",
+          "report--entrance-cta"
+        );
+      }, 2200);
+    }, 260);
+  };
+
+  const ensureAnalyzingOverlay = () => {
+    let overlay = reportRoot.querySelector("[data-report-analyzing-overlay]");
+    if (overlay) return overlay;
+    overlay = document.createElement("div");
+    overlay.className = "report__analyzing-overlay";
+    overlay.setAttribute("data-report-analyzing-overlay", "true");
+    overlay.hidden = true;
+    overlay.innerHTML = `
+      <div class="report__analyzing-modal" role="status" aria-live="polite">
+        <p class="report__analyzing-title">${
+          deepGet(window.__BLEN_LOCALE__, "report.analyzingTitle") ||
+          "Analyzing your relationship style..."
+        }</p>
+        <p class="report__analyzing-subtitle" data-report-analyzing-message>${
+          deepGet(window.__BLEN_LOCALE__, "report.analyzingSubtitle") ||
+          "Building your personalized Blen report."
+        }</p>
+        <span class="report__analyzing-dots" aria-hidden="true"><span></span><span></span><span></span></span>
+      </div>
+    `;
+    reportRoot.appendChild(overlay);
+    return overlay;
+  };
+
+  const startAnalyzingOverlayMessages = () => {
+    const overlay = ensureAnalyzingOverlay();
+    const messageEl = overlay.querySelector("[data-report-analyzing-message]");
+    if (!messageEl) return () => {};
+    const messageList = deepGet(window.__BLEN_LOCALE__, "report.analyzingSteps");
+    const messages = Array.isArray(messageList) && messageList.length
+      ? messageList
+      : [
+          "Understanding your relationship patterns...",
+          "Analyzing your emotional tendencies...",
+          "Building your personalized report...",
+        ];
+    let index = 0;
+    const intervalId = window.setInterval(() => {
+      index = (index + 1) % messages.length;
+      messageEl.textContent = messages[index];
+    }, 1800);
+    return () => window.clearInterval(intervalId);
+  };
+
+  const requestAnalysisForReport = async (messages) => {
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), 25000);
+    const response = await fetch("/api/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messages, language: getCurrentLang() }),
+      signal: controller.signal,
+    }).finally(() => {
+      window.clearTimeout(timeoutId);
+    });
+    if (!response.ok) {
+      const payload = await response.json().catch(() => ({}));
+      throw new Error(payload.error || "Failed to analyze conversation");
+    }
+    return response.json();
+  };
+
   const parseShareIdFromLocation = () => {
     const params = new URLSearchParams(window.location.search || "");
     const fromQuery = params.get("id") || params.get("share");
@@ -1098,11 +1169,25 @@ function bindReportPage() {
     };
   };
 
-  const raw =
-    localStorage.getItem(ANALYSIS_STORAGE_KEY) ||
-    localStorage.getItem(LEGACY_ANALYSIS_STORAGE_KEY);
+  const schemaVersion = localStorage.getItem(ANALYSIS_SCHEMA_VERSION_KEY);
+  const isSchemaCurrent = schemaVersion === ANALYSIS_SCHEMA_VERSION;
+  const raw = isSchemaCurrent
+    ? localStorage.getItem(ANALYSIS_STORAGE_KEY) || localStorage.getItem(LEGACY_ANALYSIS_STORAGE_KEY)
+    : null;
+  if (!isSchemaCurrent) {
+    localStorage.removeItem(ANALYSIS_STORAGE_KEY);
+    localStorage.removeItem(LEGACY_ANALYSIS_STORAGE_KEY);
+    localStorage.removeItem(ANALYSIS_SCHEMA_VERSION_KEY);
+  }
   const localAnalysis = raw ? JSON.parse(raw) : fallback;
   const shareId = parseShareIdFromLocation();
+  const pendingMessagesRaw = localStorage.getItem(PENDING_ANALYSIS_MESSAGES_KEY);
+  let pendingMessages = null;
+  try {
+    pendingMessages = pendingMessagesRaw ? JSON.parse(pendingMessagesRaw) : null;
+  } catch (_) {
+    pendingMessages = null;
+  }
   let activeAnalysis = localAnalysis;
   setFromAnalysis(activeAnalysis);
   const gate = reportRoot.querySelector("[data-report-login-gate]");
@@ -1110,6 +1195,37 @@ function bindReportPage() {
   if (gate) gate.hidden = true;
   if (content) content.hidden = false;
   reportRoot.classList.remove("report--locked");
+
+  if (!shareId && Array.isArray(pendingMessages) && pendingMessages.length) {
+    const overlay = ensureAnalyzingOverlay();
+    const stopMessageRotation = startAnalyzingOverlayMessages();
+    setAnalyzingState(true);
+    overlay.hidden = false;
+    const minDelay = 2200;
+    const startedAt = Date.now();
+    (async () => {
+      try {
+        const analysis = await requestAnalysisForReport(pendingMessages);
+        activeAnalysis = analysis;
+        localStorage.setItem(ANALYSIS_STORAGE_KEY, JSON.stringify(analysis));
+        localStorage.setItem(ANALYSIS_SCHEMA_VERSION_KEY, ANALYSIS_SCHEMA_VERSION);
+      } catch (_) {
+        const fallbackAnalysis = createFallbackAnalysis();
+        activeAnalysis = fallbackAnalysis;
+        localStorage.setItem(ANALYSIS_STORAGE_KEY, JSON.stringify(fallbackAnalysis));
+        localStorage.setItem(ANALYSIS_SCHEMA_VERSION_KEY, ANALYSIS_SCHEMA_VERSION);
+      } finally {
+        localStorage.removeItem(PENDING_ANALYSIS_MESSAGES_KEY);
+        const elapsed = Date.now() - startedAt;
+        const remain = Math.max(0, minDelay - elapsed);
+        window.setTimeout(() => {
+          setFromAnalysis(activeAnalysis);
+          setAnalyzingState(false);
+          playReportEntrance(overlay, stopMessageRotation);
+        }, remain);
+      }
+    })();
+  }
 
   const copyButton = reportRoot.querySelector("[data-share-copy]");
   const nativeButton = reportRoot.querySelector("[data-share-native]");
@@ -1207,7 +1323,9 @@ function bindReportPage() {
     startAnalysisButton.addEventListener("click", () => {
       localStorage.removeItem(ANALYSIS_STORAGE_KEY);
       localStorage.removeItem(LEGACY_ANALYSIS_STORAGE_KEY);
+      localStorage.removeItem(ANALYSIS_SCHEMA_VERSION_KEY);
       localStorage.removeItem(PENDING_REPORT_SAVE_KEY);
+      localStorage.removeItem(PENDING_ANALYSIS_MESSAGES_KEY);
       const aiChatPath = localeUrl(getCurrentLang(), "aiChat");
       location.href = aiChatPath;
     });
@@ -1218,17 +1336,57 @@ function bindReportPage() {
     restartButton.addEventListener("click", () => {
       localStorage.removeItem(ANALYSIS_STORAGE_KEY);
       localStorage.removeItem(LEGACY_ANALYSIS_STORAGE_KEY);
+      localStorage.removeItem(ANALYSIS_SCHEMA_VERSION_KEY);
       localStorage.removeItem(PENDING_REPORT_SAVE_KEY);
+      localStorage.removeItem(PENDING_ANALYSIS_MESSAGES_KEY);
       const aiChatPath = localeUrl(getCurrentLang(), "aiChat");
       location.href = aiChatPath;
     });
   }
 
   const matchingButton = reportRoot.querySelector("[data-report-matching]");
+  const heroCtaButton = reportRoot.querySelector("[data-report-hero-cta]");
+  const quickShareButton = reportRoot.querySelector("[data-report-share-quick]");
+  const shareSection = reportRoot.querySelector("[data-report-share]");
+  const revealTargets = reportRoot.querySelectorAll(
+    ".report__hero, .report__insights, .report__article, .report__matching, .report__share"
+  );
+
+  revealTargets.forEach((el) => el.classList.add("report__reveal"));
+  if (window.IntersectionObserver) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-visible");
+          observer.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.18, rootMargin: "0px 0px -8% 0px" }
+    );
+    revealTargets.forEach((el) => observer.observe(el));
+  } else {
+    revealTargets.forEach((el) => el.classList.add("is-visible"));
+  }
+
   if (matchingButton) {
     matchingButton.addEventListener("click", () => {
       const relationshipTestPath = localeUrl(getCurrentLang(), "relationshipTest");
       location.href = relationshipTestPath;
+    });
+  }
+  if (heroCtaButton) {
+    heroCtaButton.addEventListener("click", () => {
+      const relationshipTestPath = localeUrl(getCurrentLang(), "relationshipTest");
+      location.href = relationshipTestPath;
+    });
+  }
+  if (quickShareButton && shareSection) {
+    quickShareButton.addEventListener("click", () => {
+      shareSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (nativeButton && typeof navigator.share === "function") {
+        nativeShare();
+      }
     });
   }
 

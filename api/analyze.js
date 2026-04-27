@@ -195,7 +195,7 @@ const REPORT_SYSTEM_PROMPT = `
 You are Blen AI, an expert relationship analyst.
 
 Your task:
-Turn structured JSON data into a beautiful, emotionally engaging relationship report.
+Turn structured JSON data into a highly personal, emotionally engaging, story-driven relationship report.
 
 Rules:
 - Write like a human, not a robot.
@@ -204,22 +204,44 @@ Rules:
 - Do NOT sound like a psychologist.
 - Do NOT explain the analysis process.
 - Make it feel like you truly understand the person.
+- Avoid abstract generic statements.
+- Use concrete emotional situations and behavior patterns.
+- If data is incomplete, infer carefully and phrase softly.
 
 Structure:
+Return exactly these 10 sections as keys inside "final_report":
+1. "한 줄 요약"
+2. "너의 연애 핵심"
+3. "너의 연애 스타일"
+4. "너가 사랑에 빠지는 방식"
+5. "연애할 때 너의 모습"
+6. "갈등 생기면 너는 이렇게 함"
+7. "너의 연애 강점"
+8. "너의 연애 리스크"
+9. "너랑 잘 맞는 사람"
+10. "너를 위한 연애 조언"
 
-1. Title (short, impactful)
-2. One-line summary
-3. Core personality in relationships
-4. How they love & connect
-5. Strengths in relationships
-6. Possible challenges
-7. Best match type
-8. Risk match type
+Output JSON shape:
+{
+  "report_text": "full readable report in markdown-like plain text",
+  "final_report": {
+    "한 줄 요약": "",
+    "너의 연애 핵심": "",
+    "너의 연애 스타일": "",
+    "너가 사랑에 빠지는 방식": "",
+    "연애할 때 너의 모습": "",
+    "갈등 생기면 너는 이렇게 함": "",
+    "너의 연애 강점": "",
+    "너의 연애 리스크": "",
+    "너랑 잘 맞는 사람": "",
+    "너를 위한 연애 조언": ""
+  }
+}
 
 Tone:
-- Warm, insightful, slightly emotional
+- Warm, insightful, slightly emotional and shareable
 - Clear and easy to read
-- Slightly premium / “wow” feeling
+- Slightly premium / “wow this is me” feeling
 
 Language:
 - Korean if user is Korean
@@ -259,17 +281,17 @@ function fallbackAnalysis() {
       self_control: 0.5,
     },
     report_inputs: {
-      headline_keyword: "천천히 맞춰가는 연결",
-      relationship_style: "너는 관계에서 안정감과 진심을 중요하게 여기는 편이야.",
-      core_values: ["상호 존중", "일상 속 꾸준한 신뢰", "감정 표현의 진정성"],
-      attraction_pattern: "편안함과 배려가 느껴지는 사람에게 더 깊게 끌리는 패턴이 있어.",
-      communication_style: "감정이 생기면 피하기보다 대화로 풀어가려는 성향이 보여.",
-      emotional_pattern: "겉으로는 차분해도 마음속으로는 관계의 균형을 섬세하게 살피는 편이야.",
-      dealbreakers: ["상호 존중이 없는 관계"],
-      strengths: ["감정 공감 능력", "관계를 지키려는 책임감"],
-      risks: ["상대 반응에 과하게 신경 쓰며 스스로 지칠 수 있어."],
-      ideal_partner_traits: ["감정적으로 안정적인 사람", "갈등을 대화로 풀 수 있는 사람"],
-      one_line_summary: "너는 진심을 오래 지켜줄 수 있는 관계에서 가장 빛나는 사람이야.",
+      headline_keyword: "선명한 감정 기준형",
+      relationship_style: "너는 가볍게 흘러가는 관계보다, 신뢰와 일관성이 쌓이는 관계에서 훨씬 편안함을 느끼는 편이야.",
+      core_values: ["솔직한 대화", "감정적 안정감", "서로에 대한 존중"],
+      attraction_pattern: "처음의 강한 자극보다 오래 함께 있어도 편안한 사람에게 더 깊게 끌리는 경향이 있어.",
+      communication_style: "서운함을 오래 묵히기보다, 타이밍을 보고 핵심을 꺼내서 대화로 풀고 싶어 하는 편이야.",
+      emotional_pattern: "겉으로는 침착해도 관계의 온도 변화는 빠르게 감지해서 마음속에서 먼저 정리하려는 성향이 보여.",
+      dealbreakers: ["말과 행동이 반복해서 달라지는 태도", "존중 없는 말투"],
+      strengths: ["감정 공감력", "관계를 지키는 책임감", "대화 회복 의지"],
+      risks: ["애매한 신호를 오래 붙잡으면 혼자 소모될 수 있어."],
+      ideal_partner_traits: ["감정적으로 안정적인 사람", "말보다 행동이 일관된 사람"],
+      one_line_summary: "너는 확신 없는 관계를 오래 버티기보다, 진심이 보이는 사람에게 깊게 몰입하는 타입이야.",
     },
     confidence: {
       overall: 0.2,
