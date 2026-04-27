@@ -583,7 +583,7 @@ function bindAiChatFlow() {
 
   const firstMessage = deepGet(window.__BLEN_LOCALE__, "aiChat.firstMessage");
   const guidanceMessage = deepGet(window.__BLEN_LOCALE__, "aiChat.guidanceMessage");
-  const totalQuestions = 15;
+  const totalQuestions = 25;
 
   const headerEl = chatRoot.querySelector(".ai-chat__header");
   const progressEl = document.createElement("section");
@@ -623,16 +623,13 @@ function bindAiChatFlow() {
   let isWaitingForFinalAnswer = false;
   let analysisRequested = false;
   let isRequesting = false;
+  let hasSentGuidanceMessage = false;
   const conversationHistory = [];
   const sendButton = form.querySelector(".ai-chat__send");
   const sendLabel = sendButton ? sendButton.textContent : "";
 
   renderChatBubble(messagesEl, firstMessage, "ai");
   conversationHistory.push({ role: "assistant", content: firstMessage });
-  if (guidanceMessage) {
-    renderChatBubble(messagesEl, guidanceMessage, "ai");
-    conversationHistory.push({ role: "assistant", content: guidanceMessage });
-  }
 
   async function requestAIReply() {
     const response = await fetch("/api/chat", {
@@ -654,7 +651,7 @@ function bindAiChatFlow() {
     const response = await fetch("/api/analyze", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages: conversationHistory }),
+      body: JSON.stringify({ messages: conversationHistory, language: getCurrentLang() }),
       signal: controller.signal,
     }).finally(() => {
       window.clearTimeout(timeoutId);
@@ -715,6 +712,12 @@ function bindAiChatFlow() {
     userTurnCount += 1;
     if (progressEl.hidden) progressEl.hidden = false;
     updateProgress(false);
+
+    if (!hasSentGuidanceMessage && guidanceMessage) {
+      hasSentGuidanceMessage = true;
+      renderChatBubble(messagesEl, guidanceMessage, "ai");
+      conversationHistory.push({ role: "assistant", content: guidanceMessage });
+    }
 
     if (isWaitingForFinalAnswer) {
       isWaitingForFinalAnswer = false;
@@ -888,8 +891,69 @@ function bindReportPage() {
   if (!reportRoot) return;
 
   const fallback = createFallbackAnalysis();
+  const deriveReportInputs = (analysis) => {
+    if (analysis?.report_inputs) return analysis.report_inputs;
+
+    const summary = analysis?.summary || {};
+    const coreValuesTop = Array.isArray(analysis?.core_values?.top_values)
+      ? analysis.core_values.top_values
+      : [];
+    const inferredCoreValues = [
+      analysis?.core_values?.money_values?.primary,
+      analysis?.core_values?.family_values?.primary,
+      analysis?.core_values?.work_life_balance?.primary,
+      analysis?.core_values?.children_preference?.type,
+    ].filter((value) => typeof value === "string" && value.trim().length > 0);
+    const strengths = Array.isArray(summary?.strengths) ? summary.strengths : [];
+    const challenges = Array.isArray(summary?.possible_challenges)
+      ? summary.possible_challenges
+      : [];
+    const bestMatchTraits = Array.isArray(summary?.best_match_traits)
+      ? summary.best_match_traits
+      : [];
+    const styleType = analysis?.relationship_style?.type || "관계 탐색형";
+    const styleSummary = analysis?.relationship_style?.summary || "";
+    const oneLine = summary?.one_sentence_summary || "";
+    const challengeLine = challenges[0] || "";
+
+    return {
+      headline_keyword: summary?.relationship_style_title || styleType || fallback.report_inputs.headline_keyword,
+      relationship_style:
+        styleSummary ||
+        `너는 연애에서 ${styleType}에 가까운 흐름을 보이고, 상황에 따라 태도를 유연하게 조절하는 편이야.`,
+      core_values:
+        coreValuesTop.length
+          ? coreValuesTop
+          : inferredCoreValues.length
+            ? inferredCoreValues
+            : fallback.report_inputs.core_values,
+      attraction_pattern:
+        analysis?.attraction_pattern?.primary
+          ? `${analysis.attraction_pattern.primary} 성향이 끌림의 핵심으로 보이고, 반복되는 감정 패턴도 함께 나타나는 편이야.`
+          : fallback.report_inputs.attraction_pattern,
+      communication_style:
+        analysis?.communication?.primary
+          ? `감정 대화에서는 ${analysis.communication.primary} 쪽 반응이 두드러지고, 갈등 상황에서 말의 톤과 타이밍을 조절하는 경향이 있어.`
+          : fallback.report_inputs.communication_style,
+      emotional_pattern:
+        analysis?.attachment_style?.primary
+          ? `관계가 깊어질수록 ${analysis.attachment_style.primary} 성향이 드러나고, 연락/반응 변화에 감정 속도가 달라지는 편이야.`
+          : fallback.report_inputs.emotional_pattern,
+      dealbreakers: challenges.length ? challenges : fallback.report_inputs.dealbreakers,
+      strengths: strengths.length ? strengths : fallback.report_inputs.strengths,
+      risks: challenges.length ? challenges : fallback.report_inputs.risks,
+      ideal_partner_traits: bestMatchTraits.length
+        ? bestMatchTraits
+        : fallback.report_inputs.ideal_partner_traits,
+      one_line_summary: oneLine || fallback.report_inputs.one_line_summary,
+      dating_advice:
+        challengeLine ||
+        "관계에서 애매한 신호가 반복되면 오래 참기보다 기준을 빨리 확인하는 게 너를 더 편하게 해줄 거야.",
+    };
+  };
+
   const setFromAnalysis = (analysis) => {
-    const report = analysis.report_inputs || fallback.report_inputs;
+    const report = deriveReportInputs(analysis);
     const setText = (selector, value) => {
       const el = reportRoot.querySelector(selector);
       if (el) el.textContent = value;
@@ -917,6 +981,12 @@ function bindReportPage() {
     setText("[data-report-ideal-partner]", (report.ideal_partner_traits || []).join(", "));
     setText("[data-report-one-line]", report.one_line_summary || "");
     setText("[data-report-advice]", report.dating_advice || "");
+    const firstItem = (arr) =>
+      Array.isArray(arr) && arr.length && typeof arr[0] === "string" ? arr[0] : "";
+    setText("[data-report-card-style]", report.relationship_style || "");
+    setText("[data-report-card-strength]", firstItem(report.strengths) || "");
+    setText("[data-report-card-challenge]", firstItem(report.risks) || firstItem(report.dealbreakers) || "");
+    setText("[data-report-card-bestmatch]", firstItem(report.ideal_partner_traits) || "");
     const setTag = (selector, value) => {
       const el = reportRoot.querySelector(selector);
       if (el) el.textContent = value;
@@ -1012,7 +1082,7 @@ function bindReportPage() {
   };
 
   const buildSharePayload = (analysis, shareId) => {
-    const reportInputs = analysis?.report_inputs || fallback.report_inputs;
+    const reportInputs = deriveReportInputs(analysis);
     return {
       share_id: shareId,
       report_text: JSON.stringify(reportInputs),
@@ -1151,6 +1221,14 @@ function bindReportPage() {
       localStorage.removeItem(PENDING_REPORT_SAVE_KEY);
       const aiChatPath = localeUrl(getCurrentLang(), "aiChat");
       location.href = aiChatPath;
+    });
+  }
+
+  const matchingButton = reportRoot.querySelector("[data-report-matching]");
+  if (matchingButton) {
+    matchingButton.addEventListener("click", () => {
+      const relationshipTestPath = localeUrl(getCurrentLang(), "relationshipTest");
+      location.href = relationshipTestPath;
     });
   }
 

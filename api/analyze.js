@@ -1,144 +1,234 @@
+const ANALYZE_MODEL = "gpt-4o";
+
 const ANALYZE_SYSTEM_PROMPT = `
-You are Blen’s relationship analysis engine.
+You are Blen AI's internal relationship analysis engine.
 
-Your job:
-Analyze the full conversation and return BOTH:
-1) structured relationship JSON
-2) a human-readable Korean report text
+Your task:
+Analyze the full conversation between the user and Blen AI, then extract structured relationship indicators.
 
-Core principle:
-- Do NOT explain the user in dry analytical language.
-- DESCRIBE the user like a real person.
-- The user should feel: "이거 뭐야... 나인데?"
-
-Output rules:
+Important:
 - Output JSON only.
-- No markdown.
-- No explanation.
-- No comments.
-- Do not continue chatting.
-- Do not ask questions.
-- Do not diagnose mental health conditions.
-- Never say "데이터가 부족하다".
-- If something is unclear, infer carefully and phrase softly.
-- Do NOT overclaim certainty.
+- Do not include markdown.
+- Do not explain.
+- Do not include comments.
+- Use scores from 1.0 to 5.0.
+- 1.0 = very low / strongly opposite
+- 3.0 = neutral / unclear / balanced
+- 5.0 = very high / strongly present
+- Use one decimal place.
+- If evidence is weak, use 3.0 and lower confidence.
+- Do not overdiagnose.
+- Do not use clinical labels beyond the schema.
+- Base your judgment only on what the user actually said.
 
 Return this exact JSON structure:
 
 {
-  "relationship_style": {
-    "type": "",
-    "score": 0,
-    "evidence": "",
-    "summary": ""
-  },
   "core_values": {
-    "top_values": [],
-    "summary": "",
-    "evidence": ""
+    "relationship_goal": {
+      "type": "casual | serious | marriage | unsure",
+      "confidence": 0.0
+    },
+    "money_values": {
+      "present_enjoyment": 3.0,
+      "future_stability": 3.0,
+      "spending_tolerance": 3.0,
+      "primary": "present_enjoyment | future_stability | balanced",
+      "confidence": 0.0
+    },
+    "family_values": {
+      "family_centered": 3.0,
+      "individual_centered": 3.0,
+      "family_involvement_tolerance": 3.0,
+      "primary": "family_centered | individual_centered | balanced",
+      "confidence": 0.0
+    },
+    "work_life_balance": {
+      "career_priority": 3.0,
+      "life_balance_priority": 3.0,
+      "relationship_priority": 3.0,
+      "primary": "career_priority | life_balance_priority | relationship_priority | balanced",
+      "confidence": 0.0
+    },
+    "children_preference": {
+      "type": "wants_children | open_to_children | does_not_want_children | unsure",
+      "confidence": 0.0
+    }
   },
+
+  "conflict_style": {
+    "scores": {
+      "avoidant": 3.0,
+      "aggressive": 3.0,
+      "defensive": 3.0,
+      "resolution_oriented": 3.0
+    },
+    "primary": "avoidant | aggressive | defensive | resolution_oriented | mixed",
+    "mixed": false,
+    "confidence": 0.0
+  },
+
+  "attachment_style": {
+    "scores": {
+      "secure": 3.0,
+      "anxious": 3.0,
+      "avoidant": 3.0
+    },
+    "primary": "secure | anxious | avoidant | mixed",
+    "mixed": false,
+    "confidence": 0.0
+  },
+
+  "lifestyle": {
+    "activity_level": {
+      "active": 3.0,
+      "homebody": 3.0,
+      "primary": "active | homebody | balanced",
+      "confidence": 0.0
+    },
+    "daily_rhythm": {
+      "morning_type": 3.0,
+      "night_type": 3.0,
+      "primary": "morning_type | night_type | flexible",
+      "confidence": 0.0
+    },
+    "organization": {
+      "clean_organized": 3.0,
+      "relaxed_flexible": 3.0,
+      "primary": "clean_organized | relaxed_flexible | balanced",
+      "confidence": 0.0
+    },
+    "sociability": {
+      "social": 3.0,
+      "quiet": 3.0,
+      "primary": "social | quiet | balanced",
+      "confidence": 0.0
+    }
+  },
+
+  "communication": {
+    "scores": {
+      "direct_open": 3.0,
+      "indirect": 3.0,
+      "emotion_suppressing": 3.0,
+      "reactive_explosive": 3.0
+    },
+    "primary": "direct_open | indirect | emotion_suppressing | reactive_explosive | mixed",
+    "mixed": false,
+    "confidence": 0.0
+  },
+
   "attraction_pattern": {
-    "primary_attraction": "",
-    "hidden_pattern": "",
-    "summary": ""
+    "scores": {
+      "comfort_seeking": 3.0,
+      "intensity_seeking": 3.0,
+      "rescuer": 3.0,
+      "unavailable_attraction": 3.0
+    },
+    "primary": "comfort_seeking | intensity_seeking | rescuer | unavailable_attraction | mixed",
+    "mixed": false,
+    "confidence": 0.0
   },
-  "communication_style": {
-    "type": "",
-    "conflict_response": "",
-    "summary": ""
-  },
-  "emotional_pattern": {
-    "attachment_tendency": "",
-    "emotional_trigger": "",
-    "summary": ""
-  },
+
   "boundaries": {
-    "non_negotiables": [],
-    "healthy_boundaries": "",
-    "warning_signs": []
+    "alone_time_need": 3.0,
+    "contact_expectation": 3.0,
+    "opposite_sex_friend_boundary": 3.0,
+    "privacy_boundary": 3.0,
+    "primary": "high_boundary | moderate_boundary | low_boundary",
+    "confidence": 0.0
   },
-  "strengths": [],
-  "risks": [],
-  "ideal_partner": {
-    "personality": "",
-    "relationship_style": "",
-    "communication_style": "",
-    "summary": ""
-  },
-  "tags": [],
-  "one_line_summary": "",
-  "confidence": {
-    "score": 0,
-    "reason": ""
-  },
-  "final_report": {
-    "한 줄 요약": "",
-    "너의 연애 핵심": "",
-    "너의 연애 스타일": "",
-    "너가 사랑에 빠지는 방식": "",
-    "연애할 때 너의 모습": "",
-    "갈등 생기면 너는 이렇게 함": "",
-    "너의 연애 강점": "",
-    "너의 연애 리스크": "",
-    "너랑 잘 맞는 사람": "",
-    "너를 위한 연애 조언": ""
-  },
-  "report_text": ""
+
+  "summary": {
+    "relationship_style_title": "",
+    "one_sentence_summary": "",
+    "strengths": [],
+    "possible_challenges": [],
+    "best_match_traits": [],
+    "risk_match_traits": []
+  }
 }
 
-Extraction rules:
-1) relationship_style.type must be one closest type among:
-   안정지향형, 설렘추구형, 신중탐색형, 깊은관계형, 자유로운연애형, 헌신형
-2) core_values.top_values: extract 3-5 values.
-3) attraction_pattern: infer primary attraction + hidden pattern.
-4) communication_style: classify from conversational/conflict behavior.
-5) emotional_pattern.attachment_tendency: use soft wording like "~경향이 있어".
-6) boundaries: include non-negotiables, healthy boundaries, warning signs.
-7) strengths: 3-5 concrete strengths.
-8) risks: 3-5 gentle, practical cautions (not harsh).
-9) ideal_partner: describe best-fit person and dynamic.
-10) tags: 3-5 short Korean tags (e.g., 신뢰중심, 안정지향).
-11) confidence.score:
-   - rich answers: usually 80-95
-   - short answers: usually 60-75
-   - never frame confidence negatively.
+Scoring guide:
 
-Report generation rules:
-- Report language: Korean only.
-- Tone: warm, insightful, slightly fun, casual Korean 반말.
-- Feel like a smart friend who understands relationships.
-- Avoid stiff psychological jargon.
-- Use real-life behavior language (e.g., 연락 패턴, 감정 반응, 싸울 때 반응).
-- Use soft inference language:
-  - "~인 편이야"
-  - "~하는 경향이 있어"
-  - "~일 가능성이 커"
-- NO generic statements. Every section must include specific situations and behavior.
-- Always describe WHEN/HOW the pattern appears (e.g., 연락이 느려질 때, 갈등이 생겼을 때, 상대가 애매할 때, 무시당한다고 느낄 때).
-- Show inner thoughts explicitly (e.g., 겉으로는 괜찮다 해도 속으로는 이유를 찾음).
-- Include outside-vs-inside contrast whenever relevant ("겉으로는..., 속으로는...").
-- In attraction section, include both what sparks attraction and what quickly cools it down.
-- In conflict section, describe concrete behavior sequence during conflict.
-- In risk section, include emotionally vivid, slightly uncomfortable but fair insights.
-- Write as flowing storytelling, not label dumping.
-- "한 줄 요약": one strong, bold hook line that feels personal and slightly provocative.
-- "너의 연애 핵심": summarize 3 short traits in natural sentence form.
-- Each of the other final_report sections: 3-5 sentences, personal and specific.
-- "너를 위한 연애 조언": practical, direct, useful, slightly sharp but kind.
-- Never use generic filler sentences.
-- Avoid repeating the same sentence pattern.
-- final_report and report_text must be emotionally engaging, useful, shareable.
-- report_text should read like one polished report that covers all 10 sections naturally.
+Conflict style:
+- avoidant high: avoids talking, needs long silence, waits for problems to disappear.
+- aggressive high: uses sharp words, raises voice, attacks, blames.
+- defensive high: feels accused easily, explains/protects self before listening.
+- resolution_oriented high: wants to understand, repair, talk calmly, solve together.
 
-Final quality check before output:
-- Does this feel like a real person wrote it?
-- Would the user want to screenshot and share it?
-- Does each section feel specific and tailored?
-- Ask: "이 문장이 특정 사람한테만 해당되나?" If not, rewrite.
-- If not, rewrite internally before returning final JSON.
+Attachment style:
+- secure high: comfortable with closeness, trusts partner, communicates needs.
+- anxious high: worries about replies, fears losing partner, needs reassurance.
+- avoidant high: feels overwhelmed by closeness, needs distance, dislikes dependency.
+
+Communication:
+- direct_open high: says feelings clearly and early.
+- indirect high: hints, expects partner to notice.
+- emotion_suppressing high: holds feelings in, avoids burdening partner.
+- reactive_explosive high: emotions come out suddenly or intensely.
+
+Attraction pattern:
+- comfort_seeking high: drawn to stability, kindness, calmness, safety.
+- intensity_seeking high: drawn to chemistry, excitement, emotional highs.
+- rescuer high: drawn to people they want to fix, help, or save.
+- unavailable_attraction high: drawn to emotionally distant or inconsistent people.
+
+Boundary:
+- alone_time_need: 1 = wants constant togetherness, 5 = strongly needs personal time.
+- contact_expectation: 1 = low contact, 5 = frequent contact.
+- opposite_sex_friend_boundary: 1 = very open, 5 = strict boundary.
+- privacy_boundary: 1 = shares almost everything, 5 = needs strong privacy.
+
+Mixed rule:
+If the highest score and second-highest score are within 0.5, set primary to "mixed" and mixed to true.
+
+Confidence:
+- 0.9 to 1.0 = very clear evidence
+- 0.7 to 0.8 = clear evidence
+- 0.5 to 0.6 = moderate evidence
+- 0.3 to 0.4 = weak evidence
+- 0.0 to 0.2 = insufficient evidence
 `.trim();
 
-const ANALYZE_MODEL = "gpt-4o-mini";
+const REPORT_SYSTEM_PROMPT = `
+You are Blen AI, an expert relationship analyst.
+
+Your task:
+Turn structured JSON data into a beautiful, emotionally engaging relationship report.
+
+Rules:
+- Write like a human, not a robot.
+- Make it feel personal, warm, and insightful.
+- Do NOT mention scores, numbers, or JSON.
+- Do NOT sound like a psychologist.
+- Do NOT explain the analysis process.
+- Make it feel like you truly understand the person.
+
+Structure:
+
+1. Title (short, impactful)
+2. One-line summary
+3. Core personality in relationships
+4. How they love & connect
+5. Strengths in relationships
+6. Possible challenges
+7. Best match type
+8. Risk match type
+
+Tone:
+- Warm, insightful, slightly emotional
+- Clear and easy to read
+- Slightly premium / “wow” feeling
+
+Language:
+- Korean if user is Korean
+- English if user is English
+
+Important:
+- Make it feel like "this is exactly me"
+- Avoid generic phrases
+`.trim();
 
 function fallbackAnalysis() {
   return {
@@ -199,6 +289,95 @@ function normalizeMessages(messages) {
     .filter((m) => m.content.length > 0);
 }
 
+function detectLanguage(text) {
+  if (!text) return "ko";
+  return /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(text) ? "ko" : "en";
+}
+
+async function generateReport(analysis, language = "ko") {
+  const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: "gpt-4o",
+      temperature: 0.8,
+      messages: [
+        {
+          role: "system",
+          content:
+            REPORT_SYSTEM_PROMPT +
+            (language === "ko"
+              ? "\nWrite the report in Korean."
+              : "\nWrite the report in English."),
+        },
+        {
+          role: "user",
+          content: JSON.stringify(analysis),
+        },
+      ],
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`OpenAI report error: ${errorText}`);
+  }
+
+  const data = await response.json();
+  const reportText = data?.choices?.[0]?.message?.content?.trim();
+  if (!reportText) {
+    throw new Error("OpenAI returned empty report text");
+  }
+  return reportText;
+}
+
+async function analyzeRelationshipProfile(messages, responseLanguage = "ko") {
+  const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: ANALYZE_MODEL,
+      temperature: 0.2,
+      response_format: { type: "json_object" },
+      messages: [
+        {
+          role: "system",
+          content:
+            `${ANALYZE_SYSTEM_PROMPT}\n\n${REPORT_SYSTEM_PROMPT}` +
+            "\n\nReturn summary text in " +
+            (responseLanguage === "ko" ? "Korean." : "English."),
+        },
+        {
+          role: "user",
+          content: JSON.stringify({
+            conversation: messages,
+          }),
+        },
+      ],
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`OpenAI analysis error: ${errorText}`);
+  }
+
+  const data = await response.json();
+  const raw = data?.choices?.[0]?.message?.content;
+
+  if (!raw) {
+    throw new Error("OpenAI returned empty analysis");
+  }
+
+  return JSON.parse(raw);
+}
+
 function extractJson(text) {
   if (!text || typeof text !== "string") return null;
   try {
@@ -239,6 +418,170 @@ function logAnalyzeDebug(message, extra) {
   } else {
     console.warn(`[Blen][analyze] ${message}`);
   }
+}
+
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function toFivePointScore(raw, fallback = 3) {
+  if (typeof raw !== "number" || Number.isNaN(raw)) return fallback;
+  const normalized = raw <= 1 ? raw * 5 : raw;
+  return Math.round(clamp(normalized, 1, 5) * 10) / 10;
+}
+
+function getLevelLabel(score, leftLabel, rightLabel) {
+  if (score <= 1.7) return `${leftLabel} 강함`;
+  if (score <= 2.6) return `${leftLabel} 성향`;
+  if (score <= 3.4) return `균형형`;
+  if (score <= 4.3) return `${rightLabel} 성향`;
+  return `${rightLabel} 강함`;
+}
+
+function getRelationshipGoalLabel(score, openness) {
+  if (score <= 1.7) return "가벼운 만남 선호";
+  if (score <= 2.6) return "부담 없는 관계 중심";
+  if (score <= 3.4) return "진지한 관계 중심";
+
+  if (score <= 4.3) {
+    if (openness) {
+      return "진지한 관계 중심 (결혼 가능성 열려 있음)";
+    }
+    return "장기 관계 지향";
+  }
+
+  return "결혼 지향형";
+}
+
+function getMoneyLabel(score) {
+  if (score <= 1.7) return "현재 행복 우선형";
+  if (score <= 2.6) return "즐김 중심 소비형";
+  if (score <= 3.4) return "균형 소비형";
+  if (score <= 4.3) return "안정 지향 소비형";
+  return "미래 안정 우선형";
+}
+
+function getFamilyLabel(score) {
+  if (score <= 1.7) return "가족 중심형";
+  if (score <= 2.6) return "가족 유대 중시형";
+  if (score <= 3.4) return "가족-개인 균형형";
+  if (score <= 4.3) return "커플 독립 중시형";
+  return "개인/커플 중심형";
+}
+
+function getWorkLifeLabel(score) {
+  if (score <= 1.7) return "커리어 몰입형";
+  if (score <= 2.6) return "성장 지향형";
+  if (score <= 3.4) return "일과 삶 균형형";
+  if (score <= 4.3) return "삶의 여유 지향형";
+  return "라이프 중심형";
+}
+
+function getChildrenLabel(score) {
+  if (score <= 1.7) return "딩크 지향형";
+  if (score <= 2.6) return "자녀 계획 낮음";
+  if (score <= 3.4) return "상황에 따라 열려 있음";
+  if (score <= 4.3) return "자녀 가능성 열려 있음";
+  return "자녀 지향형";
+}
+
+function buildInsightLabels({ structured, values }) {
+  const scoreSource = structured?.scores || structured?.scoring || {};
+  const relationshipGoalScore = toFivePointScore(
+    scoreSource.relationship_goal ??
+      scoreSource.relationshipGoal ??
+      structured?.relationship_style?.score,
+    3
+  );
+  const moneyScore = toFivePointScore(
+    scoreSource.money ??
+      scoreSource.money_values ??
+      scoreSource.spending,
+    3
+  );
+  const familyScore = toFivePointScore(
+    scoreSource.family ??
+      scoreSource.family_values,
+    3
+  );
+  const workLifeScore = toFivePointScore(
+    scoreSource.work_life_balance ??
+      scoreSource.workLifeBalance,
+    3
+  );
+  const childrenScore = toFivePointScore(
+    scoreSource.children ??
+      scoreSource.children_preference,
+    3
+  );
+  const opennessToMarriage =
+    Boolean(scoreSource.openness_to_marriage) ||
+    values?.relationship_goal === "marriage";
+
+  return {
+    relationship_goal: {
+      score: relationshipGoalScore,
+      label: getRelationshipGoalLabel(relationshipGoalScore, opennessToMarriage),
+      summary:
+        relationshipGoalScore >= 3.8
+          ? "진지하게 시작하고, 잘 맞으면 장기적인 미래까지 자연스럽게 떠올리는 편이야."
+          : relationshipGoalScore <= 2.2
+            ? "처음부터 무겁게 묶이기보다 부담 없이 서로를 알아가는 흐름을 더 편하게 느껴."
+            : "가볍기만 한 관계보다는 서로 맞춰가며 의미를 쌓는 쪽에 더 마음이 가는 편이야.",
+    },
+    money: {
+      score: moneyScore,
+      label: getMoneyLabel(moneyScore),
+      summary:
+        moneyScore >= 3.8
+          ? "지금의 즐거움도 보지만, 지출이 미래 안정에 어떤 영향을 줄지까지 함께 생각하는 편이야."
+          : moneyScore <= 2.2
+            ? "현재의 경험과 행복을 우선 두는 소비 감각이 강해서, 관계에서도 즐거운 순간의 가치를 크게 봐."
+            : "현재 만족과 미래 안정 사이에서 무리 없이 균형을 맞추려는 현실적인 타입이야.",
+    },
+    family: {
+      score: familyScore,
+      label: getFamilyLabel(familyScore),
+      summary:
+        familyScore >= 3.8
+          ? "가족의 의견도 듣되 결국은 커플의 기준으로 관계를 세우는 독립적인 성향이 보여."
+          : familyScore <= 2.2
+            ? "연애에서도 가족과의 정서적 연결을 중요하게 여겨서, 배경과 태도를 세심하게 보는 편이야."
+            : "가족과 커플의 경계를 한쪽으로 치우치지 않게 맞추려는 균형 감각이 있어.",
+    },
+    work_life: {
+      score: workLifeScore,
+      label: getWorkLifeLabel(workLifeScore),
+      summary:
+        workLifeScore >= 3.8
+          ? "관계에서도 일 성과보다 삶의 여유와 정서적 안정이 유지되는 흐름을 더 중요하게 생각해."
+          : workLifeScore <= 2.2
+            ? "성장과 커리어 목표를 분명히 두는 편이라, 연애도 그 리듬을 존중해주는 사람이 잘 맞아."
+            : "일과 관계 둘 다 놓치지 않으려는 현실적인 균형 감각이 강한 편이야.",
+    },
+    children: {
+      score: childrenScore,
+      label: getChildrenLabel(childrenScore),
+      summary:
+        childrenScore >= 3.8
+          ? "관계가 안정되면 아이에 대한 가능성도 자연스럽게 열어두는 편이야."
+          : childrenScore <= 2.2
+            ? "삶의 형태를 유연하게 가져가고 싶어 해서 자녀 계획에는 비교적 신중한 태도를 보여."
+            : "지금 당장 결론 내리기보다 관계의 질과 상황을 보며 판단하려는 편이야.",
+    },
+    expression_style: {
+      score: toFivePointScore(
+        scoreSource.expression ?? scoreSource.emotional_expression,
+        3
+      ),
+      label: getLevelLabel(
+        toFivePointScore(scoreSource.expression ?? scoreSource.emotional_expression, 3),
+        "직접표현",
+        "신중표현"
+      ),
+      summary: "감정 표현에서는 상황과 상대 반응을 보며 톤을 조절하는 경향이 있어.",
+    },
+  };
 }
 
 function toClientReportShape(raw) {
@@ -311,9 +654,14 @@ function toClientReportShape(raw) {
   const adviceText =
     finalReport["너를 위한 연애 조언"] ||
     "너는 애매한 신호를 오래 붙잡고 있으면 마음이 빨리 지칠 수 있어. 관계 초반에 기준을 솔직하게 말하고, 맞지 않으면 빨리 선을 정해주는 게 너를 더 편하게 해줄 거야.";
+  const mergedValues = { ...base.values, ...(raw?.values || {}) };
+  const insightLabels = buildInsightLabels({
+    structured,
+    values: mergedValues,
+  });
 
   return {
-    values: { ...base.values, ...(raw?.values || {}) },
+    values: mergedValues,
     attachment: { ...base.attachment, ...(raw?.attachment || {}) },
     conflict_style: { ...base.conflict_style, ...(raw?.conflict_style || {}) },
     personality: { ...base.personality, ...(raw?.personality || {}) },
@@ -376,6 +724,7 @@ function toClientReportShape(raw) {
     },
     confidence: { ...base.confidence, ...(raw?.confidence || {}), overall: confidenceScore },
     tags,
+    insight_labels: insightLabels,
   };
 }
 
@@ -397,52 +746,92 @@ module.exports = async (req, res) => {
       res.status(400).json({ error: "messages is required" });
       return;
     }
-
-    const controller = new AbortController();
-    const timeoutMs = 22000;
-    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: ANALYZE_MODEL,
-        temperature: 0.2,
-        response_format: { type: "json_object" },
-        messages: [
-          { role: "system", content: ANALYZE_SYSTEM_PROMPT },
-          ...messages,
-        ],
-      }),
-      signal: controller.signal,
-    }).finally(() => {
-      clearTimeout(timeoutId);
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`OpenAI analyze error: ${errorText}`);
-    }
-
-    const data = await response.json();
-    const rawText = data?.choices?.[0]?.message?.content || "";
-    const parsed = extractJson(rawText);
-    if (!parsed || typeof parsed !== "object") {
-      logAnalyzeDebug("JSON parse failed, using fallbackAnalysis", {
-        raw_preview: String(rawText || "").slice(0, 320),
-      });
-      res.status(200).json(fallbackAnalysis());
-      return;
-    }
-    warnIfReportShapeIncomplete(parsed);
-
-    res.status(200).json(toClientReportShape(parsed));
+    const firstUserMessage =
+      messages.find((m) => m.role === "user")?.content || "";
+    const requestedLanguage =
+      body.language === "en" || body.language === "ko" ? body.language : null;
+    const responseLanguage = requestedLanguage || detectLanguage(firstUserMessage);
+    const analysis = await analyzeRelationshipProfile(messages, responseLanguage);
+    res.status(200).json(analysis);
   } catch (error) {
-    logAnalyzeDebug("Analyze request failed, using fallbackAnalysis", {
+    logAnalyzeDebug("Analyze request failed, using fallback structured result", {
       error: error?.message || String(error),
     });
-    res.status(200).json(fallbackAnalysis());
+    res.status(200).json({
+      core_values: {
+        relationship_goal: { type: "unsure", confidence: 0.2 },
+        money_values: {
+          present_enjoyment: 3.0,
+          future_stability: 3.0,
+          spending_tolerance: 3.0,
+          primary: "balanced",
+          confidence: 0.2,
+        },
+        family_values: {
+          family_centered: 3.0,
+          individual_centered: 3.0,
+          family_involvement_tolerance: 3.0,
+          primary: "balanced",
+          confidence: 0.2,
+        },
+        work_life_balance: {
+          career_priority: 3.0,
+          life_balance_priority: 3.0,
+          relationship_priority: 3.0,
+          primary: "balanced",
+          confidence: 0.2,
+        },
+        children_preference: { type: "unsure", confidence: 0.2 },
+      },
+      conflict_style: {
+        scores: { avoidant: 3.0, aggressive: 3.0, defensive: 3.0, resolution_oriented: 3.0 },
+        primary: "mixed",
+        mixed: true,
+        confidence: 0.2,
+      },
+      attachment_style: {
+        scores: { secure: 3.0, anxious: 3.0, avoidant: 3.0 },
+        primary: "mixed",
+        mixed: true,
+        confidence: 0.2,
+      },
+      lifestyle: {
+        activity_level: { active: 3.0, homebody: 3.0, primary: "balanced", confidence: 0.2 },
+        daily_rhythm: { morning_type: 3.0, night_type: 3.0, primary: "flexible", confidence: 0.2 },
+        organization: { clean_organized: 3.0, relaxed_flexible: 3.0, primary: "balanced", confidence: 0.2 },
+        sociability: { social: 3.0, quiet: 3.0, primary: "balanced", confidence: 0.2 },
+      },
+      communication: {
+        scores: { direct_open: 3.0, indirect: 3.0, emotion_suppressing: 3.0, reactive_explosive: 3.0 },
+        primary: "mixed",
+        mixed: true,
+        confidence: 0.2,
+      },
+      attraction_pattern: {
+        scores: { comfort_seeking: 3.0, intensity_seeking: 3.0, rescuer: 3.0, unavailable_attraction: 3.0 },
+        primary: "mixed",
+        mixed: true,
+        confidence: 0.2,
+      },
+      boundaries: {
+        alone_time_need: 3.0,
+        contact_expectation: 3.0,
+        opposite_sex_friend_boundary: 3.0,
+        privacy_boundary: 3.0,
+        primary: "moderate_boundary",
+        confidence: 0.2,
+      },
+      summary: {
+        relationship_style_title: "관계를 신중하게 맞춰가는 타입",
+        one_sentence_summary: "너는 진심과 균형을 함께 보면서 관계를 만들어가는 편이야.",
+        strengths: ["상대를 배려하려는 마음이 커."],
+        possible_challenges: ["애매한 신호가 반복되면 혼자 생각이 길어질 수 있어."],
+        best_match_traits: ["대화가 솔직하고 꾸준한 사람"],
+        risk_match_traits: ["태도가 자주 바뀌고 애매한 사람"],
+      },
+    });
   }
 };
+
+module.exports.analyzeRelationshipProfile = analyzeRelationshipProfile;
+module.exports.generateReport = generateReport;

@@ -2067,3 +2067,115 @@ body.has-modal-open {
     font-size: 0.9rem;
   }
 }
+
+/* Premium minimal report refresh */
+body[data-page="report"] .report {
+  background: #f1efed;
+}
+
+.report__hero,
+.report__insights,
+.report__article,
+.report__matching,
+.report__share {
+  animation: reportSectionFade 520ms ease both;
+}
+
+.report__insights {
+  width: min(820px, 100%);
+  margin: 0 auto 28px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.report__insight-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 10px 28px rgba(15, 15, 15, 0.05);
+  padding: 18px 18px 16px;
+  min-height: 104px;
+}
+
+.report__insight-label {
+  margin: 0;
+  color: rgba(30, 30, 30, 0.5);
+  font-size: 0.79rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.report__insight-value {
+  margin: 10px 0 0;
+  color: #1d1d1f;
+  font-size: 1rem;
+  line-height: 1.6;
+  font-weight: 600;
+}
+
+.report__article {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 14px 32px rgba(16, 16, 16, 0.06);
+  padding: clamp(18px, 3vw, 28px);
+}
+
+.report__section {
+  padding: 0 2px 26px;
+}
+
+.report__section-title {
+  font-size: clamp(1.1rem, 3vw, 1.28rem);
+  letter-spacing: -0.01em;
+}
+
+.report__matching {
+  width: min(820px, 100%);
+  margin: 20px auto 0;
+}
+
+.report__matching-btn,
+.report__share-btn--primary {
+  width: 100%;
+  min-height: 52px;
+  border: none;
+  border-radius: 999px;
+  background: #545454;
+  color: #fff;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(34, 34, 34, 0.22);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.report__matching-btn:hover,
+.report__share-btn--primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(34, 34, 34, 0.26);
+}
+
+.report__matching-btn:active,
+.report__share-btn--primary:active {
+  transform: scale(0.99);
+}
+
+.report__share {
+  margin-top: 26px;
+}
+
+@keyframes reportSectionFade {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 760px) {
+  .report__insights {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .report__article {
+    padding: 18px 16px;
+  }
+}

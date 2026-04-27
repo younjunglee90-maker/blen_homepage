@@ -15,6 +15,7 @@
     "navAria": "주요 메뉴",
     "navHome": "홈",
     "navAbout": "소개",
+    "navService": "서비스",
     "navSupport": "고객센터",
     "menuToggle": "메뉴 열기",
     "langEng": "English",
@@ -343,6 +344,7 @@
     "shareFailed": "공유 링크를 만드는 중 문제가 생겼어요. 다시 시도해 주세요.",
     "shareComingSoon": "이 공유 옵션은 곧 지원될 예정이에요.",
     "sharedNote": "지금 보고 있는 건 공유된 Blen AI 연애 성향 레포트야.",
-    "sharedStartCta": "나도 Blen AI 분석 시작하기"
+    "sharedStartCta": "나도 Blen AI 분석 시작하기",
+    "matchingCta": "매칭 시작하기"
   }
 }

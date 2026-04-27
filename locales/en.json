@@ -15,6 +15,7 @@
     "navAria": "Primary navigation",
     "navHome": "Home",
     "navAbout": "About",
+    "navService": "Service",
     "navSupport": "Support",
     "menuToggle": "Open navigation menu",
     "langEng": "English",
@@ -350,6 +351,7 @@
     "shareFailed": "There was a problem creating the share link. Please try again.",
     "shareComingSoon": "This share option is coming soon.",
     "sharedNote": "You are viewing a Blen AI report shared with you.",
-    "sharedStartCta": "Start My Blen AI Analysis"
+    "sharedStartCta": "Start My Blen AI Analysis",
+    "matchingCta": "Start Matching"
   }
 }
