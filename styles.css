@@ -3187,3 +3187,79 @@ body[data-page="about"] .content-page__email:hover {
     border-radius: 18px;
   }
 }
+
+/* About polish v2 */
+body[data-page="about"] .content-page {
+  max-width: 1040px;
+}
+
+body[data-page="about"] .content-card {
+  position: relative;
+  overflow: hidden;
+}
+
+body[data-page="about"] .content-card::before {
+  content: "";
+  position: absolute;
+  right: -80px;
+  top: -100px;
+  width: 220px;
+  height: 220px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 70%);
+  pointer-events: none;
+}
+
+body[data-page="about"] .content-page__title {
+  max-width: 820px;
+  margin-bottom: 26px;
+}
+
+body[data-page="about"] .content-page__text + .content-page__text {
+  margin-top: 14px;
+}
+
+body[data-page="about"] .content-page__section:first-of-type {
+  margin-top: clamp(36px, 5vw, 58px);
+}
+
+body[data-page="about"] .content-list {
+  gap: 14px;
+}
+
+body[data-page="about"] .content-list li {
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+body[data-page="about"] .content-list li:hover {
+  transform: translateY(-1px);
+  border-color: rgba(84, 84, 84, 0.14);
+  box-shadow: 0 14px 32px rgba(20, 20, 20, 0.06);
+}
+
+body[data-page="about"] .content-page__email {
+  margin-top: 4px;
+  letter-spacing: -0.01em;
+}
+
+body[data-page="about"] .content-card::after {
+  content: "AI Match  •  Value-based  •  Deep Fit";
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 12px;
+  margin-bottom: 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(84, 84, 84, 0.14);
+  background: rgba(255, 255, 255, 0.7);
+  color: rgba(38, 40, 46, 0.72);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+@media (max-width: 720px) {
+  body[data-page="about"] .content-card::after {
+    font-size: 0.68rem;
+    margin-bottom: 14px;
+  }
+}
