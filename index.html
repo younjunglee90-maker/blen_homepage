@@ -1,23 +1,20 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
   <head>
-    <!-- Meta -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Title -->
     <title>Blen</title>
 
-    <!-- Styles -->
     <link rel="stylesheet" href="../../../styles.css" />
   </head>
 
-  <body data-page="about" data-locale="en">
+  <body data-page="about" data-locale="ko">
     <!-- ================= HEADER ================= -->
     <header class="site-header">
       <div class="site-header__inner">
         <!-- Logo -->
-        <a class="site-brand" href="/en" aria-label="Blen Home">Blen</a>
+        <a class="site-brand" href="/ko" aria-label="Blen 홈">Blen</a>
 
         <!-- Mobile Menu Toggle -->
         <button
@@ -25,8 +22,7 @@
           class="site-nav-toggle"
           aria-expanded="false"
           aria-controls="primary-nav"
-          data-i18n-attr="aria-label"
-          data-i18n-key="common.menuToggle"
+          aria-label="메뉴 열기"
         >
           <span></span>
           <span></span>
@@ -34,18 +30,12 @@
         </button>
 
         <!-- Navigation -->
-        <nav
-          id="primary-nav"
-          class="site-nav"
-          aria-label="Primary navigation"
-          data-i18n-attr="aria-label"
-          data-i18n-key="common.navAria"
-        >
+        <nav id="primary-nav" class="site-nav" aria-label="주요 메뉴">
           <ul class="site-nav__list">
             <li>
               <a
                 class="site-nav__link"
-                href="/en"
+                href="/ko"
                 data-nav="home"
                 data-i18n="common.navHome"
               ></a>
@@ -53,7 +43,7 @@
             <li>
               <a
                 class="site-nav__link"
-                href="/en/about"
+                href="/ko/about"
                 data-nav="about"
                 data-i18n="common.navAbout"
               ></a>
@@ -61,7 +51,7 @@
             <li>
               <a
                 class="site-nav__link"
-                href="https://www.blenmatch.com/en/relationship-test/"
+                href="https://www.blenmatch.com/ko/relationship-test/"
                 data-nav="service"
                 data-i18n="common.navService"
               ></a>
@@ -69,7 +59,7 @@
             <li>
               <a
                 class="site-nav__link"
-                href="/en/support"
+                href="/ko/support"
                 data-nav="support"
                 data-i18n="common.navSupport"
               ></a>
@@ -78,21 +68,16 @@
         </nav>
 
         <!-- Language Selector -->
-        <div
-          class="site-lang"
-          role="group"
-          aria-label="Language selector"
-          data-i18n-attr="aria-label"
-          data-i18n-key="common.languageAria"
-        >
+        <div class="site-lang" role="group" aria-label="언어 선택">
           <button
             type="button"
             class="site-lang__trigger"
             aria-expanded="false"
             aria-controls="language-menu"
+            aria-label="언어 선택"
           >
             <span class="site-lang__icon">🌐</span>
-            <span class="site-lang__current" data-lang-current>English</span>
+            <span class="site-lang__current" data-lang-current>한국어</span>
             <span class="site-lang__chevron">▾</span>
           </button>
 
@@ -117,20 +102,16 @@
     <!-- ================= MAIN ================= -->
     <main class="content-page">
       <article class="content-card">
-        <!-- Title -->
         <h1 class="content-page__title" data-i18n="about.title"></h1>
 
-        <!-- Description -->
         <p class="content-page__text" data-i18n="about.description"></p>
 
-        <!-- Mission -->
         <section class="content-page__section">
           <h2 class="content-page__heading" data-i18n="about.missionTitle"></h2>
           <p class="content-page__text" data-i18n="about.missionIntro"></p>
           <p class="content-page__text" data-i18n="about.missionBody"></p>
         </section>
 
-        <!-- What We Do -->
         <section class="content-page__section">
           <h2
             class="content-page__heading"
@@ -146,7 +127,6 @@
           </ul>
         </section>
 
-        <!-- Approach -->
         <section class="content-page__section">
           <h2
             class="content-page__heading"
@@ -163,7 +143,6 @@
           <p class="content-page__text" data-i18n="about.approachGoal"></p>
         </section>
 
-        <!-- Important Note -->
         <section class="content-page__section">
           <h2
             class="content-page__heading"
@@ -172,7 +151,6 @@
           <p class="content-note" data-i18n="about.importantNoteBody"></p>
         </section>
 
-        <!-- Contact -->
         <section class="content-page__section">
           <h2 class="content-page__heading" data-i18n="about.contactTitle"></h2>
           <p>
@@ -189,7 +167,7 @@
     <!-- ================= FOOTER ================= -->
     <footer class="site-footer">
       <div class="site-footer__inner">
-        <ul class="footer-nav">
+        <ul class="footer-nav" aria-label="하단 메뉴">
           <li><a href="../about/" data-i18n="common.footerAbout"></a></li>
           <li><a href="../terms/" data-i18n="common.footerTerms"></a></li>
           <li><a href="../privacy/" data-i18n="common.footerPrivacy"></a></li>
@@ -200,7 +178,6 @@
       </div>
     </footer>
 
-    <!-- Scripts -->
     <script src="../../../script.js"></script>
   </body>
 </html>
