@@ -1,0 +1,122 @@
+{
+  "menu": {
+    "about": "소개",
+    "features": "기능",
+    "download": "다운로드",
+    "privacy": "개인정보 처리방침",
+    "terms": "이용약관",
+    "contact": "문의하기"
+  },
+  "common": {
+    "appName": "Blen",
+    "appleStore": "앱 스토어",
+    "googlePlay": "구글 플레이",
+    "language": "언어",
+    "loading": "로딩 중..."
+  },
+
+  "meta": {
+    "homeTitle": "Blen - 당신에게 꼭 맞는 인연을 발견하세요",
+    "homeDescription": "Blen은 성격과 관심사를 기반으로 당신에게 가장 잘 맞는 인연을 찾아주는 데이팅 앱입니다.",
+    "homeKeywords": "데이트, 매칭, 성격, 관심사, 데이팅 앱",
+    "notFoundTitle": "페이지를 찾을 수 없습니다",
+    "notFoundDescription": "요청하신 페이지가 존재하지 않습니다.",
+    "notFoundKeywords": "404, 페이지 없음"
+  },
+
+  "errors": {
+    "somethingWentWrong": "문제가 발생했습니다",
+    "unexpectedError": "예기치 않은 오류가 발생했습니다. 다시 시도해 주세요.",
+    "reloadPage": "페이지 새로고침",
+    "goHome": "홈으로",
+    "lostInSpace": "길을 잃으셨나요?",
+    "notFoundBody": "요청하신 페이지를 찾을 수 없습니다.",
+    "goBack": "뒤로 가기",
+    "returnHome": "홈으로 돌아가기"
+  },
+
+  "heroContent": {
+    "title1": "사랑하기 전에, ",
+    "title2": "먼저 자신을 이해하세요.",
+    "description": "AI가 당신의 감정 패턴과 관계 궁합을 분석합니다.",
+    "text1": "지금 다운로드",
+    "socialProof": "이미 200만 명 이상이 Blen을 사용 중입니다"
+  },
+
+  "aboutContent": {
+    "topTitle": "Blen소개",
+    "title": "AI가 당신의 연애 성향을 깊이 분석합니다.",
+    "description": "Blen은 실제 연애 심리학과 행동 연구를 기반으로 설계된 AI 기반 관계 분석 플랫폼입니다. 우리의 목표는 사람들이 더 건강하고, 의미 있으며, 감정적으로 잘 맞는 관계를 형성할 수 있도록 돕는 것입니다.",
+    "button": "자세히 보기",
+
+    "ourMission": {
+      "title": "우리의 미션",
+      "text1": "의미 있는 관계는 자기 이해에서 시작된다고 믿습니다.",
+      "text2": "Blen은 AI 기반 인사이트를 통해 사람들의 감정 패턴, 소통 방식, 연애 성향을 깊이 이해할 수 있도록 만들어졌습니다.",
+      "text3": "우리의 미션은 연애 심리학을 더욱 개인적이고, 성찰적이며, 의미 있는 경험으로 바꾸는 것입니다."
+    },
+
+    "whatWeDo": {
+      "title": "우리는 무엇을 하나요?",
+      "subTitle": "플랫폼 기능:",
+      "list1": "AI 기반 연애 성향 분석",
+      "list2": "감정 및 소통 스타일 인사이트",
+      "list3": "궁합 및 상호보완 관계 리포트",
+      "list4": "개인 맞춤형 연애 성향 리포트",
+      "list5": "QR 기반 궁합 비교 시스템"
+    },
+
+    "approach": {
+      "title": "우리의 접근 방식",
+      "subTitle": "우리가 중요하게 생각하는 것:",
+      "list1": "매칭 이전의 자기 발견",
+      "list2": "연애 심리학과 행동 패턴",
+      "list3": "감정적 궁합과 소통 스타일",
+      "list4": "라이프스타일과 가치관의 조화",
+      "text2": "우리는 단순한 외적 매칭을 넘어 진정성 있고 의미 있는 연결을 만드는 것을 목표로 합니다."
+    },
+
+    "contact": {
+      "title": "문의하기",
+      "email": "hello@blenmatch.com",
+      "text1": "고객 지원 시간",
+      "text2": "월-금",
+      "text3": "오전 10시 - 오후 4시 (PT)",
+
+      "stats": {
+        "users": "200만+",
+        "usersLabel": "활성 사용자",
+        "matches": "94%",
+        "matchesLabel": "매칭 만족도",
+        "country": "150+",
+        "countryLabel": "국가"
+      }
+    }
+  },
+
+  "feature": {
+    "topTitle": "기능",
+    "title": "당신의 인연을 찾기 위해 필요한 모든 것",
+
+    "box1": {
+      "title": "AI 성격 분석",
+      "description": "AI 기반 분석을 통해 당신의 감정 패턴, 소통 스타일, 연애 성향을 이해하세요."
+    },
+
+    "box2": {
+      "title": "궁합 리포트",
+      "description": "상세한 AI 기반 궁합 리포트를 통해 서로의 연애 성향이 얼마나 비슷하거나 다른지 확인해보세요."
+    },
+
+    "box3": {
+      "title": "의미 있는 연결",
+      "description": "외적인 요소를 넘어 더 깊고 진정성 있는 관계를 만들 수 있도록 설계되었습니다."
+    }
+  },
+
+  "download": {
+    "topTitle": "앱 다운로드",
+    "title": "더 깊은 궁합은 여기서 시작됩니다.",
+    "description": "AI를 통해 당신의 감정 패턴과 연애 성향을 이해해보세요."
+  }
+}

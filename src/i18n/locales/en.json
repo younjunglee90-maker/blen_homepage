@@ -1,0 +1,118 @@
+{
+ "menu": {
+  "about": "About",
+  "features": "Features",
+  "download": "Download",
+  "privacy": "Privacy Policy",
+  "terms": "Terms of Service",
+  "contact": "Contact us"
+ },
+ "common": {
+  "appName": "Blen",
+  "appleStore": "App Store",
+  "googlePlay": "Google Play",
+  "language": "Language",
+  "loading": "Loading..."
+ },
+
+ "meta": {
+  "homeTitle": "Blen - Discover Your Perfect Match",
+  "homeDescription": "Blen is a dating app that helps you find your perfect match based on your personality and interests.",
+  "homeKeywords": "dating, match, personality, interests, dating app",
+  "notFoundTitle": "Page not found",
+  "notFoundDescription": "The page you are looking for does not exist.",
+  "notFoundKeywords": "404, not found"
+ },
+
+ "errors": {
+  "somethingWentWrong": "Something went wrong",
+  "unexpectedError": "An unexpected error occurred. Please try again.",
+  "reloadPage": "Reload page",
+  "goHome": "Go home",
+  "lostInSpace": "Lost in space",
+  "notFoundBody": "The page you requested could not be found.",
+  "goBack": "Go back",
+  "returnHome": "Return home"
+ },
+ "heroContent": {
+  "title1": "Before love, ",
+  "title2": "understand yourself.",
+  "description": "AI analyzes your emotional patterns and relationship compatibility.",
+  "text1": "Download Now",
+  "socialProof": "2M+ people already blending"
+ },
+
+ "aboutContent": {
+  "topTitle": "About Blen",
+  "title": "AI deeply analyzes your relationship personality.",
+  "description": "Blen is an AI-powered relationship insight platform designed based on real relationship psychology and behavioral research. Our goal is to help people build healthier, more intentional, and emotionally compatible relationships.",
+  "button": "Learn more",
+  "ourMission": {
+    "title": "Our Mission",
+    "text1": "We believe meaningful relationships begin with self-understanding.  ",
+    "text2": "Blen was created to help people deeply understand their emotional patterns, communication styles, and relationship tendencies through AI-powered insights.",
+    "text3": "Our mission is to transform relationship psychology into a more personal, reflective, and meaningful experience."
+  },
+  "whatWeDo": {
+    "title": "What Do We Do?",
+    "subTitle": "Our platform includes:",
+    "list1": "AI-powered relationship personality analysis",
+    "list2": "Emotional and communication style insights",
+    "list3": "Compatibility and complementary relationship reports",
+    "list4": "Personalized relationship tendency reports",
+    "list5": "QR-based compatibility comparison system "
+  },
+  "approach": {
+    "title": "Our Approach",
+    "subTitle": "We prioritize:",
+    "list1": "Self-discovery before matching ",
+    "list2": "Relationship psychology and behavioral patterns",
+    "list3": " Emotional compatibility and communication styles",
+    "list4": " Lifestyle and value alignment",
+    "text2": "Our goal is to move beyond superficial matching and create real, meaningful connections."
+  },
+
+  "contact": {
+     "title": "Contact",
+     "email": "hello@blenmatch.com",
+     "text1": "Support Hours",
+     "text2": "Mon-Fri",
+     "text3": "10 AM -4 PM PT",
+    "stats": {
+        "users": "2M+",
+        "usersLabel": "Active users",
+        "matches": "94%",
+        "matchesLabel": "Match satisfaction",
+        "country": "150+",
+        "countryLabel": "Countries"
+    }
+  }
+},
+
+"feature":{
+  "topTitle": "Features",
+  "title": "Everything you need To find your person ", 
+  "box1" : {
+    "title": "AI Personality Insights ",
+    "description": "Understand your emotional patterns, communication style, and relationship tendencies through AI-powered analysis."
+  } ,
+  
+  "box2" : {
+    "title": "Compatibility Reports",
+    "description": "Discover how similar — or different — your relationship personalities are through detailed AI-powered compatibility reports. "
+  } ,
+  
+  "box3" : {
+    "title": "Meaningful Connection ",
+    "description": "Designed to go beyond appearances and help people build deeper, more intentional relationships."
+  } 
+},
+
+"download" : {
+  "topTitle": "Get the app",
+  "title": "Deeper compatibility starts here.",
+  "description": "Understand your emotional patterns and relationship tendencies through AI. "
+}
+
+
+}
