@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { buildSupportMailto } from '@/lib/buildSupportMailto';
 import { cn } from '@/lib/utils';
+import { Link } from 'react-router-dom';
 
 const CATEGORY_ICONS = [Heart, Lightbulb, CreditCard, Shield] as const;
 
@@ -315,13 +316,14 @@ export default function SupportPage() {
             <p className="mx-auto mt-3 max-w-xl text-base text-[#717182]">
               {t('supportPage.community.description')}
             </p>
-            <button
-              type="button"
+            <Link
+              to="https://www.instagram.com/blen.ai_matching"
+              target="_blank"
               className="mt-6 inline-flex items-center gap-2 rounded-[14px] bg-[#030213] px-6 py-3 text-base font-medium text-white"
             >
               <Globe className="size-5" />
               {t('supportPage.community.cta')}
-            </button>
+            </Link>
           </section>
         </main>
       </div>
