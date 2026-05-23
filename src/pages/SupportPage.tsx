@@ -71,6 +71,10 @@ export default function SupportPage() {
   const faqItems = t('supportPage.faq.items', { returnObjects: true }) as FaqItem[];
   const helpTopics = t('supportPage.helpTopics', { returnObjects: true }) as HelpTopic[];
 
+  function scrollToStillNeedHelp() {
+    document.getElementById('contact-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
@@ -223,6 +227,7 @@ export default function SupportPage() {
                 <p className="mt-2 text-sm leading-5 text-[#717182]">{topic.description}</p>
                 <button
                   type="button"
+                  onClick={scrollToStillNeedHelp}
                   className={cn(
                     'mt-4 text-sm font-medium',
                     index === 2 ? 'text-[#d4183d]' : 'text-[#030213]',
