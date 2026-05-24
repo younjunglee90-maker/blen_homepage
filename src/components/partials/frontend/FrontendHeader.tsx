@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Menu, X } from 'lucide-react';
 
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
@@ -18,19 +18,52 @@ const PAGE_LINKS = [
 
 export function FrontendHeader() {
   const { t } = useTranslation();
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
   const navigate = useNavigate();
   const isHome = pathname === '/';
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<HomeScrollSection | ''>('');
+  const scrollTargetRef = useRef<HomeScrollSection | null>(null);
+  const scrollEndTimerRef = useRef<number | undefined>(undefined);
+
+  function clearScrollTarget() {
+    scrollTargetRef.current = null;
+    window.clearTimeout(scrollEndTimerRef.current);
+  }
+
+  function beginScrollToSection(id: HomeScrollSection) {
+    scrollTargetRef.current = id;
+    setActiveSection(id);
+    window.clearTimeout(scrollEndTimerRef.current);
+    scrollEndTimerRef.current = window.setTimeout(clearScrollTarget, 1200);
+  }
+
+  useEffect(() => {
+    if (!isHome || !hash) return;
+
+    const id = hash.replace('#', '') as HomeScrollSection;
+    if (!HOME_SCROLL_SECTIONS.includes(id)) return;
+
+    beginScrollToSection(id);
+  }, [isHome, hash]);
 
   useEffect(() => {
     if (!isHome) {
+      clearScrollTarget();
       setActiveSection('');
       return;
     }
 
     const observers: IntersectionObserver[] = [];
+
+    const onScrollEnd = () => {
+      if (scrollTargetRef.current) {
+        setActiveSection(scrollTargetRef.current);
+      }
+      clearScrollTarget();
+    };
+
+    window.addEventListener('scrollend', onScrollEnd);
 
     HOME_SCROLL_SECTIONS.forEach((id) => {
       const el = document.getElementById(id);
@@ -38,7 +71,18 @@ export function FrontendHeader() {
 
       const observer = new IntersectionObserver(
         ([entry]) => {
-          if (entry.isIntersecting) setActiveSection(id);
+          if (!entry.isIntersecting) return;
+
+          const scrollTarget = scrollTargetRef.current;
+          if (scrollTarget) {
+            if (id === scrollTarget) {
+              setActiveSection(id);
+              clearScrollTarget();
+            }
+            return;
+          }
+
+          setActiveSection(id);
         },
         { rootMargin: '-30% 0px -60% 0px', threshold: 0 },
       );
@@ -47,11 +91,15 @@ export function FrontendHeader() {
       observers.push(observer);
     });
 
-    return () => observers.forEach((o) => o.disconnect());
+    return () => {
+      window.removeEventListener('scrollend', onScrollEnd);
+      clearScrollTarget();
+      observers.forEach((o) => o.disconnect());
+    };
   }, [isHome]);
 
   function scrollToSection(id: HomeScrollSection) {
-    setActiveSection(id);
+    beginScrollToSection(id);
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
     setIsMobileMenuOpen(false);
   }
@@ -67,10 +115,10 @@ export function FrontendHeader() {
 
   function navItemClass(isActive: boolean) {
     return cn(
-      'rounded-full px-3 py-1.5 text-base font-medium transition-colors duration-200',
+      'rounded-full px-3 py-1.5 text-base font-medium',
       isActive
         ? 'bg-black text-white'
-        : 'text-[#364153] hover:bg-black hover:text-white',
+        : 'text-[#364153] transition-colors duration-200 hover:bg-black hover:text-white',
     );
   }
 
