@@ -107,12 +107,7 @@ export function FrontendHeader() {
           <button
             type="button"
             onClick={() => goToHomeSection('download')}
-            className={cn(
-              'rounded-full px-4 py-1.5 text-base transition-colors duration-200',
-              isHome && activeSection === 'download'
-                ? 'bg-black text-white'
-                : 'bg-black text-white hover:bg-neutral-800',
-            )}
+            className={navScrollClass('download')}
           >
             {t('menu.download')}
           </button>
@@ -180,7 +175,7 @@ export function FrontendHeader() {
               <button
                 type="button"
                 onClick={() => goToHomeSection('download')}
-                className="rounded-full bg-black px-3 py-2 text-left text-base font-medium text-white"
+                className={navScrollClass('download') + ' text-left'}
               >
                 {t('menu.download')}
               </button>
